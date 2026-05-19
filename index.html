@@ -12,15 +12,16 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f4f7f6;
+            background-color: #f0f4f8; /* Дуже світлий блакитний фон */
         }
         header {
             text-align: center;
             padding: 40px 0;
-            background: #007C58;
-            color: white;
+            background: #0057B8; /* Український синій */
+            color: #FFD700; /* Український жовтий */
             border-radius: 10px;
             margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .container {
             background: white;
@@ -28,36 +29,48 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        h1 { margin: 0; font-size: 24px; }
-        h2 { color: #007C58; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h1 { margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { 
+            color: #0057B8; 
+            border-bottom: 3px solid #FFD700; /* Жовта лінія під заголовком */
+            padding-bottom: 10px; 
+            margin-top: 30px;
+        }
         .app-card {
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
+            transition: transform 0.2s;
         }
-        .app-card img {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            margin-right: 15px;
+        .app-card:hover {
+            transform: scale(1.01);
+            border-color: #0057B8;
+        }
+        .app-card strong {
+            color: #0057B8;
+            font-size: 18px;
         }
         .contact-info {
-            background: #e9f5f0;
-            padding: 15px;
+            background: #FFF9E6; /* Світло-жовтий фон для контактів */
+            padding: 20px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
+            border-left: 5px solid #FFD700;
         }
         footer {
             text-align: center;
             margin-top: 40px;
-            font-size: 12px;
-            color: #777;
+            font-size: 13px;
+            color: #555;
         }
-        a { color: #007C58; text-decoration: none; font-weight: bold; }
-        a:hover { text-decoration: underline; }
+        a { color: #0057B8; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; color: #004494; }
+        
+        /* Стиль для виділення важливих слів */
+        .highlight { color: #0057B8; font-weight: bold; }
     </style>
     <meta name="google-site-verification" content="80sclJzF61wxv2i7qvVTCgbNp-Wo2VkNF8mLqwkILxw" />
 </head>
@@ -65,15 +78,22 @@
 
 <header>
     <h1>FOP Nikulov Leonid Anatoliiovych</h1>
-    <p>Official Android App Developer</p>
+    <p style="font-weight: bold;">Official Android App Developer from Ukraine 🇺🇦</p>
 </header>
 
 <div class="container">
     <h2>About Us</h2>
-    <p>We specialize in creating high-quality educational and trivia applications for Android devices. Our mission is to make learning fun and accessible for everyone through interactive mobile experiences.</p>
+    <p>We specialize in creating high-quality <span class="highlight">educational and trivia applications</span> for Android devices. Our mission is to make learning fun and accessible for everyone through interactive mobile experiences.</p>
 
     <h2>Our Applications</h2>
     
+    <div class="app-card">
+        <div>
+            <strong>UK Quiz</strong>
+            <p>A comprehensive trivia game exploring the rich history, geography, culture, and iconic music of the United Kingdom.</p>
+        </div>
+    </div>
+
     <div class="app-card">
         <div>
             <strong>Capital Guess Quiz</strong>
@@ -98,7 +118,7 @@
 
 <footer>
     &copy; 2026 FOP Nikulov Leonid Anatoliiovych. All rights reserved. <br>
-    Registered in Ukraine.
+    Developed with ❤️ in Ukraine.
 </footer>
 
 </body>
