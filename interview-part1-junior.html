@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 1 (Junior)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+            --accent-badge: #dbeafe;
+            --accent-badge-text: #1e40af;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Навігаційний блок */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картки питань */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Рівень: Junior • Порція 1 з 4</span>
+        <h1 style="margin-top: 0.5rem;">Базовий C# та Типи Даних</h1>
+        <p style="color: var(--text-muted);">Об'єднані питання з DOU («Співбесіда з .NET» + «Співбесіда з C# розробником») без дублікатів із готовими відповідями</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 1</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. Принципи ООП у C# та множинне успадкування</a></li>
+            <li><a href="#q2">2. Інкапсуляція та властивості (Properties)</a></li>
+            <li><a href="#q3">3. Поліморфізм: статичний vs динамічний</a></li>
+            <li><a href="#q4">4. `virtual`, `override` та приховування через `new`</a></li>
+            <li><a href="#q5">5. Абстрактні класи vs Інтерфейси</a></li>
+            <li><a href="#q6">6. Модифікатори `sealed` та `static`</a></li>
+            <li><a href="#q7">7. Модифікатори доступу в C#</a></li>
+            <li><a href="#q8">8. Value types vs Reference types (Stack vs Heap)</a></li>
+            <li><a href="#q9">9. Чому `string` незмінний і де зберігається</a></li>
+            <li><a href="#q10">10. Boxing та Unboxing (оверхед)</a></li>
+            <li><a href="#q11">11. Різниця між `const` та `readonly`</a></li>
+            <li><a href="#q12">12. Параметри `ref`, `out` та `in`</a></li>
+            <li><a href="#q13">13. Records та Record Structs (C# 9+)</a></li>
+            <li><a href="#q14">14. Nullable типи (`Nullable<T>` та `T?`)</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. Основні принципи ООП. Як вони реалізовані в C#? Від якого класу неявно успадковуються всі типи? Чи дозволено множинне успадкування?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> 4 принципи (Інкапсуляція, Успадкування, Поліморфізм, Абстракція). Усі типи походять від <code>System.Object</code>. Множинне успадкування класів заборонено, але дозволено множинну реалізацію інтерфейсів.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Інкапсуляція:</b> Приховування внутрішнього стану об'єкта та надання контрольованого доступу через публічний інтерфейс (модифікатори <code>private</code>, <code>public</code>, властивості <code>{ get; set; }</code>).</li>
+            <li><b>Успадкування:</b> Механізм створення нового класу на основі існуючого з повторним використанням коду (<code>class Dog : Animal</code>).</li>
+            <li><b>Поліморфізм:</b> Здатність одного інтерфейсу представляти різні форми поведінки (перевантаження методів або перевизначення через <code>virtual</code>/<code>override</code>).</li>
+            <li><b>Абстракція:</b> Відокремлення концептуального контракту («що об'єкт робить») від його конкретної реалізації («як саме») за допомогою <code>interface</code> та <code>abstract class</code>.</li>
+        </ul>
+        <p><b>Базовий тип:</b> Абсолютно всі типи в .NET (як класи, так і структури через ланцюжок <code>ValueType</code>) прямо або неявно успадковуються від класу <code>System.Object</code> (аліас у C# — <code>object</code>).</p>
+        <p><b>Множинне успадкування:</b> C# <b>не підтримує</b> множинне успадкування класів (щоб уникнути «проблеми ромба» — Diamond Problem). Але клас може реалізовувати <b>будь-яку кількість інтерфейсів</b>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. Що таке інкапсуляція та як її реалізувати в C#? Навіщо потрібні властивості (Properties)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Захист інваріанту даних об'єкта від некоректних змін ззовні. Властивості — це «синтаксичний цукор» над парою методів <code>get_X()</code> та <code>set_X()</code>.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Замість відкриття приватних полів назовні (що ламає контроль), поле роблять <code>private</code>, а доступ надають через публічні методи або властивості, де можна додати валідацію:</p>
+        <pre><code>public class BankAccount
+{
+    private decimal _balance; // Приватне поле
+
+    public decimal Balance   // Властивість з інкапсульованою логікою
+    {
+        get =&gt; _balance;
+        private set
+        {
+            if (value &lt; 0) throw new ArgumentException("Баланс не може бути від'ємним!");
+            _balance = value;
+        }
+    }
+}</code></pre>
+        <p><b>Автоматичні властивості:</b> <code>public string Name { get; set; }</code> автоматично генерують приховане анонімне поле компілятора (Backing Field).</p>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. Що таке поліморфізм? У чому різниця між статичним та динамічним поліморфізмом?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Статичний (compile-time) — це перевантаження методів (Overloading). Динамічний (run-time) — перевизначення методів через віртуальні таблиці (Overriding).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Статичний поліморфізм (Compile-time):</b> Компілятор визначає потрібний метод ще на етапі збірки за сигнатурою (назвою та типами аргументів). Приклад: перевантаження методів:
+                <pre><code>public int Add(int a, int b) =&gt; a + b;
+public double Add(double a, double b) =&gt; a + b;</code></pre>
+            </li>
+            <li><b>Динамічний поліморфізм (Run-time):</b> Який саме метод викликати, вирішується в момент виконання програми на основі реального типу об'єкта в пам'яті (через механізм vtable — таблиці віртуальних методів). Реалізується через ключові слова <code>virtual</code>, <code>override</code> або інтерфейси.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. Що дає ключове слово `virtual`? Різниця між `override` та приховуванням через `new`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `override` змінює поведінку у віртуальній таблиці об'єкта (поліморфізм). `new` розриває зв'язок і приховує метод базового класу, виклик залежить від типу посилання.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>public class BaseClass
+{
+    public virtual void MethodA() =&gt; Console.WriteLine("Base A");
+    public void MethodB() =&gt; Console.WriteLine("Base B");
+}
+
+public class DerivedClass : BaseClass
+{
+    public override void MethodA() =&gt; Console.WriteLine("Derived A");
+    public new void MethodB() =&gt; Console.WriteLine("Derived B"); // Приховування
+}
+
+// Перевірка поведінки:
+BaseClass obj = new DerivedClass();
+obj.MethodA(); // Виведе: "Derived A" (поліморфізм відпрацював)
+obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseClass, new розірвав віртуальність!)</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. Що таке абстрактний клас і чим він відрізняється від інтерфейсу?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Клас може успадкувати лише один абстрактний клас (визначає сутність IS-A), але реалізувати багато інтерфейсів (визначає контракт/здатність CAN-DO).
+        </div>
+        <h4>Порівняльна таблиця:</h4>
+        <ul>
+            <li><b>Успадкування:</b> Абстрактний клас — одиничне успадкування; Інтерфейси — множинна реалізація.</li>
+            <li><b>Стан (Fields):</b> Абстрактний клас може містити власні нестатичні поля стану (<code>private int _id;</code>). Інтерфейс <b>не може</b> містити стан екземпляра (поля).</li>
+            <li><b>Конструктори:</b> Абстрактний клас має конструктор (викликається нащадками через <code>base()</code>). Інтерфейс конструкторів мати не може.</li>
+            <li><i>(Починаючи з C# 8):</i> В інтерфейсах з'явилися Default Interface Methods (дефолтні реалізації), проте вони призначені для еволюції API без ламання клієнтів і не роблять інтерфейс повноцінним класом.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. Що дають модифікатори `sealed` та `static`? Особливості статичних класів.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `sealed` забороняє успадкування класу або перевизначення методу. `static` клас не може мати екземплярів, містить лише статичні члени та не успадковується.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b><code>sealed</code> (запечатаний):</b>
+                <ul>
+                    <li>Для класу: забороняє будь-яке успадкування від нього (наприклад, <code>public sealed class String</code>). Це оптимізує виклики методів (JIT-девіртуалізація).</li>
+                    <li>Для методу: забороняє подальше перевизначення у нащадках (<code>public sealed override void DoWork()</code>).</li>
+                </ul>
+            </li>
+            <li><b><code>static</code> клас:</b>
+                <ul>
+                    <li>Не можна створити через <code>new</code>.</li>
+                    <li>Не може містити нестатичних конструкторів, полів або методів.</li>
+                    <li>Завжди неявно є <code>sealed</code> і успадковується напряму від <code>System.Object</code>.</li>
+                    <li>Має статичний конструктор, який викликається автоматично CLR рівно один раз перед першим зверненням до класу.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. Які модифікатори доступу є в C#?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> 6 основних рівнів видимості: <code>public</code>, <code>private</code>, <code>protected</code>, <code>internal</code>, <code>protected internal</code>, <code>private protected</code>.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><code>private</code>: Доступний лише всередині того ж класу/структури (за замовчуванням для членів класу).</li>
+            <li><code>protected</code>: Доступний у поточному класі та у всіх його нащадках.</li>
+            <li><code>internal</code>: Доступний усім класам <b>у межах тієї ж збірки (Assembly / .dll)</b>.</li>
+            <li><code>public</code>: Доступний звідусіль без обмежень.</li>
+            <li><code>protected internal</code>: Доступний нащадкам <b>АБО</b> будь-якому коду в тій самій збірці (логічне АБО).</li>
+            <li><code>private protected</code>: Доступний нащадкам, але <b>ТІЛЬКИ</b> якщо вони знаходяться в тій самій збірці (логічне І).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. Value Types vs Reference Types: у чому різниця? Де зберігаються (Stack vs Heap)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Значущі типи копіюються за значенням. Посилальні — копіюють лише посилання на об'єкт. Стек швидкий, але пам'ять виділяється також у купі, якщо value-тип є полем класу!
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Value Types (типи-значення):</b> <code>struct</code>, примітиви (<code>int</code>, <code>bool</code>, <code>double</code>), <code>enum</code>. Змінна містить самі дані.
+                <ul>
+                    <li>Якщо оголошені локально всередині методу — живуть на <b>стеку (Stack)</b>.</li>
+                    <li><b>Увага підступне питання:</b> Якщо структура чи примітив є полем класу (reference type), вони зберігаються разом із класом у <b>купі (Managed Heap)</b>!</li>
+                </ul>
+            </li>
+            <li><b>Reference Types (типи-посилання):</b> <code>class</code>, <code>interface</code>, <code>delegate</code>, <code>string</code>, масиви.
+                <ul>
+                    <li>Сам об'єкт із даними завжди живе в <b>купі (Heap)</b> і очищується Garbage Collector'ом.</li>
+                    <li>Змінна містить лише посилання (адресу в пам'яті розміром 4 або 8 байт), яке лежить на стеку.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. `string` — це Reference чи Value тип? Чому рядки незмінні (immutable)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Рядок — це повноцінний Reference Type, який веде себе як Value Type через перевизначені оператори порівняння. Незмінність забезпечує потокобезпечність та інтернування.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Рядок є <b>посилальним типом</b> (живе в купі). Але він має особливості:</p>
+        <ul>
+            <li><b>Незмінність (Immutability):</b> Після створення рядок не можна змінити в пам'яті. Будь-яка операція (наприклад, <code>s += "abc"</code> або <code>s.Replace(...)</code>) насправді створює <b>новий об'єкт рядка</b> у купі.</li>
+            <li><b>Навіщо це зроблено:</b>
+                <ul>
+                    <li><b>Потокобезпечність (Thread-safety):</b> Незмінні об'єкти можна безпечно читати з кількох потоків без синхронізації/блокувань.</li>
+                    <li><b>Інтернування рядків (String Interning):</b> CLR тримає таблицю унікальних літералів. Якщо в коді 100 разів написати <code>"hello"</code>, у пам'яті буде лише один екземпляр.</li>
+                </ul>
+            </li>
+            <li>При частій конкатенації (наприклад, у циклі) слід використовувати <code>StringBuilder</code>, щоб не засмічувати купу десятками проміжних рядків.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Що таке Boxing та Unboxing? Який їхній оверхед?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Boxing — запакування значення зі стеку в об'єкт у купі. Unboxing — розпакування назад. Створює додаткове навантаження на Garbage Collector.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>int x = 42;
+object obj = x;        // Boxing (алокація пам'яті в Heap + копіювання даних)
+int y = (int)obj;      // Unboxing (перевірка типу в runtime + копіювання значення на стек)</code></pre>
+        <p><b>Оверхед упаковки:</b></p>
+        <ol>
+            <li>Виділяється пам'ять у купі (розмір даних + заголовок об'єкта 8/16 байт під TypeHandle та SyncBlockIndex).</li>
+            <li>Витрачається час процесора на копіювання байтів.</li>
+            <li>Збільшується навантаження на Garbage Collector, який змушений чистити ці тимчасові об'єкти в Gen 0.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Різниця між `const` та `readonly`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `const` — compile-time константа (жорстко вшивається в код). `readonly` — runtime константа (може задаватися в конструкторі).
+        </div>
+        <h4>Порівняння:</h4>
+        <ul>
+            <li><code>const</code>:
+                <ul>
+                    <li>Значення має бути відоме на момент компіляції (числа, рядки, булеві).</li>
+                    <li>Неявно є статичним (звернення через <code>ClassName.ConstField</code>).</li>
+                    <li>Значення «вшивається» напряму в IL-код виклику (якщо змінити константу в одній бібліотеці без перекомпіляції клієнта — буде старе значення!).</li>
+                </ul>
+            </li>
+            <li><code>readonly</code>:
+                <ul>
+                    <li>Може бути ініціалізоване під час виконання програми (наприклад, прочитане з конфігурації в конструкторі).</li>
+                    <li>Може бути як статичним (ініціалізується в <code>static</code> конструкторі), так і належати екземпляру.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. Як працюють параметри `ref`, `out` та `in`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Усі три передають аргумент за посиланням (адресою пам'яті). `ref` — на читання і запис, `out` — тільки на запис усередині методу, `in` — тільки для читання.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><code>ref</code>: Змінна <b>має бути ініціалізована</b> до виклику методу. Метод може як читати її, так і записувати нове значення.</li>
+            <li><code>out</code>: Змінна може бути неініціалізованою до виклику, але викликаний метод <b>зобов'язаний</b> присвоїти їй значення перед завершенням (використовується для повернення кількох значень, як у <code>int.TryParse(s, out int res)</code>).</li>
+            <li><code>in</code> (додано в C# 7.2): Передає аргумент за посиланням, але <b>забороняє його зміну</b> всередині методу (read-only reference). Використовується для оптимізації продуктивності: передача великих структур без їх копіювання в стек.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Що таке Records (`record`) та Record Structs? Чим вони відрізняються від звичайних класів?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Records (C# 9+) — типи даних з автоматичним Value-based порівнянням, незмінністю (init-only) та зручним копіюванням за допомогою оператора `with`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>За замовчуванням <code>record</code> компілюється як звичайний <b>посилальний клас</b> (Reference Type), проте з унікальними фічами:</p>
+        <ul>
+            <li><b>Порівняння за значенням:</b> Два різних об'єкти <code>record</code> з однаковими полями повернуть <code>true</code> при <code>Equals()</code> та <code>==</code>.</li>
+            <li><b>Короткий синтаксис:</b> <code>public record Person(string Name, int Age);</code> сам генерує конструктор, властивості <code>{ get; init; }</code>, методи <code>Equals</code>, <code>GetHashCode</code> і <code>ToString()</code>.</li>
+            <li><b>Non-destructive mutation:</b> створення зміненої копії через <code>with</code>:
+                <pre><code>var p1 = new Person("Олексій", 25);
+var p2 = p1 with { Age = 26 }; // новий об'єкт із тим самим ім'ям</code></pre>
+            </li>
+            <li><b><code>record struct</code> (C# 10):</b> дозволяє отримати ті самі переваги порівняння та оператора <code>with</code>, але у вигляді структури на стеку (Value Type).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. Що таке Nullable-типи (`Nullable<T>` та `T?`)? Nullable Reference Types.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Для Value Types — це структура `Nullable<T>`, яка дозволяє приймати `null`. Для Reference Types (C# 8+) — це статичний аналіз компілятора для запобігання NRE.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Nullable Value Types (<code>int?</code>):</b> Структури за замовчуванням не можуть містити <code>null</code>. Запис <code>int?</code> є синтаксичним цукром для структури <code>System.Nullable&lt;int&gt;</code>, яка містить значення та булевий прапорець <code>HasValue</code>.</li>
+            <li><b>Nullable Reference Types (C# 8+):</b> Якщо ввімкнено <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code>, посилальні типи за замовчуванням вважаються такими, що <b>не можуть містити null</b> (<code>string name</code>). Якщо поле може бути порожнім, його треба явно позначити знаком питання: <code>string? middleName</code>.
+            <br/><i>Важливо:</i> Це підказка для компілятора та попередження під час збірки (Warnings), в IL-коді тип <code>string?</code> залишається звичайним <code>string</code>.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>

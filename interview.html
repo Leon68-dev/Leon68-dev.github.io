@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET & C# Interview Hub — Головне меню</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+
+            --badge-junior-bg: #fef3c7;
+            --badge-junior-text: #92400e;
+            --badge-middle-bg: #e0e7ff;
+            --badge-middle-text: #4338ca;
+            --badge-arch-bg: #f3e8ff;
+            --badge-arch-text: #6b21a8;
+            --badge-infra-bg: #ccfbf1;
+            --badge-infra-text: #115e59;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2.5rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        /* Статистика */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .stat-item span { color: var(--primary); }
+
+        /* Пошуковий рядок */
+        .search-box {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Сітка карток */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .card-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .tag {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .card:hover .card-footer {
+            color: var(--primary-hover);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-junior { background: var(--badge-junior-bg); color: var(--badge-junior-text); }
+        .badge-middle { background: var(--badge-middle-bg); color: var(--badge-middle-text); }
+        .badge-arch   { background: var(--badge-arch-bg); color: var(--badge-arch-text); }
+        .badge-infra  { background: var(--badge-infra-bg); color: var(--badge-infra-text); }
+
+        footer {
+            text-align: center;
+            margin-top: 3.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>.NET & C# Interview Portal</h1>
+        <p class="subtitle">Повна база знань для підготовки до співбесіди: архітектура, патерни, теорія DOU та задачі на уважність компілятора.</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item">Всього модулів: <span>7</span></div>
+            <div class="stat-item">GoF Патернів: <span>23</span></div>
+            <div class="stat-item">Принципів SOLID: <span>5</span></div>
+            <div class="stat-item">Питань DOU: <span>65+</span></div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="Швидкий пошук теми (наприклад: boxing, gc, span, jwt, docker, mediator)..." autofocus>
+        </div>
+    </header>
+
+    <main class="grid" id="cardsGrid">
+
+        <!-- 1. SOLID -->
+        <a href="interview-solid.html" class="card" data-keywords="solid srp ocp lsp isp dip single responsibility open closed liskov interface segregation dependency inversion архітектура чистий код">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-arch">Фундамент</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">~30 KB</span>
+                </div>
+                <h2 class="card-title">Принципи SOLID</h2>
+                <p class="card-desc">Розбір 5 принципів проєктування з порівнянням реальних антипатернів (проблемний код) та виправлених рішень на C#.</p>
+                <div class="tags-list">
+                    <span class="tag">SRP</span>
+                    <span class="tag">OCP</span>
+                    <span class="tag">LSP</span>
+                    <span class="tag">ISP</span>
+                    <span class="tag">DIP</span>
+                    <span class="tag">Code Smells</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 2. GoF Patterns -->
+        <a href="interview-patterns-gof.html" class="card" data-keywords="gof patterns патерни проектування singleton factory abstract builder prototype adapter bridge composite decorator facade flyweight proxy chain command iterator mediator memento observer state strategy template method visitor interpreter">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-arch">Фундамент</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">~75 KB</span>
+                </div>
+                <h2 class="card-title">23 Патерни GoF</h2>
+                <p class="card-desc">Класичні патерни проєктування (Банда Чотирьох) з інтерактивним меню, практичними C# реалізаціями, плюсами та мінусами.</p>
+                <div class="tags-list">
+                    <span class="tag">Породжувальні (5)</span>
+                    <span class="tag">Структурні (7)</span>
+                    <span class="tag">Поведінкові (11)</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 3. Junior Part 1 -->
+        <a href="interview-part1-junior.html" class="card" data-keywords="junior 1 ооп інкапсуляція спадкування поліморфізм віртуальні методи override new sealed static модифікатори доступу value types reference types stack heap string immutability boxing unboxing const readonly ref out in records record struct nullable">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-junior">Рівень: Junior</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Порція 1</span>
+                </div>
+                <h2 class="card-title">C# База, ООП та Пам'ять</h2>
+                <p class="card-desc">Принципи ООП, відмінність інтерфейсів від абстрактних класів, Stack проти Heap, природа Boxing/Unboxing, Records та модифікатори.</p>
+                <div class="tags-list">
+                    <span class="tag">ООП</span>
+                    <span class="tag">Stack vs Heap</span>
+                    <span class="tag">Boxing / Unboxing</span>
+                    <span class="tag">Records</span>
+                    <span class="tag">ref / out / in</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 4. Junior Part 2 -->
+        <a href="interview-part2-junior.html" class="card" data-keywords="junior 2 колекції list array arraylist dictionary hashset хеш колізії ienumerable icollection ilist action func predicate делегати події events linq deferred execution iqueryable try catch finally idisposable using clr jit transient scoped singleton rest sql join unit тести mock">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-junior">Рівень: Junior</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Порція 2</span>
+                </div>
+                <h2 class="card-title">Колекції, LINQ, Web та SQL</h2>
+                <p class="card-desc">Будова List та Dictionary під капотом, системні делегати, події, відкладене виконання LINQ, DI-скоупи, REST, базовий SQL та тести.</p>
+                <div class="tags-list">
+                    <span class="tag">List / Dictionary</span>
+                    <span class="tag">LINQ / IQueryable</span>
+                    <span class="tag">Action / Func / Events</span>
+                    <span class="tag">DI Lifetimes</span>
+                    <span class="tag">SQL JOIN</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 5. Middle Part 1 -->
+        <a href="interview-part3-middle.html" class="card" data-keywords="middle 1 коваріантність контраваріантність generics in out замикання closures display class yield return state machine span memory ref struct pattern matching garbage collector gc покоління gen 0 gen 1 gen 2 loh poh workstation server dispose finalizer витоки пам'яті async await task valuetask threadpool starvation lock semaphoreslim interlocked volatile">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-middle">Рівень: Middle</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Порція 3</span>
+                </div>
+                <h2 class="card-title">C# Під Капотом, CLR та Потоки</h2>
+                <p class="card-desc">Варіантність у дженериках, Span та ref struct, внутрішня будова GC (Gen 0/1/2, LOH, POH), нутрощі async/await, ThreadPool та примітиви блокування.</p>
+                <div class="tags-list">
+                    <span class="tag">Span &lt;T&gt;</span>
+                    <span class="tag">GC Internals (LOH)</span>
+                    <span class="tag">Async State Machine</span>
+                    <span class="tag">ValueTask</span>
+                    <span class="tag">Closures</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 6. Middle Part 2 -->
+        <a href="interview-part4-middle.html" class="card" data-keywords="middle 2 middleware action filters captive dependencies options pattern ioptions ioptionssnapshot ioptionsmonitor jwt access refresh tokens claims change tracker asnotracking n+1 split queries eager lazy explicit loading acid транзакції рівні ізоляції dirty read індекси clustered non clustered covering repository unit of work cqrs mediatr grpc rabbitmq kafka redis testcontainers webapplicationfactory health checks serilog">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-middle">Рівень: Middle</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Порція 4</span>
+                </div>
+                <h2 class="card-title">ASP.NET Core, EF Core та Архітектура</h2>
+                <p class="card-desc">Пайплайни Middleware, Captive Dependencies, JWT авторизація, Change Tracker, проблема N+1, індекси, рівні ізоляції, CQRS/MediatR та Testcontainers.</p>
+                <div class="tags-list">
+                    <span class="tag">Middleware & DI</span>
+                    <span class="tag">EF Core (N+1, Indexes)</span>
+                    <span class="tag">JWT / Security</span>
+                    <span class="tag">CQRS & MediatR</span>
+                    <span class="tag">Testcontainers</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+        <!-- 7. Part 5 Practical & Infra -->
+        <a href="interview-part5-practical-and-infra.html" class="card" data-keywords="практика 5 код пазли що виведе цей код замикання в циклі for foreach віртуальний метод в конструкторі try finally return string interning referenceequals модифікація колекції foreach boxing мутація структури google.com шлях запиту https tls handshake tcp docker multi stage git merge rebase cancellationtoken graceful shutdown extension methods на null upcasting downcasting is as чисті функції pure functions protobuf messagepack">
+            <div>
+                <div class="card-header">
+                    <span class="badge badge-infra">Практика & Мережі</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Порція 5</span>
+                </div>
+                <h2 class="card-title">Код-пазли, Мережі та Інфраструктура</h2>
+                <p class="card-desc">6 підступних задач на читання коду, ланцюжок виклику google.com, анатомія HTTPS/TLS, Dockerfile multi-stage, Git merge/rebase та CancellationToken.</p>
+                <div class="tags-list">
+                    <span class="tag">Задачі «Що виведе?»</span>
+                    <span class="tag">Шлях google.com</span>
+                    <span class="tag">HTTPS / TLS</span>
+                    <span class="tag">Docker & Git</span>
+                    <span class="tag">CancellationToken</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span>Відкрити модуль</span>
+                <span>→</span>
+            </div>
+        </a>
+
+    </main>
+
+    <footer>
+        <p>Збережіть цей файл як <b>index.html</b> у спільну папку з усіма модулями для швидкого доступу.</p>
+    </footer>
+</div>
+
+<script>
+    // Живий пошук карток за ключовими словами
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.card');
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+
+        cards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+            const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+
+            if (title.includes(query) || desc.includes(query) || keywords.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

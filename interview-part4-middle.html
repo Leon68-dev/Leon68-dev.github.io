@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 4 (Middle)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #0284c7;
+            --primary-light: #f0f9ff;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Навігаційний блок */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картка питання */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Рівень: Middle • Порція 4 з 4</span>
+        <h1 style="margin-top: 0.5rem;">ASP.NET Core, EF Core, Бази Даних та Архітектура</h1>
+        <p style="color: var(--text-muted);">Практичні питання DOU: веб-пайплайни, оптимізація запитів, транзакції, патерни та інтеграційні тести</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 4</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. Middleware Pipeline vs Action Filters</a></li>
+            <li><a href="#q2">2. Captive Dependencies у DI-контейнері</a></li>
+            <li><a href="#q3">3. Options Pattern: `IOptions`, `Snapshot`, `Monitor`</a></li>
+            <li><a href="#q4">4. JWT Авторизація: Access/Refresh токени, Claims</a></li>
+            <li><a href="#q5">5. EF Core Change Tracker та `.AsNoTracking()`</a></li>
+            <li><a href="#q6">6. Проблема $N+1$ запиту та Split Queries</a></li>
+            <li><a href="#q7">7. Стратегії завантаження: Eager, Lazy, Explicit</a></li>
+            <li><a href="#q8">8. Рівні ізоляції транзакцій (ACID) та аномалії</a></li>
+            <li><a href="#q9">9. Кластеризовані, некластеризовані та покриваючі індекси</a></li>
+            <li><a href="#q10">10. Чи потрібні Repository & Unit of Work поверх EF Core?</a></li>
+            <li><a href="#q11">11. CQRS та патерн Mediator (MediatR)</a></li>
+            <li><a href="#q12">12. REST vs gRPC vs Асинхронні брокери (RabbitMQ/Kafka)</a></li>
+            <li><a href="#q13">13. Стратегії кешування: In-Memory vs Redis</a></li>
+            <li><a href="#q14">14. Інтеграційні тести: `WebApplicationFactory` + Testcontainers</a></li>
+            <li><a href="#q15">15. Observability: Structured Logging (Serilog) та Health Checks</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. Як влаштований конвеєр Middleware в ASP.NET Core? Різниця між Middleware та Action Filters?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Middleware обробляє кожен HTTP-запит глобально за патерном Chain of Responsibility і має доступ лише до `HttpContext`. Action Filters є частиною MVC-конвеєра і мають доступ до моделі, контролера та аргументів конкретного Action.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Middleware:</b> Двосторонній конвеєр (російська матрьошка). Запит іде вперед через <code>next()</code>, а відповідь повертається назад у зворотному порядку:
+                <pre><code>app.Use(async (context, next) =&gt;
+{
+    // Логіка ДО наступного middleware
+    await next(); // Передача запиту далі
+    // Логіка ПІСЛЯ завершення запиту
+});</code></pre>
+                <i>Short-circuiting (коротке замикання):</i> Middleware може не викликати <code>next()</code>, а повернути відповідь одразу (наприклад, перевірка статичних файлів або відхилення через відсутність токена).
+            </li>
+            <li><b>Action Filters:</b> Спрацьовують значно пізніше — лише після того, як Middleware маршрутизації (Routing) знайшов відповідний Controller і Action. Фільтри можуть маніпулювати параметрами методу (<code>ActionExecutingContext.ActionArguments</code>) та результатом <code>IActionResult</code>.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. Що таке Captive Dependency у DI-контейнері? Як виникає і як від неї захиститися?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Коли довгоживучий сервіс (Singleton) захоплює короткоживучий сервіс (Scoped або Transient) через конструктор. Захоплений сервіс не вмирає вчасно, що викликає витоки пам'яті та баги конкурентного доступу (наприклад, у `DbContext`).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Класичний приклад катастрофи: <code>SingletonService</code> приймає через конструктор <code>AppDbContext</code> (який є Scoped):</p>
+        <pre><code>public class CacheManager // Зареєстрований як Singleton!
+{
+    private readonly AppDbContext _db; // Scoped залежність потрапила в полон!
+    public CacheManager(AppDbContext db) =&gt; _db = db;
+}</code></pre>
+        <p><b>Чому це ламає систему:</b></p>
+        <ol>
+            <li><code>AppDbContext</code> не є потокобезпечним (thread-safe). Якщо 10 паралельних запитів звернуться до Singleton'а, виникне аварія <code>InvalidOperationException: A second operation was started on this context before a previous operation completed</code>.</li>
+            <li>Change Tracker контексту ніколи не очиститься, що роздує споживання RAM до гігабайтів.</li>
+        </ol>
+        <p><b>Захист:</b> Вмикати валідацію скоупів при створенні хоста (у <i>Development</i> режимі ASP.NET Core це ввімкнено за замовчуванням): <code>builder.Host.UseDefaultServiceProvider(o => o.ValidateScopes = true);</code>. Якщо Singleton'у дійсно потрібен Scoped сервіс, створюйте явний скоуп через <code>IServiceScopeFactory</code>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. Options Pattern: у чому різниця між `IOptions<T>`, `IOptionsSnapshot<T>` та `IOptionsMonitor<T>`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `IOptions` читає конфігурацію 1 раз при старті (Singleton). `IOptionsSnapshot` перечитує зміни `appsettings.json` на кожен HTTP-запит (Scoped). `IOptionsMonitor` підтримує сповіщення про зміни в реальному часі без перестворення сервісів (Singleton).
+        </div>
+        <h4>Порівняльна таблиця:</h4>
+        <ul>
+            <li><code>IOptions&lt;TOptions&gt;</code>: Реєструється як <b>Singleton</b>. Читає налаштування один раз під час першого звернення. Не реагує на зміну файлу <code>appsettings.json</code> без перезапуску сервісу. Найшвидший за продуктивністю.</li>
+            <li><code>IOptionsSnapshot&lt;TOptions&gt;</code>: Реєструється як <b>Scoped</b>. Перевіряє зміни конфігурації для кожного окремого HTTP-запиту. Гарантує стабільність налаштувань протягом обробки одного запиту. <i>Не можна інжектувати в Singleton!</i></li>
+            <li><code>IOptionsMonitor&lt;TOptions&gt;</code>: Реєструється як <b>Singleton</b>. Дозволяє читати актуальні дані будь-коли через <code>.CurrentValue</code> та підтримує подію <code>OnChange(opt =&gt; ...)</code> для підписки на гарячу зміну конфігурації без перезапуску додатку.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. JWT авторизація: структура токена, різниця між Access та Refresh токенами, що таке Claims?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> JWT складається з 3 частин (Header, Payload, Signature), закодованих у Base64Url. Access токен короткоживучий (15 хв) для доступу до API. Refresh токен довгоживучий (дні/тижні) у базі даних для безшовного поновлення Access токена.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Анатомія JWT:</b>
+                <ul>
+                    <li><code>Header</code>: Алгоритм підпису (наприклад, HMAC-SHA256 або RSA).</li>
+                    <li><code>Payload (Корисне навантаження)</code>: Набір тверджень (<b>Claims</b>) — це пари ключ/значення з даними користувача: <code>sub</code> (User Id), <code>email</code>, <code>roles</code>, термін придатності <code>exp</code>. <i>Важливо: дані в Payload НЕ зашифровані, їх може прочитати будь-хто!</i></li>
+                    <li><code>Signature (Підпис)</code>: Хеш від Header + Payload, підписаний секретним ключем сервера. Сервер не ходить у БД для валідації токена — він лише математично перевіряє підпис своїм секретом.</li>
+                </ul>
+            </li>
+            <li><b>Access vs Refresh:</b> Якщо вкрадуть Access-токен, він протухне за 15 хвилин. Refresh-токен зберігається у захищених `HttpOnly, Secure` куках або в базі даних клієнта, і при його компрометації адміністратор може миттєво відкликати запис із бази даних.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. Як працює Change Tracker в Entity Framework Core? Чому `.AsNoTracking()` дає приріст швидкості?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Change Tracker зберігає зліпок (снапшот) кожного прочитаного об'єкта. При виклику `SaveChanges()` він порівнює поточні значення зі зліпком, щоб згенерувати SQL `UPDATE`. `.AsNoTracking()` відключає збереження зліпків, заощаджуючи до 50% пам'яті.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Коли ви завантажуєте сутності через звичайний запит:</p>
+        <pre><code>var user = await db.Users.FirstAsync(u =&gt; u.Id == 1);
+user.Name = "Нове Ім'я";
+await db.SaveChangesAsync(); // Автоматично генерує: UPDATE Users SET Name = ... WHERE Id = 1</code></pre>
+        <p><b>Що робить Change Tracker під капотом:</b></p>
+        <ol>
+            <li>Виділяє додаткову пам'ять у купі під копію вихідних даних кожної сутності.</li>
+            <li>Прив'язує статус (<code>EntityState.Unchanged</code>).</li>
+            <li>Під час виклику <code>SaveChangesAsync()</code> запускає важкий процес <code>DetectChanges()</code>, скануючи кожне поле кожного об'єкта в пам'яті на відмінність від вихідного зліпка.</li>
+        </ol>
+        <p><b>Чому важливий <code>.AsNoTracking()</code>:</b> Для будь-яких запитів читання (Read-Only) трекінг не потрібен. Відключення трекінгу позбавляє EF Core необхідності виділяти пам'ять під копії об'єктів та прискорює виконання запиту у 2–3 рази.</p>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. Проблема $N+1$ запиту в EF Core: як виникає і як вирішити? Що таке Split Queries (`.AsSplitQuery()`)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Виникає, коли 1 запит витягує батьківські сутності, а зв'язані дочірні дістаються в циклі окремими $N$ запитами. Вирішується через Eager Loading (`Include`), проекцію `Select()` або розбиттям на окремі SQL-запити через `AsSplitQuery()`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>// КАТАСТРОФА (N+1):
+var orders = await db.Orders.ToListAsync(); // 1 запит: витягнув 100 замовлень
+foreach (var order in orders)
+{
+    Console.WriteLine(order.Customer.Name); // Робить ЩЕ 100 окремих запитів до бази!
+}</code></pre>
+        <p><b>Способи вирішення:</b></p>
+        <ul>
+            <li><b>Жадібне завантаження через <code>.Include()</code>:</b>
+                <pre><code>var orders = await db.Orders.Include(o =&gt; o.Customer).ToListAsync(); // 1 запит через SQL JOIN</code></pre>
+            </li>
+            <li><b>Проекція через DTO (Найшвидший варіант):</b>
+                <pre><code>var data = await db.Orders.Select(o =&gt; new { o.Id, CustomerName = o.Customer.Name }).ToListAsync();</code></pre>
+            </li>
+            <li><b>Split Queries (<code>.AsSplitQuery()</code>):</b> Якщо ви робите <code>.Include()</code> для кількох колекцій одночасно (наприклад, <code>Include(OrderItems).Include(OrderLogs)</code>), один гігантський <code>LEFT JOIN</code> створює «картезіанський вибух» (дублювання мільйонів рядків у трафіку). <code>.AsSplitQuery()</code> змушує EF зробити 2–3 швидких паралельних SQL-запити замість одного монструозного JOIN'а.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. Стратегії завантаження зв'язаних даних в EF Core: Eager, Lazy та Explicit loading.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Eager — завантажує все одразу через `.Include()`. Lazy — підвантажує зв'язані дані автоматично при першому зверненні до властивості (вимагає virtual). Explicit — явне завантаження за запитом через `db.Entry(e).Collection().Load()`.
+        </div>
+        <h4>Порівняння підходів:</h4>
+        <ul>
+            <li><b>Eager Loading (Жадібне):</b> Завантажує залежності одразу в першому запиті за допомогою методів <code>.Include()</code> та <code>.ThenInclude()</code>. Рекомендований дефолтний підхід у вебі.</li>
+            <li><b>Lazy Loading (Ліниве):</b> Дані не вантажаться, поки ви не звернетеся до властивості: <code>order.Customer</code>. Вимагає спеціального пакету <i>Proxies</i> та оголошення полів як <code>public virtual</code>. <i>Антипатерн для REST API</i>, бо серіалізатор JSON пройдеться по всіх властивостях і несподівано вивантажить усю базу даних, зробивши сотні запитів!</li>
+            <li><b>Explicit Loading (Явне):</b> Завантажує пов'язані дані лише тоді, коли ви явно попросите про це в коді:
+                <pre><code>await db.Entry(order).Reference(o =&gt; o.Customer).LoadAsync();</code></pre>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. Рівні ізоляції транзакцій у SQL (ACID). Які аномалії можуть виникати?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Рівні ізоляції (від слабкого до сильного): Read Uncommitted → Read Committed → Repeatable Read → Serializable. Чим вищий рівень, тим менше аномалій, але тим гірша паралельна продуктивність через блокування рядків/таблиць.
+        </div>
+        <h4>Аномалії паралельного читання:</h4>
+        <ol>
+            <li><b>Брудне читання (Dirty Read):</b> Транзакція А прочитала дані, які змінила транзакція Б, але транзакція Б раптово зробила <code>ROLLBACK</code>. Транзакція А працювала з даними, яких насправді ніколи не існувало в базі!</li>
+            <li><b>Неповторюване читання (Non-repeatable Read):</b> Транзакція А читає рядок двічі, але між цими читаннями транзакція Б оновила цей рядок і зробила <code>COMMIT</code>. Значення поля змінилося прямо під час виконання першої транзакції.</li>
+            <li><b>Фантомне читання (Phantom Read):</b> Транзакція А робить вибірку за діапазоном (наприклад, <code>WHERE Age &gt; 20</code> — повернуло 5 рядків). Транзакція Б вставляє новий 6-й рядок із цим критерієм. Повторне виконання запиту в транзакції А повертає вже 6 рядків.</li>
+        </ol>
+        <h4>Рівні ізоляції:</h4>
+        <ul>
+            <li><code>Read Uncommitted</code>: Дозволяє всі 3 аномалії (включаючи брудне читання).</li>
+            <li><code>Read Committed</code>: Дефолт для MS SQL та PostgreSQL. Забороняє Dirty Read.</li>
+            <li><code>Repeatable Read</code>: Забороняє Dirty Read та Non-repeatable Read (блокує прочитані рядки).</li>
+            <li><code>Serializable</code>: Повна ізоляція, блокує цілі діапазони ключів (Range Locks). Жодних аномалій, але викликає часті Deadlock'и.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. Кластеризовані vs Некластеризовані індекси в БД. Що таке складений та покриваючий індекс?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Кластеризований індекс — це сама таблиця, фізично впорядкована за ключем (може бути лише один). Некластеризований — окрема B-Tree структура, що містить покажчик на рядок. Покриваючий індекс містить усі необхідні для запиту поля, позбавляючи потреби ходити в таблицю.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Кластеризований індекс (Clustered Index):</b> Листові вузли дерева індексу (B-Tree) містять реальні сторінки даних таблиці. Може бути лише <b>один</b> на таблицю (за замовчуванням це Primary Key).</li>
+            <li><b>Некластеризований індекс (Non-clustered Index):</b> Окрема допоміжна структура даних. Листові вузли містять лише значення індексованого поля та покажчик (Row ID або Clustered Key) на рядок у головній таблиці. Пошук спочатку знаходить рядок у некластеризованому індексі, а потім робить <i>Key Lookup</i> у кластеризовану таблицю за рештою полів.</li>
+            <li><b>Складений індекс (Composite Index):</b> Індекс по кількох колонках: <code>(LastName, FirstName)</code>. Працює за правилом «лівого префікса»: допоможе для пошуку по <code>LastName</code> або <code>LastName + FirstName</code>, але марний для пошуку тільки по <code>FirstName</code>!</li>
+            <li><b>Покриваючий індекс (Covering Index / INCLUDE):</b> Якщо індекс містить усі колонки, які запитує SELECT (через <code>CREATE INDEX ... INCLUDE (Email, Age)</code>), СУБД віддає дані прямо з індексу без жодного звернення до самої таблиці (0 Key Lookups).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Чи потрібні патерни Repository та Unit of Work поверх EF Core? Аргументи «За» та «Проти».</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Сам `DbContext` вже є реалізацією Unit of Work, а `DbSet<T>` — реалізацією Repository. Власні обгортки поверх EF Core часто є надлишковим антипатерном, якщо тільки вони не інкапсулюють специфічні бізнес-специфікації.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Чому це часто АНТИПАТЕРН:</b>
+                <ul>
+                    <li>Створення загального <code>GenericRepository&lt;T&gt;</code> з методами <code>GetById</code>, <code>GetAll</code> банально дублює API самого EF Core.</li>
+                    <li>Повернення <code>IEnumerable</code> замість <code>IQueryable</code> ламає фільтрацію на боці бази, змушуючи викачувати всю таблицю в пам'ять.</li>
+                    <li>Спроба абстрагуватися від EF Core на випадок «раптом змінимо БД на Mongo» у 99% реальних проєктів ніколи не реалізується, але створює тисячі рядків марного коду.</li>
+                </ul>
+            </li>
+            <li><b>Коли кастомний Repository має сенс:</b> Коли репозиторій інкапсулює складну доменну логіку (DDD-підхід): агрегат завжди завантажується цілком з усіма обов'язковими дочірніми сутностями за інваріантом, захищаючи базу від некоректного часткового читання.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Що таке CQRS? Використання патерну Mediator та бібліотеки MediatR у .NET.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> CQRS розділяє модель на операції модифікації (Commands) та операції читання (Queries). MediatR позбавляє контролери прямих залежностей від бізнес-сервісів, відправляючи команди відповідним окремим обробникам (Handlers).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p><b>CQRS (Command Query Responsibility Segregation):</b></p>
+        <ul>
+            <li><b>Command (Команда):</b> Змінює стан системи (створення, редагування, видалення). Завжди виконує валідацію бізнес-правил, не повертає складних даних (повертає void або Id).</li>
+            <li><b>Query (Запит):</b> Лише читає дані. Не змінює стан. Може оминати важкі доменні моделі та читати DTO напряму з бази через оптимізований Dapper або `.AsNoTracking()`.</li>
+        </ul>
+        <pre><code>// Запит:
+public record GetUserByIdQuery(int Id) : IRequest&lt;UserDto&gt;;
+
+// Окремий ізольований обробник:
+public class GetUserByIdHandler : IRequestHandler&lt;GetUserByIdQuery, UserDto&gt;
+{
+    public async Task&lt;UserDto&gt; Handle(GetUserByIdQuery request, CancellationToken ct)
+    {
+        // Логіка тільки для цього запиту
+    }
+}
+
+// Контролер знає лише про IMediator:
+[HttpGet("{id}")]
+public async Task&lt;IActionResult&gt; Get(int id) =&gt; Ok(await _mediator.Send(new GetUserByIdQuery(id)));</code></pre>
+        <p><i>Перевага:</i> Контролери стають ультратонкими, дотримано Single Responsibility Principle (кожна операція — окремий файл/клас), зручно додавати наскрізну функціональність (валідацію FluentValidation або логування) через <code>IPipelineBehavior</code>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. Комунікація між сервісами: REST проти gRPC проти Message Brokers (RabbitMQ / Kafka).</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> REST — універсальний текстовий HTTP/JSON протокол для публічних клієнтів. gRPC — надшвидкий двійковий HTTP/2 RPC для внутрішньої взаємодії мікросервісів. RabbitMQ/Kafka — асинхронна комунікація через події без жорсткого зв'язування.
+        </div>
+        <h4>Порівняння підходів:</h4>
+        <ul>
+            <li><b>REST (HTTP + JSON):</b> Простий, людиночитабельний, працює в будь-якому браузері. <i>Мінуси:</i> великий розмір текстового JSON, відсутність суворої схеми типів за замовчуванням, оверхед на парсинг рядків.</li>
+            <li><b>gRPC (HTTP/2 + Protocol Buffers):</b> Двійкова серіалізація через контрактні <code>.proto</code> файли. У 5–10 разів швидший за REST, споживає мінімум мережевого трафіку, підтримує двосторонній стрімінг (bidirectional streaming) та мультиплексування з'єднань. Ідеальний для синхронних викликів між бекенд-мікросервісами.</li>
+            <li><b>Message Brokers (RabbitMQ, Apache Kafka):</b> Асинхронна шина подій (Event-Driven). Якщо Сервіс оплат впав, Сервіс замовлень все одно публікує подію в чергу повідомлень. Коли сервіс підніметься — він спокійно дочитає повідомлення. Гарантує слабке зв'язування (Loose Coupling) та стійкість до відмов.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Стратегії кешування: In-Memory vs Розподілений кеш (Redis). Що таке Cache Stampede (Лавина кешу)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> In-Memory кеш живе в RAM конкретного процесу і втрачається при перезапуску. Redis живе на окремому сервері і доступний усім подам кластера. Cache Stampede — це падіння бази даних, коли одночасно протухає популярний ключ і тисячі потоків одночасно біжать у БД.
+        </div>
+        <h4>Порівняння:</h4>
+        <ul>
+            <li><code>IMemoryCache</code>: Працює прямо в оперативній пам'яті процесу .NET. Доступ миттєвий ($O(1)$ без мережевих затримок). <i>Проблема:</i> якщо у вас запущено 5 копій (інстансів) програми під балансувальником, у кожної буде свій незалежний розсинхронізований кеш.</li>
+            <li><b>Розподілений кеш (Redis через <code>IDistributedCache</code>):</b> Окремий спільний сервіс. Усі інстанси додатка бачать один і той самий стан. При перезапуску додатка кеш зберігається.</li>
+            <li><b>Cache Stampede (Лавина запитів):</b> Відбувається, коли закінчується TTL (термін життя) дуже популярного запису (наприклад, каталогу товарів на Чорну П'ятницю). Сотні паралельних користувацьких запитів виявляють, що в кеші порожньо, і одночасно надсилають важкий запит у SQL-базу, що миттєво «кладе» базу.
+            <br/><i>Рішення:</i> Використання бібліотеки <b>FusionCache</b> або блокувань (Probabilistic early expiration, семафори), щоб лише ОДИН потік ішов у базу для оновлення кешу, а решта чекали на результат.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. Інтеграційні тести в ASP.NET Core: `WebApplicationFactory` та бібліотека Testcontainers.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `WebApplicationFactory` піднімає весь реальний ASP.NET Core бекенд у пам'яті тестового процесу. `Testcontainers` автоматично запускає реальну базу даних (Postgres/MSSQL) у тимчасовому Docker-контейнері на час прогону тестів.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Раніше розробники часто тестували інтеграцію через <i>In-Memory EF Core Provider</i>, проте In-Memory провайдер не підтримує сирий SQL, збережені процедури, транзакції та зовнішні ключі, пропускаючи критичні баги.</p>
+        <pre><code>// Сучасний золотий стандарт інтеграційного тесту:
+public class OrderApiTests : IAsyncLifetime
+{
+    // 1. Автоматично стартує реальний PostgreSQL у Docker
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder().Build();
+
+    public async Task InitializeAsync() =&gt; await _dbContainer.StartAsync();
+
+    [Fact]
+    public async Task CreateOrder_ValidRequest_Returns201Created()
+    {
+        // 2. Піднімаємо In-Memory веб-сервер із реальною базою в контейнері
+        var factory = new WebApplicationFactory&lt;Program&gt;()
+            .WithWebHostBuilder(builder =&gt;
+            {
+                builder.ConfigureServices(services =&gt;
+                {
+                    // Підміна рядка підключення на тимчасовий контейнер
+                    services.AddDbContext&lt;AppDbContext&gt;(opt =&gt; opt.UseNpgsql(_dbContainer.GetConnectionString()));
+                });
+            });
+
+        HttpClient client = factory.CreateClient();
+
+        // 3. Відправляємо реальний HTTP-запит через увесь пайплайн
+        var response = await client.PostAsJsonAsync("/api/orders", new CreateOrderDto("Laptop"));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    public async Task DisposeAsync() =&gt; await _dbContainer.DisposeAsync();
+}</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 15 -->
+    <article class="q-card" id="q15">
+        <div class="q-header">
+            <h3 class="q-title">15. Що таке Observability? Структуроване логування (Serilog) та Health Checks в ASP.NET Core.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Observability складається з Трьох Кигів: Logs, Metrics та Traces. Структуроване логування зберігає повідомлення не звичайним текстом, а як JSON-об'єкти з параметрами для зручного пошуку в ElasticSearch/Seq.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Структуроване логування (Structured Logging):</b>
+                <pre><code>// ПОГАНО: Звичайний текст. Складно знайти замовлення в Kibana/Seq
+_logger.LogInformation($"Замовлення {orderId} створено клієнтом {userId}");
+
+// ДОБРЕ: Повідомлення зберігає властивості як окремі поля JSON-об'єкта!
+_logger.LogInformation("Замовлення {OrderId} створено клієнтом {UserId}", orderId, userId);</code></pre>
+                У системах моніторингу (Seq, ElasticSearch, Loki) тепер можна робити запити на зразок: <code>UserId == 42 AND OrderId &gt; 100</code> без повільних регулярних виразів.
+            </li>
+            <li><b>Health Checks:</b> Вбудований механізм перевірки працездатності додатку для Kubernetes або балансувальника:
+                <pre><code>builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString) // Перевірка доступності бази даних
+    .AddRedis(redisConnectionString); // Перевірка Redis
+
+app.MapHealthChecks("/healthz"); // Ендпоінт для k8s Liveness/Readiness проби</code></pre>
+            </li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>

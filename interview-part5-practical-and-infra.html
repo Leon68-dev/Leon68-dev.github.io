@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 5 (Практика, Мережі та Інфраструктура)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #0d9488;
+            --primary-light: #f0fdfa;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #ccfbf1;
+            color: #115e59;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Навігаційний блок */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картка питання */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Рівень: Практика, Мережі та Інфраструктура • Порція 5 з 5</span>
+        <h1 style="margin-top: 0.5rem;">Підступні Задачки («Що виведе?»), Мережі, Docker та CancellationToken</h1>
+        <p style="color: var(--text-muted);">Завершальний блок: задачі на уважність компілятора, життєвий цикл запиту, TLS, Docker і Git</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 5</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. [Код-пазл] Замикання в циклі `for` vs `foreach`</a></li>
+            <li><a href="#q2">2. [Код-пазл] Виклик `virtual` методу з конструктора</a></li>
+            <li><a href="#q3">3. [Код-пазл] Що виведе `try-finally` при зміні змінної?</a></li>
+            <li><a href="#q4">4. [Код-пазл] Інтернування рядків (`ReferenceEquals`)</a></li>
+            <li><a href="#q5">5. [Код-пазл] Модифікація колекції під час `foreach`</a></li>
+            <li><a href="#q6">6. [Код-пазл] Мутація структури через інтерфейс (Boxing)</a></li>
+            <li><a href="#q7">7. Що відбувається, коли вводиш `google.com` у браузер?</a></li>
+            <li><a href="#q8">8. Як під капотом працює HTTPS (TLS Handshake)?</a></li>
+            <li><a href="#q9">9. Docker: Контейнери vs Віртуальні Машини, Multi-stage</a></li>
+            <li><a href="#q10">10. Git: `git merge` проти `git rebase`</a></li>
+            <li><a href="#q11">11. `CancellationToken` та Graceful Shutdown</a></li>
+            <li><a href="#q12">12. Extension Methods: чи впаде виклик на `null`?</a></li>
+            <li><a href="#q13">13. Upcasting vs Downcasting: `is` та `as` оператори</a></li>
+            <li><a href="#q14">14. Чисті функції (Pure Functions) та Side Effects</a></li>
+            <li><a href="#q15">15. Формати серіалізації: JSON vs Protobuf vs MessagePack</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. [Код-пазл] Що виведе цей код із замиканням у циклі?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>var actions = new List&lt;Action&gt;();
+
+for (int i = 0; i &lt; 3; i++)
+{
+    actions.Add(() =&gt; Console.Write(i + " "));
+}
+
+foreach (var action in actions)
+{
+    action();
+}</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Виведе: <code>3 3 3 </code> (а не <code>0 1 2 </code>).
+        </div>
+        <h4>Чому так відбувається:</h4>
+        <p>Компілятор створює <b>один-єдиний</b> екземпляр службового класу (Display Class) для всього циклу <code>for</code>. Локальна змінна <code>i</code> стає єдиним спільним полем цього класу: <code>displayClass.i</code>. Коли цикл завершується, значення <code>displayClass.i</code> дорівнює <code>3</code>. При послідовному виклику делегатів усі три лямбди звертаються до однієї й тієї ж ділянки пам'яті в купі.</p>
+        <p><b>Як виправити:</b> Створити локальну копію всередині тіла циклу: <code>int copy = i; actions.Add(() =&gt; Console.Write(copy));</code>. Для кожної ітерації буде виділено свій окремий контекст.</p>
+        <p><i>Примітка:</i> У циклі <code>foreach</code> у C# 5.0+ це виправили автоматично — там компілятор сам створює новий скоуп на кожну ітерацію.</p>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. [Код-пазл] Виклик `virtual` методу з конструктора базового класу. Що виведе?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>public class Parent
+{
+    public Parent()
+    {
+        PrintMessage();
+    }
+
+    public virtual void PrintMessage() =&gt; Console.WriteLine("Parent message");
+}
+
+public class Child : Parent
+{
+    private string _msg = "Child message";
+
+    public Child()
+    {
+        // Конструктор нащадка
+    }
+
+    public override void PrintMessage() =&gt; Console.WriteLine(_msg ?? "null");
+}
+
+// Виклик:
+new Child();</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Виведе: <code>Child message</code>, АЛЕ якщо прибрати ініціалізатор поля і задати його в тілі конструктора — виведе <code>null</code>!
+        </div>
+        <h4>Підступний механізм CLR (Порядок ініціалізації):</h4>
+        <ol>
+            <li>Спочатку ініціалізуються інлайн-поля нащадка (<code>_msg = "Child message"</code>).</li>
+            <li>Викликається <b>конструктор базового класу <code>Parent()</code></b>.</li>
+            <li>Конструктор <code>Parent()</code> викликає віртуальний метод <code>PrintMessage()</code>. Оскільки тип об'єкта в таблиці віртуальних методів уже <code>Child</code>, викликається саме перевизначений метод <code>Child.PrintMessage()</code>!</li>
+            <li>Якщо поле <code>_msg</code> ініціалізувалося <b>всередині конструктора Child</b>:
+                <pre><code>public Child() { _msg = "Child message"; }</code></pre>
+                Тоді в момент виклику з базового класу конструктор Child ще <b>НЕ починав виконуватися</b>, і поле <code>_msg</code> дорівнює дефолтному <code>null</code>!
+            </li>
+        </ol>
+        <p><i>Золоте правило C#:</i> <b>Ніколи не викликайте віртуальні методи з конструктора</b>, тому що нащадок виконуватиме свій код у напівініціалізованому стані.</p>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. [Код-пазл] Поведінка `try-finally` при зміні змінної. Що поверне метод?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>public int GetNumber()
+{
+    int x = 10;
+    try
+    {
+        return x;
+    }
+    finally
+    {
+        x = 20;
+        Console.Write("Finally! ");
+    }
+}
+
+// Виклик:
+Console.WriteLine(GetNumber());</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Виведе: <code>Finally! 10</code> (значення <code>10</code>, а НЕ <code>20</code>).
+        </div>
+        <h4>Чому так відбувається:</h4>
+        <p>Коли виконання доходить до <code>return x;</code> у блоці <code>try</code>, значення змінної <code>x</code> (число <code>10</code>) <b>обчислюється та копіюється в стек виконання (або регістр процесора) як значення, що повертається</b>. Після цього обов'язково виконується блок <code>finally</code>, де локальна змінна <code>x</code> перезаписується на <code>20</code>, проте значення на стеку повернення залишається незмінним. Метод повертає початкові <code>10</code>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. [Код-пазл] Інтернування рядків: що поверне `ReferenceEquals`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>string s1 = "hello world";
+string s2 = "hello " + "world";
+
+string part = "world";
+string s3 = "hello " + part;
+
+Console.WriteLine(object.ReferenceEquals(s1, s2)); // ???
+Console.WriteLine(object.ReferenceEquals(s1, s3)); // ???</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Перший виклик поверне <code>True</code>, другий — <code>False</code>.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><code>s1 == s2 (True):</code> Рядок <code>"hello " + "world"</code> складається з двох строкових літералів. Компілятор Roslyn на етапі збірки виконує оптимізацію <i>Constant Folding</i> (згортання констант) і перетворює це на <code>"hello world"</code>. Обидва посилання вказують на один і той самий об'єкт із глобальної таблиці інтернування рядків CLR.</li>
+            <li><code>s1 == s3 (False):</code> Оскільки <code>part</code> є змінною, конкатенація відбувається динамічно в рантаймі через виклик <code>string.Concat()</code>. Створюється абсолютно новий об'єкт у купі, тому посилання в пам'яті різні. (Зробити посилання однаковими можна було б лише явним викликом <code>string.Intern(s3)</code>).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. [Код-пазл] Модифікація колекції під час ітерації в `foreach`. Що станеться?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>var list = new List&lt;int&gt; { 1, 2, 3, 4, 5 };
+
+foreach (var item in list)
+{
+    if (item == 3)
+    {
+        list.Remove(item);
+    }
+}</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Аварія в runtime: <code>InvalidOperationException: Collection was modified; enumeration operation may not execute.</code>
+        </div>
+        <h4>Внутрішня механіка:</h4>
+        <p>Клас <code>List&lt;T&gt;</code> має внутрішнє приватне цілочисельне поле <code>_version</code>. Будь-яка операція додавання або видалення (<code>Add</code>, <code>Remove</code>, <code>Clear</code>) інкрементує лічильник: <code>_version++</code>.</p>
+        <p>Коли ви запускаєте <code>foreach</code>, створюється структура-ітератор <code>List&lt;T&gt;.Enumerator</code>, яка запам'ятовує версію списку в момент старту: <code>this.version = list._version</code>. При кожному наступному кроці <code>MoveNext()</code> ітератор перевіряє: <code>if (this.version != list._version) throw ...</code>. Це захищає від читання пошкоджених зміщених індексів.</p>
+        <p><b>Як правильно видаляти:</b>
+            <ul>
+                <li>Використовувати вбудований метод: <code>list.RemoveAll(x =&gt; x == 3);</code></li>
+                <li>Або звичайний цикл <code>for</code> з кінця до початку: <code>for (int i = list.Count - 1; i &gt;= 0; i--)</code>.</li>
+            </ul>
+        </p>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. [Код-пазл] Мутація структури через інтерфейс (Boxing пастка). Що виведе?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <pre><code>public interface ICounter
+{
+    void Increment();
+}
+
+public struct Counter : ICounter
+{
+    public int Value { get; private set; }
+    public void Increment() =&gt; Value++;
+}
+
+// Виклик:
+Counter c = new Counter();
+c.Increment();
+Console.WriteLine(c.Value); // 1
+
+ICounter ic = c; // Boxing!
+ic.Increment();
+Console.WriteLine(c.Value);  // ???
+Console.WriteLine(((Counter)ic).Value); // ???</code></pre>
+        <div class="summary-box">
+            <b>Результат:</b> Виведе: <code>1</code>, а потім <code>2</code>.
+        </div>
+        <h4>Чому значення <code>c.Value</code> не змінилося:</h4>
+        <p>Присвоєння <code>ICounter ic = c;</code> запаковує (boxing) структуру <code>c</code> у новий об'єкт у купі. Виклик <code>ic.Increment()</code> змінює поле <b>всередині об'єкта в купі</b>, тоді як оригінальна локальна структура <code>c</code> на стеку залишається незмінною зі значенням <code>1</code>.</p>
+        <p><i>Висновок:</i> Мутабельні структури (Mutable Structs) — це антипатерн. Структури в C# завжди повинні бути незмінними: <code>readonly struct</code>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. Що відбувається під капотом, коли ви вводите `https://google.com` у браузері і натискаєте Enter?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Повний шлях: DNS резолвінг (IP) → TCP 3-Way Handshake (SYN, SYN-ACK, ACK) → TLS Handshake (обмін ключами) → відправка HTTP GET → маршрутизація через Reverse Proxy на веб-сервер Kestrel → генерація HTML/JSON → рендеринг у DOM.
+        </div>
+        <h4>Покроковий ланцюжок:</h4>
+        <ol>
+            <li><b>Парсинг URL:</b> Браузер відокремлює протокол (HTTPS), хост (google.com) та порт (443 за замовчуванням).</li>
+            <li><b>DNS Резолвінг (Пошук IP):</b> Браузер шукає IP-адресу по черзі: у власному кеші → кеші ОС → файлі <code>hosts</code> → запит до DNS-сервера провайдера або 8.8.8.8.</li>
+            <li><b>TCP Handshake (Встановлення з'єднання на транспортному рівні L4):</b>
+                <ul>
+                    <li>Клієнт відправляє <code>SYN</code>.</li>
+                    <li>Сервер відповідає <code>SYN-ACK</code>.</li>
+                    <li>Клієнт підтверджує <code>ACK</code>. З'єднання відкрито.</li>
+                </ul>
+            </li>
+            <li><b>TLS Handshake (Криптографічний захист L5):</b> Клієнт і сервер домовляються про версію TLS, шифр (Cipher Suite), сервер надає SSL-сертифікат, перевіряється ланцюжок довіри (CA), генерується спільний симетричний ключ.</li>
+            <li><b>HTTP Запит:</b> Клієнт відправляє текстовий шифрований запит: <code>GET / HTTP/1.1\r\nHost: google.com...</code>.</li>
+            <li><b>Обробка на сервері:</b> Запит приймає Reverse Proxy (Nginx/Cloudflare/Envoy) → передає на Kestrel (.NET) → прохід через конвеєр Middleware → повернення HTTP 200 OK з контентом.</li>
+            <li><b>Рендеринг у браузері:</b> Парсинг HTML → побудова DOM-дерева → завантаження CSS/JS → виконання скриптів.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. Як під капотом влаштований HTTPS? Симетричне vs Асиметричне шифрування.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> HTTPS використовує гібридне шифрування: важке асиметричне (RSA / ECC з відкритим та закритим ключами) використовується ЛИШЕ на старті для безпечної передачі спільного сесійного ключа. Далі весь потік даних шифрується надшвидким симетричним алгоритмом (AES-GCM).
+        </div>
+        <h4>Чому не шифрувати все асиметрично?</h4>
+        <p>Асиметричне шифрування (з публічним і приватним ключами) вимагає складних математичних операцій з гігантськими простими числами і працює у сотні разів повільніше за симетричне. Воно б миттєво перевантажило процесори серверів.</p>
+        <p><b>Роль цифрового сертифіката X.509:</b> Сертифікат підтверджує, що публічний ключ дійсно належить саме компанії Google, а не зловмиснику посередині (захист від Man-in-the-Middle атаки). Справжність сертифіката підтверджується цифровим підписом акредитованого Центру Сертифікації (Certificate Authority — Let's Encrypt, DigiCert), кореневі сертифікати яких вшиті прямо в операційну систему.</p>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. Docker: Чим контейнери відрізняються від віртуальних машин? Що таке Multi-stage збірка в .NET?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Віртуальна машина віртуалізує апаратне залізо і несе всередині окрему повноцінну гостьову ОС (гіпервізор). Контейнер — це просто ізольований процес, що використовує спільне ядро хостової Linux ОС через cgroups та namespaces.
+        </div>
+        <h4>Порівняння:</h4>
+        <ul>
+            <li><b>Віртуальна машина (VM):</b> Важка (гігабайти на диску), повільний старт (хвилини), дублювання ядра ОС, значні накладні витрати оперативної пам'яті.</li>
+            <li><b>Docker Контейнер:</b> Легкий (мегабайти), стартує за мілісекунди, використовує ресурси та ядро хоста напряму без прошарку гіпервізора.</li>
+        </ul>
+        <h4>Multi-stage builds у .NET Dockerfile:</h4>
+        <p>Дозволяє розділити важке середовище збірки (SDK) від середовища виконання (Runtime), зменшуючи фінальний образ з 800 МБ до 100 МБ:</p>
+        <pre><code># Етап 1: Збірка проекту у важкому SDK образі (містить компілятор Roslyn)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
+
+# Етап 2: Фінальний образ (містить лише легкий ASP.NET Runtime без SDK!)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "MyApi.dll"]</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Git для розробника: у чому принципова різниця між `git merge` та `git rebase`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `git merge` створює новий коміт злиття (merge commit) і зберігає реальну історію відгалужень. `git rebase` переносить ваші коміти на верхівку цільової гілки, створюючи ідеально чисту лінійну історію без додаткових комітів злиття.
+        </div>
+        <h4>Порівняння:</h4>
+        <ul>
+            <li><code>git merge feature</code>:
+                <ul>
+                    <li>Безпечна неруйнівна операція: історія комітів гілки залишається недоторканою.</li>
+                    <li>Створює спеціальний «Merge commit» із двома батьками.</li>
+                    <li><i>Мінус:</i> при великій кількості розробників історія перетворюється на заплутаний «вузол спагеті».</li>
+                </ul>
+            </li>
+            <li><code>git rebase main</code>:
+                <ul>
+                    <li>Бере ваші коміти з feature-гілки, тимчасово відкладає їх, оновлює гілку до останнього коміту main і накладає ваші коміти поверх по одному.</li>
+                    <li>Історія стає красивою, строго послідовною та лінійною.</li>
+                    <li><b>Золоте правило Rebase:</b> <i>Ніколи не робіть rebase у публічних гілках (наприклад, main/develop)!</i> Оскільки rebase змінює хеші комітів (створює нові об'єкти комітів), це зламає роботу іншим колегам, які встигли затягнути старі коміти.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Що таке `CancellationToken`? Як організувати коректне скасування операцій (Graceful Shutdown)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Структура для кооперативного (добровільного) скасування асинхронних задач. `CancellationTokenSource` ініціює скасування, а викликаний метод регулярно перевіряє токен через `ThrowIfCancellationRequested()` і звільняє ресурси.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>У .NET потік не можна просто грубо «вбити» посеред виконання (це призведе до блокувань у пам'яті та незакритих файлів). Скасування завжди є <b>кооперативним</b>: метод повинен сам погодитися завершити роботу.</p>
+        <pre><code>public async Task ProcessDataAsync(CancellationToken ct)
+{
+    while (hasMoreData)
+    {
+        // 1. Швидка перевірка: викидає OperationCanceledException, якщо надійшов сигнал відміни
+        ct.ThrowIfCancellationRequested(); 
+
+        // 2. Прокидання токена у всі внутрішні асинхронні виклики
+        await _httpClient.GetAsync(url, ct);
+    }
+}</code></pre>
+        <p><b>Використання в ASP.NET Core:</b> Кожен метод контролера або ендпоінт може приймати <code>CancellationToken ct</code>. Якщо користувач у браузері закрив вкладку або обірвав з'єднання до того, як бекенд відповів, ASP.NET Core автоматично надсилає сигнал скасування. Завдяки цьому важкий SQL-запит у базі миттєво анулюється, заощаджуючи ресурси сервера.</p>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. Методи розширення (Extension Methods): як влаштовані під капотом? Чи впаде виклик на `null`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Методи розширення — це чистий синтаксичний цукор компілятора. Під капотом вони перетворюються на звичайний виклик статичного методу. Виклик екстеншена на `null` об'єкті НЕ викликає NullReferenceException автоматично!
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>public static class StringExtensions
+{
+    public static bool IsNullOrEmpty(this string str)
+    {
+        return string.IsNullOrEmpty(str); // Безпечна перевірка!
+    }
+}
+
+// Виклик:
+string name = null;
+bool result = name.IsNullOrEmpty(); // НЕ ВПАДЕ з NullReferenceException!</code></pre>
+        <p><b>Чому код не падає:</b> Компілятор Roslyn перетворює рядок <code>name.IsNullOrEmpty()</code> на прямий статичний виклик:</p>
+        <pre><code>bool result = StringExtensions.IsNullOrEmpty(name); // Звичайний виклик, куди передано аргумент null!</code></pre>
+        <p>Помилка <code>NullReferenceException</code> виникне лише тоді, коли ви всередині самого методу розширення спробуєте звернутися до властивостей або методів аргументу (<code>str.Length</code>) без попередньої перевірки на <code>null</code>.</p>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Upcasting vs Downcasting: у чому різниця? Оператори `as` та `is`.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Upcasting — приведення нащадка до базового типу (завжди безпечне, неявне). Downcasting — приведення базового типу до нащадка (небезпечне, вимагає явного касту або операторів `as`/`is`).
+        </div>
+        <h4>Порівняння способів приведення:</h4>
+        <ul>
+            <li><b>Upcasting:</b> <code>Animal a = new Dog();</code> Завжди успішний, компілятор дозволяє виконувати неявно.</li>
+            <li><b>Downcasting (Спосіб 1 — Явний каст):</b>
+                <pre><code>Dog d = (Dog)a; // Якщо 'a' насправді Cat, вилетить InvalidCastException!</code></pre>
+            </li>
+            <li><b>Downcasting (Спосіб 2 — Оператор `as`):</b>
+                <pre><code>Dog d = a as Dog; // Якщо привести не вдалося, повертає null (не кидає виняток). Працює ТІЛЬКИ для nullable/reference types!</code></pre>
+            </li>
+            <li><b>Downcasting (Спосіб 3 — Сучасний оператор `is`):</b>
+                <pre><code>if (a is Dog dog)
+{
+    dog.Bark(); // Змінна 'dog' доступна одразу всередині if (найбезпечніший підхід)
+}</code></pre>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. Що таке чисті функції (Pure Functions) та побічні ефекти (Side Effects)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Чиста функція є строго детермінованою (для однакових вхідних аргументів ЗАВЖДИ повертає однаковий результат) і не створює жодних побічних ефектів (не змінює глобальні змінні, не пише в БД, консоль чи файл).
+        </div>
+        <h4>Приклади:</h4>
+        <pre><code>// ЧИСТА ФУНКЦІЯ: Ідеальна для Unit-тестів, легко кешується (Memoization), потокобезпечна
+public int Add(int a, int b) =&gt; a + b;
+
+// НЕЧИСТА ФУНКЦІЯ (має Side Effect: запис у консоль та залежність від поточного часу)
+public int AddAndLog(int a, int b)
+{
+    Console.WriteLine(DateTime.Now); // Побічний ефект
+    return a + b;
+}</code></pre>
+        <p><b>Переваги чистих функцій:</b> Не викликають Race Conditions у багатопотоковому середовищі, для них не потрібні Mock-об'єкти в тестах, їх виконання можна безпечно розпаралелювати на будь-яку кількість ядер процесора.</p>
+    </article>
+
+    <!-- ПИТАННЯ 15 -->
+    <article class="q-card" id="q15">
+        <div class="q-header">
+            <h3 class="q-title">15. Формати серіалізації: JSON (`System.Text.Json`) vs Protocol Buffers (Protobuf) vs MessagePack.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> JSON — текстовий, зручний для вебу і налагодження, але повільний і об'ємний. Protobuf та MessagePack — двійкові, компактні та в рази швидші, ідеальні для внутрішньої мікросервісної взаємодії та високих навантажень.
+        </div>
+        <h4>Порівняльна таблиця:</h4>
+        <ul>
+            <li><b>JSON (`System.Text.Json`):</b> Стандарт для Public Web API. У сучасному .NET 8/9 підтримує <i>Source Generators</i> (генерація серіалізаторів під час компіляції без використання повільної рефлексії через <code>[JsonSerializable]</code>).</li>
+            <li><b>Protocol Buffers (Protobuf):</b> Бінарний контрактний формат від Google. Використовує суворі файли <code>.proto</code>, стискає цілі числа за алгоритмом Varint. Не передає назви полів у повідомленні (тільки числові теги 1, 2, 3), що робить пейлоад у 3–5 разів меншим за JSON. Стандарт для <b>gRPC</b>.</li>
+            <li><b>MessagePack:</b> «Бінарний JSON». Не вимагає обов'язкових контрактних proto-файлів, може серіалізувати довільні C# об'єкти на льоту, забезпечуючи швидкість, близьку до Protobuf. Популярний для кешування великих об'єктів у Redis.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>

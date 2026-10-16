@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 2 (Junior)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Навігація */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картка питання */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Рівень: Junior • Порція 2 з 4</span>
+        <h1 style="margin-top: 0.5rem;">Колекції, LINQ, Ресурси, Web та SQL</h1>
+        <p style="color: var(--text-muted);">Запитання з DOU: практичний стек, алгоритми під капотом і фундамент розробника</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 2</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. `Array` vs `ArrayList` vs `List<T>`. Будова `List<T>`</a></li>
+            <li><a href="#q2">2. Як влаштований `Dictionary<TKey, TValue>` (хеш-колізії)</a></li>
+            <li><a href="#q3">3. Ієрархія: `IEnumerable<T>`, `ICollection<T>`, `IList<T>`</a></li>
+            <li><a href="#q4">4. Делегати: `Action`, `Func`, `Predicate`</a></li>
+            <li><a href="#q5">5. Події (`event`) проти відкритих полів-делегатів</a></li>
+            <li><a href="#q6">6. Анонімні методи та лямбда-вирази</a></li>
+            <li><a href="#q7">7. LINQ: відкладене vs негайне виконання</a></li>
+            <li><a href="#q8">8. `IEnumerable<T>` проти `IQueryable<T>`</a></li>
+            <li><a href="#q9">9. Винятки: `throw` vs `throw ex`, блок `finally`</a></li>
+            <li><a href="#q10">10. Некеровані ресурси, `IDisposable` та `using`</a></li>
+            <li><a href="#q11">11. Як виконується код: CLR, IL, JIT-компілятор</a></li>
+            <li><a href="#q12">12. Dependency Injection: `Transient`, `Scoped`, `Singleton`</a></li>
+            <li><a href="#q13">13. REST API: методи HTTP та статусні коди</a></li>
+            <li><a href="#q14">14. SQL для джуна: PK, FK, `JOIN`, індекси</a></li>
+            <li><a href="#q15">15. Що таке Unit-тести? Патерн AAA і Mocking</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. Різниця між `Array`, `ArrayList` та `List<T>`. Як влаштований `List<T>` під капотом? Що таке Capacity?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Масив фіксованого розміру. `ArrayList` — застарілий нетипізований список (boxing/unboxing). `List<T>` — обгортка над звичайним масивом, який автоматично подвоюється при переповненні.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b><code>T[]</code> (Масив):</b> Має фіксовану довжину, виділену в пам'яті один раз. Елементи лежать у пам'яті послідовно (найшвидший доступ за індексом $O(1)$).</li>
+            <li><b><code>ArrayList</code>:</b> Застарілий клас із .NET 1.1. Зберігає все як <code>object</code>. Будь-яке додавання <code>int</code> викликає boxing. Сьогодні не використовується!</li>
+            <li><b><code>List&lt;T&gt;</code>:</b> Типізований динамічний список. Під капотом має звичайний масив <code>T[] _items</code>.
+                <ul>
+                    <li><code>Count</code> — кількість реально доданих елементів.</li>
+                    <li><code>Capacity</code> — реальний розмір внутрішнього масиву (за замовчуванням: 0, 4, 8, 16, 32...).</li>
+                    <li><b>Що відбувається при перевищенні Capacity:</b> Створюється новий масив удвічі більшого розміру, всі старі елементи копіюються туди, а старий масив віддається на збір сміття GC. Операція додавання займає амортизований час $O(1)$, але при розширенні — $O(N)$.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. Як влаштований `Dictionary<TKey, TValue>` під капотом? Що таке хеш-колізія і як вона вирішується?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Хеш-таблиця на основі двох масивів: `buckets` (індекси) та `entries` (дані). Пошук за $O(1)$. Колізія вирішується методом ланцюжків (внутрішній зв'язаний список за індексами).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Для збереження пари ключ-значення Dictionary робить таке:</p>
+        <ol>
+            <li>Викликає <code>key.GetHashCode()</code> та вираховує індекс бакета: <code>bucketIndex = hash % buckets.Length</code>.</li>
+            <li>Зберігає запис у масив <code>Entry[]</code> (містить хеш, ключ, значення та індекс наступного елемента <code>next</code>).</li>
+        </ol>
+        <p><b>Хеш-колізія</b> виникає у двох випадках:
+            1) Різні ключі видали однаковий `GetHashCode()`; 
+            2) Різні хеші після взяття залишку від ділення дали однаковий номер бакета.
+        </p>
+        <p><b>Як C# вирішує колізію:</b> Метод ланцюжків (Chaining). У бакет кладеться посилання на останній доданий елемент, а його поле <code>next</code> вказує на попередній. При пошуку перевіряється точний хеш, а потім викликається <code>Equals()</code>.</p>
+        <p><i>Вимога:</i> Якщо ви перевизначаєте <code>Equals()</code> у своєму класі, ви <b>зобов'язані</b> узгоджено перевизначити і <code>GetHashCode()</code>!</p>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. Ієрархія інтерфейсів колекцій: `IEnumerable<T>`, `ICollection<T>`, `IList<T>`. У чому різниця?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `IEnumerable` — тільки послідовний перегляд (`foreach`). `ICollection` додає модифікацію (`Add`, `Remove`) та властивість `Count`. `IList` додає доступ за числовим індексом `[i]`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><code>IEnumerable&lt;T&gt;</code>: Базовий інтерфейс. Має лише один метод <code>GetEnumerator()</code>. Дозволяє тільки бігти вперед по колекції за допомогою <code>foreach</code>. Не знає розміру колекції (щоб дізнатися довжину, треба пройти її всю).</li>
+            <li><code>ICollection&lt;T&gt; : IEnumerable&lt;T&gt;</code>: Додає розмір (<code>Count</code>), методи редагування (<code>Add</code>, <code>Remove</code>, <code>Clear</code>) та перевірку наявності (<code>Contains</code>).</li>
+            <li><code>IList&lt;T&gt; : ICollection&lt;T&gt;</code>: Додає індексатор (<code>list[0]</code>), можливість вставки за індексом (<code>Insert</code>) та видалення за індексом (<code>RemoveAt</code>).</li>
+            <li><code>IReadOnlyCollection&lt;T&gt;</code> та <code>IReadOnlyList&lt;T&gt;</code>: Використовуються, коли клієнту потрібно віддати колекцію тільки на читання.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. Що таке делегат? Стандартні узагальнені делегати: `Action`, `Func`, `Predicate`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Делегат — це безпечний покажчик на метод. `Action` нічого не повертає (`void`). `Func` обов'язково повертає значення. `Predicate` повертає `bool`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Делегат є посилальним типом, який знає, який метод (або методи) викликати і на якому екземплярі об'єкта.</p>
+        <ul>
+            <li><code>Action&lt;T1, T2...&gt;</code>: Приймає від 0 до 16 параметрів, <b>завжди повертає <code>void</code></b>.
+                <pre><code>Action&lt;string&gt; print = msg =&gt; Console.WriteLine(msg);</code></pre>
+            </li>
+            <li><code>Func&lt;T1, T2..., TResult&gt;</code>: Приймає параметри і <b>обов'язково повертає результат</b> (останній тип у дженерику — тип результату).
+                <pre><code>Func&lt;int, int, int&gt; sum = (a, b) =&gt; a + b; // приймає два int, повертає int</code></pre>
+            </li>
+            <li><code>Predicate&lt;T&gt;</code>: Приймає один аргумент і завжди повертає <code>bool</code> (аналог <code>Func&lt;T, bool&gt;</code>). Зазвичай використовується в <code>List.Find</code>.
+                <pre><code>Predicate&lt;int&gt; isEven = x =&gt; x % 2 == 0;</code></pre>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. Що таке подія (`event`)? Чим вона відрізняється від звичайного публічного поля-делегата?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `event` — це захисна обгортка над делегатом (як властивість над полем). Ззовні дозволені лише оператори підписки `+=` та відписки `-=`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Якщо зробити поле-делегат публічним: <code>public Action OnChange;</code>, будь-який зовнішній клас зможе:</p>
+        <ol>
+            <li>Випадково затерти всіх інших підписників, написавши <code>obj.OnChange = MyHandler;</code> замість <code>+=</code>.</li>
+            <li>Викликати подію напряму ззовні: <code>obj.OnChange();</code>, коли це має робити тільки сам власник.</li>
+        </ol>
+        <p>Ключове слово <code>event</code> обмежує права зовнішнього коду: клієнти можуть <b>тільки підписуватися (+=) або відписуватися (-=)</b>. Смикати виклик події може виключно той клас, у якому вона оголошена.</p>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. Що таке анонімні методи та лямбда-вирази?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Спосіб передати блок коду або метод як параметр прямо на місці виклику без необхідності виносити його в окремий іменований метод класу.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Еволюція синтаксису C#:</p>
+        <pre><code>// 1. C# 2.0: Анонімний метод через ключове слово delegate
+button.Click += delegate(object sender, EventArgs e) { Console.WriteLine("Click!"); };
+
+// 2. C# 3.0+: Лямбда-вираз через стрілочний оператор =&gt;
+button.Click += (sender, e) =&gt; Console.WriteLine("Click!");</code></pre>
+        <p>Лямбда-вирази діляться на:</p>
+        <ul>
+            <li><b>Expression Lambda:</b> Має один вираз праворуч: <code>x =&gt; x * 2</code> (результат повертається автоматично).</li>
+            <li><b>Statement Lambda:</b> Має блок інструкцій у фігурних дужках: <code>(x, y) =&gt; { int res = x + y; return res; }</code>.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. Що таке LINQ? Чим відрізняється відкладене (Deferred) виконання від негайного (Immediate)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> LINQ — уніфікована мова запитів до колекцій. Відкладене виконання виконує запит лише в момент обходу (в `foreach`). Негайне — одразу генерує результат (`ToList()`, `Count()`).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>var numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+// ВІДКЛАДЕНЕ (Deferred): запит лише побудований, фільтрація ще НЕ запускалася!
+var query = numbers.Where(n =&gt; n &gt; 1); 
+
+numbers.Add(4); // Змінили початкову колекцію
+
+// НЕГАЙНЕ (Immediate): виконання відбувається прямо зараз під час ітерації
+foreach (var n in query) 
+{
+    Console.WriteLine(n); // Виведе 2, 3 і 4! (бо запит спрацював після додавання)
+}</code></pre>
+        <p><b>Які методи форсують негайне виконання:</b>
+            <ul>
+                <li>Перетворення в колекції: <code>ToList()</code>, <code>ToArray()</code>, <code>ToDictionary()</code>.</li>
+                <li>Агрегатні функції: <code>Count()</code>, <code>Sum()</code>, <code>Average()</code>, <code>Min()</code>, <code>Max()</code>.</li>
+                <li>Вибірка одного елемента: <code>First()</code>, <code>FirstOrDefault()</code>, <code>Single()</code>.</li>
+            </ul>
+        </p>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. У чому принципова різниця між `IEnumerable<T>` та `IQueryable<T>`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `IEnumerable` фільтрує дані в пам'яті програми (підходить для локальних колекцій). `IQueryable` перекладає запит у SQL-код і фільтрує дані на боці сервера бази даних.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><code>IEnumerable&lt;T&gt;</code> (простір <code>System.Collections.Generic</code>):
+                <ul>
+                    <li>Працює з даними, що вже завантажені в оперативну пам'ять процесу.</li>
+                    <li>Методи приймають звичайні делегати <code>Func&lt;T, bool&gt;</code>.</li>
+                    <li>Якщо написати <code>db.Users.AsEnumerable().Where(u =&gt; u.Age &gt; 18)</code>, база вивантажить <b>всіх мільйон користувачів</b> через мережу, а фільтрація виконається в C#.</li>
+                </ul>
+            </li>
+            <li><code>IQueryable&lt;T&gt;</code> (простір <code>System.Linq</code>):
+                <ul>
+                    <li>Призначений для віддалених джерел даних (Entity Framework, бази даних).</li>
+                    <li>Методи приймають дерева виразів (Expression Trees): <code>Expression&lt;Func&lt;T, bool&gt;&gt;</code>.</li>
+                    <li>EF Core аналізує дерево виразів і перетворює його на конструкцію <code>SELECT ... WHERE Age &gt; 18</code> прямо в SQL-запит. На клієнт приїдуть лише відфільтровані рядки.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. Обробка винятків: різниця між `throw` та `throw ex`? Чи завжди спрацьовує `finally`? Що таке фільтри винятків (`when`)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `throw` зберігає повний StackTrace; `throw ex` затирає історію і робить поточний рядок початком помилки. `finally` виконується завжди (крім падіння процесу).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>try 
+{ 
+    SomeOperation(); 
+}
+catch (Exception ex)
+{
+    Log(ex);
+    throw;    // ПРАВИЛЬНО: прокидає виняток вище, зберігаючи початковий стек викликів
+    // throw ex; // КАТАСТРОФА: перезаписує StackTrace, справжній рядок аварії буде втрачено!
+}</code></pre>
+        <p><b>Чи завжди спрацьовує <code>finally</code>?</b> Практично завжди, навіть якщо в <code>try</code> стоїть <code>return</code>. Блок НЕ виконається лише в екстремальних випадках: примусове вбивство процесу ОС (<code>Environment.FailFast()</code> або <code>kill -9</code>) чи аварійний Overflow стеку (<code>StackOverflowException</code>).</p>
+        <p><b>Фільтри винятків (<code>when</code>):</b> Дозволяють перехоплювати помилку лише за виконання умови без розгортання стеку:</p>
+        <pre><code>catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+{
+    Console.WriteLine("Ресурс не знайдено 404");
+}</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Керовані та некеровані ресурси. Навіщо потрібен `IDisposable` та конструкція `using`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Garbage Collector вміє звільняти тільки керовану пам'ять .NET. Некеровані ресурси (файли, підключення до БД, сокети ОС) треба закривати вручну через `Dispose()`.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Керовані (Managed):</b> Об'єкти C#, виділені в купі. Ними автоматично опікується GC.</li>
+            <li><b>Некеровані (Unmanaged):</b> Дескриптори файлів Windows/Linux, мережеві сокети, дескриптори вікон, підключення до БД. GC про них нічого не знає і не закриє їх вчасно.</li>
+        </ul>
+        <p>Для детермінованого (негайного) звільнення ресурсів клас реалізує <code>IDisposable</code> з методом <code>Dispose()</code>. Щоб гарантовано викликати його навіть при виникненні винятків, використовують <code>using</code>:</p>
+        <pre><code>// Сучасний using statement (C# 8+)
+using var stream = new FileStream("data.txt", FileMode.Open);
+// В кінці видимості методу автоматично викличеться stream.Dispose()!</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Як виконується C# код? Що таке CLR, IL-код та JIT-компілятор?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> C# код компілюється Roslyn'ом у проміжний байт-код (IL). Під час запуску програми віртуальна машина CLR компілює IL у машинний код процесора за допомогою JIT (Just-In-Time).
+        </div>
+        <h4>Ланцюжок виконання:</h4>
+        <ol>
+            <li><b>Вихідний код C#</b> компілюється компілятором Roslyn у файл збірки (<code>.dll</code> або <code>.exe</code>).</li>
+            <li>Всередині збірки лежить <b>IL (Intermediate Language)</b> — платформонезалежний байт-код + метадані типів.</li>
+            <li>При запуску програми стартує <b>CLR (Common Language Runtime)</b> — віртуальне середовище виконання .NET.</li>
+            <li><b>JIT-компілятор (Just-In-Time):</b> компілює інструкції IL у реальний нативний код процесора (x86, x64, ARM) «на льоту» прямо перед першим викликом конкретного методу. Наступні виклики виконують уже скомпільований нативний код.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. Життєві цикли сервісів у вбудованому Dependency Injection (.NET): `Transient`, `Scoped`, `Singleton`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `Transient` — новий об'єкт на кожен запит. `Scoped` — один екземпляр на один HTTP-запит. `Singleton` — один єдиний об'єкт на весь час роботи додатку.
+        </div>
+        <h4>Порівняння життєвих циклів:</h4>
+        <ul>
+            <li><code>AddTransient&lt;IService, Service&gt;()</code>:
+                <br/>Створюється заново <b>кожного разу</b>, коли його хтось запитує через конструктор. Найкраще підходить для легковагих сервісів без збереження стану.
+            </li>
+            <li><code>AddScoped&lt;IService, Service&gt;()</code>:
+                <br/>Створюється <b>один екземпляр на весь життєвий цикл одного веб-запиту (Scope)</b>. Всі контролери чи сервіси всередині одного HTTP-запиту отримають однаковий екземпляр. Наприклад: <code>DbContext</code> в EF Core за замовчуванням є саме <i>Scoped</i>.
+            </li>
+            <li><code>AddSingleton&lt;IService, Service&gt;()</code>:
+                <br/>Створюється рівно <b>один раз</b> при першому зверненні і живе до вимкнення сервера. Повинен бути обов'язково потокобезпечним (thread-safe). Наприклад: сервіс локального in-memory кешування.
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Що таке REST API? Основні HTTP-методи та найважливіші статусні коди відповідей.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> REST — архітектурний стиль передачі стану за допомогою стандартного протоколу HTTP. Статуси: 2xx — успіх, 4xx — помилка клієнта, 5xx — помилка сервера.
+        </div>
+        <h4>Основні HTTP методи:</h4>
+        <ul>
+            <li><code>GET</code>: Отримання ресурсу. Не повинен змінювати стан на сервері (ідемпотентний).</li>
+            <li><code>POST</code>: Створення нового ресурсу. Неідемпотентний.</li>
+            <li><code>PUT</code>: Повне оновлення ресурсу (або створення з вказаним ID). Ідемпотентний.</li>
+            <li><code>PATCH</code>: Часткове оновлення окремих полів ресурсу.</li>
+            <li><code>DELETE</code>: Видалення ресурсу. Ідемпотентний.</li>
+        </ul>
+        <h4>Популярні HTTP статуси:</h4>
+        <ul>
+            <li><b>200 OK:</b> Успішний запит. | <b>201 Created:</b> Ресурс успішно створено (відповідь на POST). | <b>204 No Content:</b> Успіх, але тіло порожнє (часто для DELETE).</li>
+            <li><b>400 Bad Request:</b> Невалідне тіло або параметри запиту.</li>
+            <li><b>401 Unauthorized:</b> Користувач не автентифікований (не надав валідний токен).</li>
+            <li><b>403 Forbidden:</b> Користувача розпізнано, але у нього недостатньо прав (ролей) для цієї дії.</li>
+            <li><b>404 Not Found:</b> Запитуваний ресурс не існує.</li>
+            <li><b>500 Internal Server Error:</b> Необроблена аварія або виняток на бекенді.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. Реляційні бази даних для Junior: PK, FK, різниця між `INNER JOIN` та `LEFT JOIN`, навіщо потрібні індекси?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> PK — унікальний ідентифікатор рядка. FK — посилання на іншу таблицю. INNER JOIN повертає лише спільні збіги, LEFT JOIN повертає ВСІ рядки лівої таблиці + відповідності з правої. Індекс прискорює пошук з $O(N)$ до $O(\log N)$.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li><b>Primary Key (PK):</b> Первинний ключ. Унікальне непорожнє значення (зазвичай <code>Id</code>: int або Guid), що ідентифікує конкретний запис.</li>
+            <li><b>Foreign Key (FK):</b> Зовнішній ключ. Поле, що посилається на PK іншої таблиці, забезпечуючи зв'язки між сутностями.</li>
+            <li><b>Різниця JOIN'ів:</b>
+                <ul>
+                    <li><code>INNER JOIN</code>: Повертає тільки ті рядки, для яких знайдено збіг в <b>обох</b> таблицях.</li>
+                    <li><code>LEFT (OUTER) JOIN</code>: Повертає <b>всі</b> записи з лівої таблиці. Якщо для запису зліва в правій таблиці збігу не знайдено, поля правої таблиці заповнюються значеннями <code>NULL</code>.</li>
+                </ul>
+            </li>
+            <li><b>Індекси:</b> Спеціальні допоміжні структури (найчастіше B-Tree дерева). Без індексу СУБД робить <i>Full Table Scan</i> (перебирає кожен рядок таблиці $O(N)$). Індекс дозволяє миттєво знаходити записи за логарифмічний час $O(\log N)$. <i>Плата:</i> сповільнює операції запису (`INSERT`, `UPDATE`), бо дерево індексу потрібно перебудовувати.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 15 -->
+    <article class="q-card" id="q15">
+        <div class="q-header">
+            <h3 class="q-title">15. Що таке Unit-тести? Патерн Arrange-Act-Assert (AAA) та Mock-об'єкти.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Тестування одного маленького методу в повній ізоляції від бази/мережі. Структура: підготовка даних (Arrange), виклик (Act), перевірка очікувань (Assert). Залежності замінюються на «заглушки» (Mock).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Unit-тест перевіряє правильність логіки одного класу або методу. Він має виконуватися за мілісекунди і не повинен ходити в реальну базу даних чи зовнішні HTTP API.</p>
+        <pre><code>[Fact]
+public void CalculateDiscount_ForVipUser_ShouldReturn20Percent()
+{
+    // 1. Arrange (Підготовка даних та залежностей)
+    var calculator = new DiscountService();
+    decimal amount = 100m;
+
+    // 2. Act (Виконання досліджуваної дії)
+    decimal discount = calculator.Calculate(amount, isVip: true);
+
+    // 3. Assert (Перевірка результату на відповідність очікуванням)
+    Assert.Equal(20m, discount);
+}</code></pre>
+        <p><b>Mock (макет / заглушка):</b> Спеціальний фіктивний об'єкт (створюється за допомогою бібліотек на зразок <i>Moq</i> або <i>NSubstitute</i>), який емулює поведінку реального інтерфейсу (наприклад, <code>IUserRepository</code>) і повертає заздалегідь запрограмовані дані, щоб тест не залежав від реальної БД.</p>
+    </article>
+
+</div>
+
+</body>
+</html>

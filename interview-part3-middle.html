@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 3 (Middle)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Навігаційний блок */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картка питання */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Рівень: Middle • Порція 3 з 4</span>
+        <h1 style="margin-top: 0.5rem;">C# Під Капотом, CLR, Пам'ять та Async/Threading</h1>
+        <p style="color: var(--text-muted);">Поглиблені питання DOU: внутрішня механіка компілятора, керування пам'яттю та паралелізм</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 3</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. Коваріантність та контраваріантність (`out` / `in`)</a></li>
+            <li><a href="#q2">2. Замикання (Closures) та Display Class у C#</a></li>
+            <li><a href="#q3">3. Як влаштований `yield return` під капотом</a></li>
+            <li><a href="#q4">4. `Span<T>`, `Memory<T>` та обмеження `ref struct`</a></li>
+            <li><a href="#q5">5. Сучасний Pattern Matching (C# 9–12)</a></li>
+            <li><a href="#q6">6. Внутрішня будова GC: покоління, LOH, POH</a></li>
+            <li><a href="#q7">7. Workstation GC vs Server GC, Background GC</a></li>
+            <li><a href="#q8">8. Патерн `Dispose(bool disposing)` та фіналізатори</a></li>
+            <li><a href="#q9">9. Витоки пам'яті в керованому .NET (Memory Leaks)</a></li>
+            <li><a href="#q10">10. Як влаштований `async / await` (State Machine)</a></li>
+            <li><a href="#q11">11. `SynchronizationContext` та `ConfigureAwait(false)`</a></li>
+            <li><a href="#q12">12. `Task` проти `ValueTask` (алокації пам'яті)</a></li>
+            <li><a href="#q13">13. `ThreadPool`, Work-Stealing та Thread Starvation</a></li>
+            <li><a href="#q14">14. Примітиви синхронізації: `lock`, `SemaphoreSlim`, `Mutex`</a></li>
+            <li><a href="#q15">15. Атомарні операції `Interlocked`, `volatile`, бар'єри пам'яті</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. Коваріантність та контраваріантність у Generics: що це, навіщо потрібні `out` та `in`? Чому не працює для Value Types?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Варіантність дозволяє приводити дженерик-інтерфейси/делегати на основі спорідненості їх типів. `out` (коваріантність) — тип повертається (більш специфічний тип до базового). `in` (контраваріантність) — тип приймається як аргумент. Працює ТІЛЬКИ для Reference Types!
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>За замовчуванням узагальнення в C# є <b>інваріантними</b> (наприклад, <code>List&lt;string&gt;</code> не можна привести до <code>List&lt;object&gt;</code>, інакше ви змогли б додати туди число і поламати безпеку типів).</p>
+        <ul>
+            <li><b>Коваріантність (<code>out T</code>):</b> Дозволяє використати тип-нащадок замість батьківського типу. Тип <code>T</code> може бути ТІЛЬКИ результатом методів:
+                <pre><code>IEnumerable&lt;string&gt; strings = new List&lt;string&gt;();
+IEnumerable&lt;object&gt; objects = strings; // Працює, бо IEnumerable&lt;out T&gt;</code></pre>
+            </li>
+            <li><b>Контраваріантність (<code>in T</code>):</b> Дозволяє використати батьківський тип замість нащадка. Тип <code>T</code> може бути ТІЛЬКИ вхідним аргументом:
+                <pre><code>Action&lt;object&gt; actObject = obj =&gt; Console.WriteLine(obj);
+Action&lt;string&gt; actString = actObject; // Працює, бо Action&lt;in T&gt;</code></pre>
+            </li>
+            <li><b>Чому НЕ працює з Value Types:</b> Структури мають різний бінарний розмір у пам'яті (наприклад, <code>int</code> — 4 байти, а <code>double</code> — 8 байт). Посилальні типи завжди мають розмір 4 або 8 байт (покажчик), тому CLR може безпечно працювати з ними на рівні масивів та регістрів без конвертації/боксингу.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. Що таке замикання (Closures) в C#? Як компілятор реалізує його під капотом (Display Class)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Замикання — це здатність лямбда-функції «запам'ятовувати» змінні зі своєї зовнішньої області видимості. Компілятор створює невидимий службовий клас у купі (Display Class) і робить захоплені змінні його полями.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Коли ви пишете:</p>
+        <pre><code>int factor = 10;
+Func&lt;int, int&gt; multiplier = x =&gt; x * factor;</code></pre>
+        <p>Компілятор Roslyn генерує спеціальний прихований клас:</p>
+        <pre><code>// Те, що робить компілятор "під капотом":
+[CompilerGenerated]
+private sealed class &lt;&gt;c__DisplayClass0_0
+{
+    public int factor; // Локальна змінна перетворилася на поле класу в Купі!
+    public int &lt;Main&gt;b__0(int x) =&gt; x * factor;
+}</code></pre>
+        <p><b>Небезпеки та пастки:</b>
+            <ul>
+                <li><b>Приховані алокації:</b> Кожне замикання створює екземпляр класу в Heap, збільшуючи навантаження на Garbage Collector.</li>
+                <li><b>Захоплення змінної в циклі (історичний баг у <code>for</code>):</b> Якщо лямбда захоплює лічильник <code>for (int i = 0; i &lt; 5; i++)</code>, всі лямбди посилаються на <i>одне й те саме спільне поле</i> <code>displayClass.i</code>, тому в кінці виконання всі виведуть <code>5</code>. (У циклі <code>foreach</code> це виправили в C# 5).</li>
+            </ul>
+        </p>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. Як влаштований `yield return` під капотом? Скінченний автомат (State Machine).</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Компілятор генерує внутрішній клас, що реалізує `IEnumerator<T>` зі switch-case автоматом у методі `MoveNext()`, зберігаючи поточну точку виконання та локальні змінні.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Оператор <code>yield return</code> дозволяє створювати ітератори без попереднього виділення колекції в пам'яті.</p>
+        <ul>
+            <li><b>Скінченний автомат:</b> Компілятор перетворює метод на клас зі станами (<code>state = 0, 1, 2... -1</code>).</li>
+            <li>Кожен виклик <code>yield return value</code>:
+                <ol>
+                    <li>Присвоює поточне значення властивості <code>Current</code>.</li>
+                    <li>Змінює внутрішній <code>_state</code> на наступний крок.</li>
+                    <li>Повертає <code>true</code> з методу <code>MoveNext()</code>.</li>
+                </ol>
+            </li>
+            <li>Наступний виклик <code>MoveNext()</code> заходить у метод і через <code>switch (_state)</code> миттєво стрибає на той рядок, де зупинився минулого разу.</li>
+            <li><b>Підступний нюанс:</b> Якщо перед першим <code>yield return</code> кинути виняток валідації аргументів (<code>if (arg == null) throw ...</code>), цей виняток НЕ викинеться в момент виклику методу! Він викинеться лише тоді, коли хтось уперше викличе <code>foreach</code> або <code>MoveNext()</code>.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. Що таке `Span<T>`, `ReadOnlySpan<T>` та `Memory<T>`? Чому `Span` це `ref struct` і де його не можна використовувати?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `Span<T>` — швидкий покажчик на неперервний блок пам'яті без алокацій (zero-allocation). Це `ref struct`, тому він живе ТІЛЬКИ на стеку. `Memory<T>` — обгортка над пам'яттю, яка може жити в Купі (Heap).
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p><code>Span&lt;T&gt;</code> уніфікує доступ до пам'яті: масивів у купі, буферів на стеку (через <code>stackalloc</code>) або пам'яті, виділеної через некерований код (P/Invoke). Забезпечує нарізку (Slicing) без створення копій у пам'яті.</p>
+        <pre><code>string str = "12345";
+ReadOnlySpan&lt;char&gt; span = str.AsSpan(0, 3); // "123" БЕЗ створення нового string у купі!
+int num = int.Parse(span);</code></pre>
+        <p><b>Чому <code>Span&lt;T&gt;</code> є <code>ref struct</code>:</b><br/>
+        Він містить керований покажчик (by-ref pointer). Щоб уникнути ситуації, коли потік або GC втратить покажчик, <code>ref struct</code> гарантовано розміщується <b>виключно на стеку</b>.</p>
+        <p><b>Де <code>Span&lt;T&gt;</code> ЗАБОРОНЕНО використовувати:</b></p>
+        <ul>
+            <li>Не може бути полем звичайного класу (бо клас живе в купі).</li>
+            <li>Не можна використовувати всередині асинхронних методів (<code>async / await</code>) між точками зупинки (бо асинхронна стан-машина є класом у купі).</li>
+            <li>Не можна пакувати (Boxing в <code>object</code>).</li>
+            <li>Не може бути типом аргументу в дженериках (<code>List&lt;Span&lt;int&gt;&gt;</code> — помилка компіляції).</li>
+        </ul>
+        <p><b>Рішення для асинхронного коду:</b> Використовувати <code>Memory&lt;T&gt;</code> / <code>ReadOnlyMemory&lt;T&gt;</code> — це звичайні структури, які можуть лежати в купі та перетворюватися на <code>Span</code> безпосередньо перед синхронною обробкою.</p>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. Сучасний Pattern Matching у C#: які види патернів існують?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Потужний інструмент перевірки форми та значень об'єктів без громіздких кастів. Включає type patterns, relational, logical (and/or/not), property та positional patterns.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <pre><code>// Switch-вираз із різними патернами:
+decimal GetDeliveryCost(object order) =&gt; order switch
+{
+    // Property Pattern + Relational Pattern (&gt;=, &lt;=)
+    Order { TotalPrice: &gt;= 1000m } =&gt; 0m, 
+
+    // Logical Patterns (and / or / not)
+    Order { WeightKg: &gt; 10 and &lt;= 30 } =&gt; 150m,
+
+    // Type Pattern з перевіркою властивості
+    ExpressOrder eo when eo.IsUrgent =&gt; 300m,
+
+    // Positional Pattern (через Deconstruct у record/туплах)
+    (string city, int dist) when city == "Київ" =&gt; 50m,
+
+    null =&gt; throw new ArgumentNullException(nameof(order)),
+    _ =&gt; 100m // Discard pattern (default)
+};</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. Як детально працює Garbage Collector? Покоління 0, 1, 2, LOH та POH. Пороги розмірів.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> GC працює на основі трасування графів від GC Roots. Покоління 0/1/2 дозволяють швидко чистити короткоживучі об'єкти. LOH (від 85 000 байт) не дефрагментується за замовчуванням. POH (.NET 5+) тримає закріплені об'єкти.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p><b>Гіпотеза поколінь:</b> Чим новіший об'єкт, тим коротший його час життя. Чим довше об'єкт живе, тим менша ймовірність, що він помре найближчим часом.</p>
+        <ul>
+            <li><b>Gen 0:</b> Сюди потрапляють абсолютно всі нові малі об'єкти. Збір відбувається найчастіше і за мілісекунди. Ті, хто вижив, переходять у Gen 1.</li>
+            <li><b>Gen 1:</b> Буфер між новими та старими об'єктами.</li>
+            <li><b>Gen 2:</b> Довгожителі (статичні змінні, кеші, синглтони). Збір сміття тут називається <i>Full GC</i>, він зупиняє потоки додатку (Stop-The-World) на відчутніший час.</li>
+            <li><b>LOH (Large Object Heap):</b> Об'єкти розміром <b>від 85 000 байт</b> (та великі масиви чисел від 1000 елементів) створюються одразу тут, оминаючи Gen 0. <i>Особливість:</i> через дорожнечу копіювання пам'яті LOH за замовчуванням <b>не дефрагментується</b>, що може призводити до фрагментації віртуальної пам'яті.</li>
+            <li><b>POH (Pinned Object Heap):</b> З'явився в .NET 5. Окремий пул для об'єктів, закріплених у пам'яті через <code>GCHandle.Alloc(..., GCHandleType.Pinned)</code> (наприклад, для передачі в C++ бібліотеки), щоб GC не дефрагментував решту звичайної купи.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. У чому різниця між Workstation GC та Server GC? Що таке Background GC?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Workstation GC оптимізований під швидкий відгук користувацького інтерфейсу (1 куча). Server GC виділяє окрему купу та окремий потік GC на кожне ядро CPU для максимальної пропускної здатності серверів.
+        </div>
+        <h4>Порівняння режимів:</h4>
+        <ul>
+            <li><b>Workstation GC:</b> Призначений для настільних програм (WPF, WinForms, консоль). Має одну купу. Пріоритет — мінімізувати час пауз, щоб UI не "зависав".</li>
+            <li><b>Server GC:</b> Стандартний режим для ASP.NET Core на серверах. CLR створює окрему пам'ять (heap) та окремий потік збору сміття для кожного логічного процесора. Пропускна здатність набагато вища, але споживає більше базової пам'яті.</li>
+            <li><b>Background GC:</b> Прийшов на зміну Concurrent GC. Дозволяє збирати сміття в Gen 0 та Gen 1 паралельно, навіть коли в цей самий момент триває важкий збір у Gen 2, зменшуючи тривалість блокувань Stop-the-World.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. Патерн `Dispose(bool disposing)`. Навіщо потрібен `GC.SuppressFinalize(this)`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Канонічний патерн очищення ресурсів. Захищає від подвійного виклику. `GC.SuppressFinalize` каже збирачу сміття не витрачати ресурси на виклик фіналізатора, якщо ресурси вже звільнені детерміновано через `Dispose()`.
+        </div>
+        <h4>Реалізація патерну:</h4>
+        <pre><code>public class ResourceHolder : IDisposable
+{
+    private bool _disposed = false;
+    private IntPtr _unmanagedHandle; // Некерований ресурс
+
+    public void Dispose()
+    {
+        Dispose(true);
+        // Запобігаємо виклику фіналізатора! Об'єкт помре в Gen 0 без черги фіналізації
+        GC.SuppressFinalize(this); 
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+
+        if (disposing)
+        {
+            // 1. Звільняємо керовані IDisposable ресурси (наприклад, файлові стріми)
+        }
+
+        // 2. Звільняємо прямі некеровані ресурси (Win32 API handles, malloc memory)
+        CloseHandle(_unmanagedHandle);
+
+        _disposed = true;
+    }
+
+    // Фіналізатор (деструктор) — підстраховка, якщо розробник забув викликати Dispose()
+    ~ResourceHolder()
+    {
+        Dispose(false); // disposing = false, бо керовані об'єкти вже могли бути зібрані GC!
+    }
+}</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. Які бувають витоки пам'яті (Memory Leaks) у керованому .NET? Як їх діагностувати?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> У .NET витік пам'яті — це не втрата покажчика (як у C++), а збереження живого посилання (GC Root) на непотрібний об'єкт. Топ причин: незняті event'и, статичні колекції та захоплення в замиканнях.
+        </div>
+        <h4>Головні джерела витоків:</h4>
+        <ol>
+            <li><b>Підписка на події без відписки (Event Handlers):</b> Видавець події (Publisher) тримає сильне посилання на підписника (Subscriber) через його метод у делегаті. Доки живий Publisher (наприклад, Singleton), подписник ніколи не буде зібраний GC!</li>
+            <li><b>Статичні поля та колекції:</b> Об'єкти, додані в <code>static List&lt;T&gt;</code> або статичний <code>Dictionary</code>, вважаються GC Roots і живуть до завершення роботи всього процесу.</li>
+            <li><b>Замикання таймерів (`System.Threading.Timer`):</b> Таймер тримає екземпляр класу через callback, не даючи йому вмерти.</li>
+            <li><b>Неочищені ресурси `IDisposable`:</b> Створення пулів з'єднань або потоків без виклику Dispose.</li>
+        </ol>
+        <p><b>Як шукати:</b> Зняття дампів пам'яті (Memory Dump) та аналіз за допомогою профайлерів: <b>JetBrains dotMemory</b>, <b>PerfView</b> або команди <code>dotnet-dump</code> у Linux/Docker.</p>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Як влаштований `async / await` під капотом? Що таке `IAsyncStateMachine`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Компілятор розбиває асинхронний метод на стани у згенерованій структурі `IAsyncStateMachine`. Метод `MoveNext()` підписується на завершення Task'а через Awaiter і повертає потік у ThreadPool, звільняючи його для інших задач.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Коли зустрічається ключове слово <code>await task</code>:</p>
+        <ol>
+            <li>Викликається <code>task.GetAwaiter()</code>.</li>
+            <li>Якщо задача вже завершена (<code>awaiter.IsCompleted == true</code>), метод продовжує виконуватися синхронно в тому самому потоці без перемикання контексту!</li>
+            <li>Якщо задача ще виконується:
+                <ul>
+                    <li>Стан-машина записує поточну точку зупинки (<code>state = 1</code>).</li>
+                    <li>Викликається <code>awaiter.UnsafeOnCompleted(MoveNext)</code>, що реєструє продовження (continuation).</li>
+                    <li>Поточний потік повертається в пул потоків (ThreadPool) обслуговувати інші HTTP-запити.</li>
+                </ul>
+            </li>
+            <li>Коли асинхронна операція введення-виведення (I/O) завершується (наприклад, драйвер мережевої карти отримує байти від БД), потік із пулу викликає <code>MoveNext()</code> знову, відновлює локальні змінні та продовжує виконання коду після <code>await</code>.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Що таке `SynchronizationContext`? Навіщо потрібен `ConfigureAwait(false)`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Контекст синхронізації повертає виконання після `await` у специфічний потік (головний потік UI у WPF або старий HttpContext в ASP.NET MVC). `ConfigureAwait(false)` каже не повертатися в оригінальний потік, запобігаючи дедлокам у бібліотеках.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li>В інтерфейсних додатках (WPF, WinForms, MAUI) оновлювати кнопки й текст можна <b>лише з головного UI-потоку</b>. <code>SynchronizationContext</code> запам'ятовує UI-потік перед `await` і маршалить код після `await` назад у цей потік.</li>
+            <li><b>Небезпека дедлоку:</b> Якщо викликати <code>Task.Result</code> або <code>.Wait()</code> у UI-потоці, UI блокується в очікуванні таски. Коли таска завершується, вона намагається повернутися в UI-потік через контекст синхронізації, але він заблокований! Виникає класичний Deadlock.</li>
+            <li><b><code>ConfigureAwait(false)</code>:</b> Вказує рантайму: <i>«Мені все одно, в якому потоці продовжувати код після await — візьми будь-який вільний потік із пулу»</i>.
+            <br/><i>Порада:</i> У бібліотеках загального призначення (Class Libraries, NuGet) завжди слід писати <code>ConfigureAwait(false)</code>. В сучасному <b>ASP.NET Core</b> контекст синхронізації було видалено взагалі, тому там ризику такого дедлоку немає.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. У чому різниця між `Task` та `ValueTask`? Коли використовувати `ValueTask`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `Task` — це клас (завжди виділяє пам'ять у купі). `ValueTask` — це структура (0 байт алокацій у разі синхронного завершення). Не можна робити подвійний await для `ValueTask`!
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Якщо метод викликається мільйони разів на секунду (наприклад, читання з локального сокету або кешу пам'яті):</p>
+        <pre><code>// Якщо дані в кеші є — метод завершується СИНХРОННО.
+public ValueTask&lt;string&gt; GetCachedDataAsync(string key)
+{
+    if (_cache.TryGetValue(key, out var val))
+    {
+        return new ValueTask&lt;string&gt;(val); // Нуль алокацій! Пам'ять у купі не витрачається
+    }
+    return new ValueTask&lt;string&gt;(FetchFromDbAsync(key)); // Асинхронний повільний шлях
+}</code></pre>
+        <p><b>Суворі обмеження <code>ValueTask</code>:</b></p>
+        <ul>
+            <li><b>НЕ можна викликати <code>await</code> двічі:</b> Об'єкт усередині пулиться та перевикористовується через <code>IValueTaskSource</code>. Подвійний await призведе до невизначеної поведінки або винятку.</li>
+            <li><b>НЕ можна викликати <code>.AsTask()</code> кілька разів</b> або паралельно очікувати через <code>Task.WhenAll()</code> без явної конвертації в Task.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Як влаштований `ThreadPool` у .NET? Що таке Work-Stealing та Thread Starvation?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Пул потоків тримає глобальну чергу та локальні черги для кожного потоку. Якщо у потоку закінчилася робота, він «краде» задачі в інших (Work-Stealing). Блокування потоків веде до Thread Starvation.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <ul>
+            <li>Створення реального системного потоку ОС (<code>new Thread()</code>) займає ~1 МБ пам'яті під стек та сотні мікросекунд процесорного часу. <code>ThreadPool</code> підтримує пул уже створених живих потоків.</li>
+            <li><b>Алгоритм Work-Stealing:</b> У пулі є одна глобальна черга завдань FIFO і локальна черга LIFO для кожного потоку. Коли робочий потік звільняється, він спочатку розгрібає власну чергу, а якщо вона порожня — «краде» задачі з хвоста черги інших зайнятих потоків. Це мінімізує конкуренцію за блокування між потоками.</li>
+            <li><b>Thread Starvation (голодування пулу):</b> Виникає, коли асинхронний код блокують синхронно через <code>.Result</code> або <code>Thread.Sleep()</code>. Пул потоків повільно ін'єктує нові потоки (приблизно 1 потік на 500 мс за алгоритмом Hill Climbing). Запити шикуються в гігантську чергу, і сервіс перестає відповідати на HTTP-запити.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. Примітиви синхронізації: `lock` (`Monitor`), `SemaphoreSlim`, `Mutex`, `AutoResetEvent`. Коли що обирати?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `lock` — для швидких синхронних блокувань у пам'яті. `SemaphoreSlim` — підтримує `await` для асинхронного коду та пулів. `Mutex` — блокування між різними процесами ОС.
+        </div>
+        <h4>Порівняльна таблиця:</h4>
+        <ul>
+            <li><code>lock (obj)</code> (під капотом <code>Monitor.Enter / Exit</code>): Найшвидший спосіб захисту критичної секції. Працює тільки всередині одного процесу. <b>Не можна писати <code>await</code> всередині блоку <code>lock</code>!</b></li>
+            <li><code>SemaphoreSlim</code>: Легковажний семафор. Дозволяє обмежити доступ кількості потоків одночасно (наприклад, не більше 5 паралельних HTTP запитів). <b>Підтримує <code>await semaphore.WaitAsync()</code></b>, тому є стандартом для асинхронного C#!</li>
+            <li><code>Mutex</code>: Важкий примітив рівня ядра ОС. Дозволяє синхронізувати різні процеси (наприклад, заборонити запуск двох копій одного додатку в операційній системі за допомогою іменованого м'ютексу).</li>
+            <li><code>ManualResetEventSlim</code> / <code>AutoResetEvent</code>: Події-сигнали для очікування завершення операції іншим потоком («ворота відкриті / закриті»).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 15 -->
+    <article class="q-card" id="q15">
+        <div class="q-header">
+            <h3 class="q-title">15. Атомарні операції `Interlocked`, ключове слово `volatile` та Memory Barriers.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `Interlocked` виконує операції на рівні інструкцій CPU без блокування потоків. `volatile` та бар'єри пам'яті забороняють компілятору і процесору оптимізувати/переставляти місцями читання та запис полів.
+        </div>
+        <h4>Розгорнута відповідь:</h4>
+        <p>Операція <code>count++</code> насправді не є атомарною (вона складається з 3 кроків: зчитати в регістр CPU, додати 1, записати назад у пам'ять). У багатопотоковому середовищі це веде до втрати даних (Race Condition).</p>
+        <pre><code>// Замість важкого блокування через lock:
+private static int _counter;
+
+// Атомарна операція за 1 такт процесора:
+Interlocked.Increment(ref _counter);
+Interlocked.Add(ref _counter, 5);
+Interlocked.CompareExchange(ref _location, newValue, comparand); // CAS операція</code></pre>
+        <ul>
+            <li><b>Бар'єри пам'яті (Memory Barriers):</b> Сучасні процесори та JIT-компілятор можуть переставляти інструкції читання/запису місцями для прискорення (Out-of-order execution). Бар'єр гарантує, що всі операції до бар'єра будуть виконані суворо раніше за операції після нього.</li>
+            <li><code>volatile</code>: Підказує компілятору, що поле може змінюватися іншими паралельними потоками. Забороняє кешувати його значення в регістрах CPU і змушує завжди читати актуальне значення напряму з оперативної пам'яті.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>
