@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOU Співбесіда .NET/C# — Порція 6 (Специфічні та пропущені теми)</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #be185d;
+            --primary-light: #fdf2f8;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-level {
+            background-color: #fce7f3;
+            color: #9d174d;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Навігаційний блок */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover { text-decoration: underline; }
+
+        /* Картка питання */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .q-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+
+        .top-link {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: inherit; }
+        p > code, li > code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        ul, ol { padding-left: 1.3rem; }
+        li { margin-bottom: 0.4rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        table th, table td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="badge-level">Додатковий модуль • Порція 6 з 6</span>
+        <h1 style="margin-top: 0.5rem;">Специфічні Питання DOU: C#, Web, CS та Бази Даних</h1>
+        <p style="color: var(--text-muted);">Повний розбір тем, що не увійшли до попередніх частин: від нутрощів JIT та рефлексії до фільтрів ASP.NET Core і нормальних форм БД</p>
+    </header>
+
+    <!-- НАВІГАЦІЯ -->
+    <nav class="toc-card" id="toc">
+        <h2>Зміст порції 6</h2>
+        <ul class="toc-list">
+            <li><a href="#q1">1. `Tuple` проти `ValueTuple` (C# 7+)</a></li>
+            <li><a href="#q2">2. Атрибути в C# (`AttributeUsage`, власні атрибути)</a></li>
+            <li><a href="#q3">3. LINQ: `First` vs `FirstOrDefault` vs `Single` vs `SingleOrDefault`</a></li>
+            <li><a href="#q4">4. Індексатори в класах (`Indexers`)</a></li>
+            <li><a href="#q5">5. Двобічно зв'язаний список `LinkedList<T>` проти `List<T>`</a></li>
+            <li><a href="#q6">6. Рефлексія (`System.Reflection`): суть та продуктивність</a></li>
+            <li><a href="#q7">7. Генерація generics у JIT: Value vs Reference Types</a></li>
+            <li><a href="#q8">8. Власні винятки (Custom Exceptions): правила створення</a></li>
+            <li><a href="#q9">9. Процес проти Потоку (Process vs Thread)</a></li>
+            <li><a href="#q10">10. Рекурсія: базовий випадок та `StackOverflowException`</a></li>
+            <li><a href="#q11">11. Cohesion (зв'язність) та Coupling (зачеплення)</a></li>
+            <li><a href="#q12">12. Балансування дерев та ідеальна хеш-функція</a></li>
+            <li><a href="#q13">13. 5 типів фільтрів у ASP.NET Core та порядок виклику</a></li>
+            <li><a href="#q14">14. JWT проти Bearer токена: у чому різниця?</a></li>
+            <li><a href="#q15">15. Що таке CORS і як працює preflight `OPTIONS`?</a></li>
+            <li><a href="#q16">16. SPA концепт (Single Page Application)</a></li>
+            <li><a href="#q17">17. Minimal API проти звичайних контролерів</a></li>
+            <li><a href="#q18">18. Нормальні форми в РСУБД (1NF, 2NF, 3NF) та денормалізація</a></li>
+            <li><a href="#q19">19. Оптимістичне блокування в EF Core (`RowVersion`)</a></li>
+            <li><a href="#q20">20. Хмарні моделі: IaaS проти PaaS проти SaaS</a></li>
+        </ul>
+    </nav>
+
+    <!-- ПИТАННЯ 1 -->
+    <article class="q-card" id="q1">
+        <div class="q-header">
+            <h3 class="q-title">1. У чому різниця між `Tuple` та `ValueTuple` у C#?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `System.Tuple` — це посилальний клас (Heap, алокація пам'яті, незручні імена `Item1`, `Item2`). `System.ValueTuple` (C# 7+) — це структура на стеку з підтримкою іменованих полів `(int Id, string Name)` та синтаксису деконструкції.
+        </div>
+        <h4>Порівняльна таблиця:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Характеристика</th>
+                    <th><code>System.Tuple</code></th>
+                    <th><code>System.ValueTuple</code></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Тип пам'яті</td>
+                    <td>Reference Type (Class в купі)</td>
+                    <td>Value Type (Struct на стеку)</td>
+                </tr>
+                <tr>
+                    <td>Мутабельність</td>
+                    <td>Незмінний (Read-only)</td>
+                    <td>Змінний (поля відкриті)</td>
+                </tr>
+                <tr>
+                    <td>Синтаксис назв полів</td>
+                    <td>Тільки <code>Item1</code>, <code>Item2</code></td>
+                    <td>Довільні: <code>(int Id, string Title)</code></td>
+                </tr>
+                <tr>
+                    <td>Деконструкція</td>
+                    <td>Не підтримується з коробки</td>
+                    <td><code>var (id, title) = GetData();</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+
+    <!-- ПИТАННЯ 2 -->
+    <article class="q-card" id="q2">
+        <div class="q-header">
+            <h3 class="q-title">2. Що таке атрибути в C#? Як створити власний атрибут та обмежити його використання?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Атрибути — це декларативні метадані, які «прикріплюються» до класів, методів чи полів та зберігаються у збірці. Їх можна читати через рефлексію в рантаймі або аналізувати source generator'ами під час компіляції.
+        </div>
+        <h4>Створення власного атрибута:</h4>
+        <pre><code>// 1. Успадковуємося від System.Attribute
+// 2. Обмежуємо область дії атрибута за допомогою [AttributeUsage]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+public class EndpointRoleAttribute : Attribute
+{
+    public string RequiredRole { get; }
+    public EndpointRoleAttribute(string role) =&gt; RequiredRole = role;
+}
+
+// Застосування:
+[EndpointRole("Admin")]
+public class AdminController { }
+
+// Читання через рефлексію:
+var attr = typeof(AdminController).GetCustomAttribute&lt;EndpointRoleAttribute&gt;();
+Console.WriteLine(attr?.RequiredRole); // Admin</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 3 -->
+    <article class="q-card" id="q3">
+        <div class="q-header">
+            <h3 class="q-title">3. LINQ: Різниця між `First`, `FirstOrDefault`, `Single` та `SingleOrDefault`?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `First` бере перший і зупиняє пошук. `Single` перевіряє ВСЮ колекцію до кінця, щоб гарантувати відсутність дублікатів (кидає виняток, якщо знайдено більше одного елемента!).
+        </div>
+        <h4>Таблиця поведінки методів:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Метод</th>
+                    <th>Колекція порожня (0)</th>
+                    <th>Рівно 1 елемент</th>
+                    <th>Більше 1 елемента (>1)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>First()</code></td>
+                    <td><code>InvalidOperationException</code></td>
+                    <td>Повертає елемент</td>
+                    <td>Повертає <b>перший</b> знайдений</td>
+                </tr>
+                <tr>
+                    <td><code>FirstOrDefault()</code></td>
+                    <td>Повертає <code>null</code> (або default)</td>
+                    <td>Повертає елемент</td>
+                    <td>Повертає <b>перший</b> знайдений</td>
+                </tr>
+                <tr>
+                    <td><code>Single()</code></td>
+                    <td><code>InvalidOperationException</code></td>
+                    <td>Повертає елемент</td>
+                    <td><code>InvalidOperationException</code> (Помилка!)</td>
+                </tr>
+                <tr>
+                    <td><code>SingleOrDefault()</code></td>
+                    <td>Повертає <code>null</code> (або default)</td>
+                    <td>Повертає елемент</td>
+                    <td><code>InvalidOperationException</code> (Помилка!)</td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+
+    <!-- ПИТАННЯ 4 -->
+    <article class="q-card" id="q4">
+        <div class="q-header">
+            <h3 class="q-title">4. Що таке індексатори (Indexers) у класах? Навіщо потрібні?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Дозволяють звертатися до екземпляра вашого класу за числовим або рядковим індексом за допомогою квадратних дужок `myObj[0]` або `myObj["key"]`, як до масиву чи словника.
+        </div>
+        <h4>Приклад реалізації:</h4>
+        <pre><code>public class KeyValueCache
+{
+    private readonly Dictionary&lt;string, string&gt; _storage = new();
+
+    // Індексатор оголошується через ключове слово 'this'
+    public string this[string key]
+    {
+        get =&gt; _storage.TryGetValue(key, out var val) ? val : null;
+        set =&gt; _storage[key] = value;
+    }
+}
+
+// Використання:
+var cache = new KeyValueCache();
+cache["theme"] = "dark"; // Працює як словник
+Console.WriteLine(cache["theme"]);</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 5 -->
+    <article class="q-card" id="q5">
+        <div class="q-header">
+            <h3 class="q-title">5. Двобічно зв'язаний список `LinkedList<T>`: будова та відмінність від `List<T>`.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> У `List<T>` елементи лежать неперервним масивом у пам'яті (швидкий індекс $O(1)$, але вставка в середину займає $O(N)$). `LinkedList<T>` складається з окремих об'єктів-вузлів `LinkedListNode` з покажчиками `Next` та `Previous`. Вставка поруч із відомим вузлом займає $O(1)$.
+        </div>
+        <h4>Плюси та мінуси `LinkedList<T>`:</h4>
+        <ul>
+            <li><b>Переваги:</b> Миттєва вставка або видалення вузла з будь-якого місця списку за $O(1)$ без зсуву сусідніх елементів у пам'яті та без необхідності перевиділення внутрішнього масиву.</li>
+            <li><b>Недоліки:</b> Немає доступу за індексом `list[i]` — щоб знайти 100-й елемент, треба послідовно пройти 99 вузлів ($O(N)$). Вузли розкидані по всій купі, що ламає кеш процесора (CPU Cache Misses) та вимагає додаткових байтів пам'яті на кожен елемент під покажчики.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 6 -->
+    <article class="q-card" id="q6">
+        <div class="q-header">
+            <h3 class="q-title">6. Що таке рефлексія (`System.Reflection`)? Які її плюси, мінуси та вплив на швидкодію?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Механізм дослідження метаданих типів під час виконання програми: отримання списку приватних полів, методів та створення екземплярів через `Activator.CreateInstance`. Рефлексія суттєво повільніша за звичайний виклик і ламає Native AOT тримінг.
+        </div>
+        <h4>Чому рефлексія повільна:</h4>
+        <ol>
+            <li>JIT-компілятор не може застосувати оптимізації (інлайнінг методів, розгортання циклів, девіртуалізацію).</li>
+            <li>Відбуваються постійні перевірки прав доступу (security checks) та валідація типів аргументів у runtime.</li>
+            <li>При виклику методів через <code>MethodInfo.Invoke(obj, params)</code> для значущих типів відбувається масовий Boxing/Unboxing параметрів у масив <code>object[]</code>.</li>
+        </ol>
+        <p><i>Сучасна альтернатива:</i> У сучасному .NET 8/9 рефлексію замінюють на <b>Source Generators</b> (генерація C# коду під час компіляції), що дає максимальну швидкість без втрати гнучкості.</p>
+    </article>
+
+    <!-- ПИТАННЯ 7 -->
+    <article class="q-card" id="q7">
+        <div class="q-header">
+            <h3 class="q-title">7. Як JIT-компілятор генерує код для узагальнень (Generics): різниця для Value Types та Reference Types?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Для кожного Value Type створюється окрема унікальна копія машинного коду (спеціалізація під розмір структури). Для ВСІХ Reference Types використовується одна спільна копія машинного коду, оскільки розмір покажчика завжди однаковий.
+        </div>
+        <h4>Деталі роботи JIT:</h4>
+        <ul>
+            <li><b>Значущі типи (<code>List&lt;int&gt;</code> vs <code>List&lt;double&gt;</code>):</b>
+                Структури мають різний розмір (<code>int</code> — 4 байти, <code>double</code> — 8 байт). JIT-компілятор створює <b>окремий бінарний машинний код</b> під кожен значущий тип. Це гарантує максимальну швидкодію без boxing'у, але збільшує розмір коду в оперативній пам'яті (Code Bloat).
+            </li>
+            <li><b>Посилальні типи (<code>List&lt;string&gt;</code> vs <code>List&lt;User&gt;</code>):</b>
+                Оскільки будь-який посилальний тип представлений у пам'яті звичайним покажчиком (адресою розміром 8 байт на x64 системі), JIT компілює машинний код <b>рівно один раз</b>, і всі класи ділять між собою одну реалізацію методів.
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 8 -->
+    <article class="q-card" id="q8">
+        <div class="q-header">
+            <h3 class="q-title">8. Як правильно створити власний виняток (Custom Exception) у .NET?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Успадкуватися від `Exception`, додати суфікс `Exception` до назви класу та реалізувати 3 стандартні базові конструктори.
+        </div>
+        <h4>Еталонна реалізація:</h4>
+        <pre><code>public class OrderNotFoundException : Exception
+{
+    public int OrderId { get; }
+
+    // 1. Порожній конструктор
+    public OrderNotFoundException() : base() { }
+
+    // 2. Конструктор із повідомленням
+    public OrderNotFoundException(string message) : base(message) { }
+
+    // 3. Конструктор з inner exception (для обгортання інших помилок)
+    public OrderNotFoundException(string message, Exception inner) : base(message, inner) { }
+
+    // Кастомний конструктор із бізнес-даними:
+    public OrderNotFoundException(int orderId) 
+        : base($"Замовлення з ID #{orderId} не знайдено.")
+    {
+        OrderId = orderId;
+    }
+}</code></pre>
+    </article>
+
+    <!-- ПИТАННЯ 9 -->
+    <article class="q-card" id="q9">
+        <div class="q-header">
+            <h3 class="q-title">9. У чому принципова різниця між Процесом (Process) та Потоком (Thread)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Процес — це ізольований екземпляр запущеної програми з власним захищеним віртуальним адресним простором. Потік — це найменша одиниця виконання CPU всередині процесу. Усі потоки одного процесу ділять спільну купу (Heap).
+        </div>
+        <h4>Порівняння:</h4>
+        <ul>
+            <li><b>Процес (Process):</b> Повна ізоляція пам'яті. Падіння одного процесу не впливає на інші процеси ОС. Комунікація між процесами (IPC) повільна (іменовані канали, сокети, файли).</li>
+            <li><b>Потік (Thread):</b> Має власний стек (~1 МБ), але ділить пам'ять купи (Heap), дескриптори файлів та мережеві з'єднання з усіма іншими потоками свого процесу. Перемикання контексту між потоками одного процесу набагато швидше, але спільна пам'ять вимагає синхронізації (<code>lock</code>, семафори), інакше виникає стан гонитви (Race Condition).</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 10 -->
+    <article class="q-card" id="q10">
+        <div class="q-header">
+            <h3 class="q-title">10. Що таке рекурсія? Чому виникає `StackOverflowException` і як його уникнути?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Рекурсія — виклик методом самого себе. Вимагає обов'язкової умови виходу (Base Case). Кожен виклик виділяє новий фрейм на стеку. При занадто глибокій рекурсії стек переповнюється, і процес аварійно падає.
+        </div>
+        <h4>Чому StackOverflowException не можна перехопити через catch:</h4>
+        <p>Починаючи з .NET 2.0, переповнення стека є фатальною помилкою CLR. Рантайм негайно завершує весь процес без виконання блоків <code>catch</code> або <code>finally</code>, оскільки для обробки винятку банально не залишилося вільної пам'яті стека!</p>
+        <p><b>Як уникнути:</b> Переписати алгоритм з рекурсивного на ітеративний (використовуючи звичайний цикл <code>while</code> та колекцію <code>Stack&lt;T&gt;</code> у купі Heap).</p>
+    </article>
+
+    <!-- ПИТАННЯ 11 -->
+    <article class="q-card" id="q11">
+        <div class="q-header">
+            <h3 class="q-title">11. Що таке Cohesion (зв'язність) та Coupling (зачеплення)? Який ідеальний баланс?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Золотий стандарт архітектури: **High Cohesion** (висока внутрішня зв'язність) та **Loose Coupling** (слабке зовнішнє зачеплення).
+        </div>
+        <h4>Розбір термінів:</h4>
+        <ul>
+            <li><b>Cohesion (Зв'язність усередині класу):</b> Показує, наскільки тісно методи та поля одного класу пов'язані єдиною метою.
+                <ul>
+                    <li><i>Низька (погано):</i> Клас робить усе підряд (робота з базою, відправка листів, валідація, рендеринг звіту).</li>
+                    <li><i>Висока (добре):</i> Клас вирішує лише одну конкретну бізнес-задачу (Single Responsibility Principle).</li>
+                </ul>
+            </li>
+            <li><b>Coupling (Зачеплення між різними класами):</b> Показує ступінь залежності модулів один від одного.
+                <ul>
+                    <li><i>Сильне (погано):</i> Клас А напряму викликає приватні деталі класу Б через <code>new ConcreteClass()</code>. Зміна класу Б ламає клас А.</li>
+                    <li><i>Слабке (добре):</i> Класи спілкуються через інтерфейси або події (Dependency Inversion). Будь-який клас можна замінити без зміни інших.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 12 -->
+    <article class="q-card" id="q12">
+        <div class="q-header">
+            <h3 class="q-title">12. Навіщо балансувати дерева пошуку? Властивості ідеальної хеш-функції.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Незбалансоване бінарне дерево деградує у звичайний лінійний список $O(N)$. Балансування (АВЛ, Червоно-чорні дерева) гарантує логарифмічний пошук $O(\log N)$. Ідеальна хеш-функція: швидка, детермінована та рівномірно розкидає значення по кошиках.
+        </div>
+        <h4>Властивості хорошої хеш-функції (`GetHashCode`):</h4>
+        <ol>
+            <li><b>Детермінізм:</b> Для однакових вхідних значень завжди повертає однаковий цілочисельний хеш протягом усього часу роботи програми.</li>
+            <li><b>Рівномірний розподіл (Uniform distribution):</b> Мінімізує колізії, розподіляючи ключі по всьому діапазону від <code>int.MinValue</code> до <code>int.MaxValue</code>.</li>
+            <li><b>Швидкість обчислення:</b> Повинна виконуватися за лічені такти процесора, інакше вставка в `Dictionary` стане вузьким місцем.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 13 -->
+    <article class="q-card" id="q13">
+        <div class="q-header">
+            <h3 class="q-title">13. Які 5 типів фільтрів існують в ASP.NET Core? Строгий порядок їх виконання.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Ланцюжок фільтрів спрацьовує всередині MVC-пайплайну в строгому порядку: 1. Authorization → 2. Resource → 3. Action → 4. Exception → 5. Result.
+        </div>
+        <h4>Порядок виконання:</h4>
+        <ol>
+            <li><b>Authorization Filters:</b> Виконуються першими. Перевіряють, чи має користувач доступ до дії (наприклад, <code>[Authorize]</code>). Якщо ні — негайно переривають запит (401 або 403).</li>
+            <li><b>Resource Filters:</b> Огортають увесь наступний конвеєр (включаючи Model Binding). Ідеальні для реалізації кешування всієї відповіді або зміни поведінки завантаження тіла запиту.</li>
+            <li><b>Action Filters:</b> Спрацьовують безпосередньо <i>до</i> та <i>після</i> виконання методу контролера. Мають доступ до вхідних аргументів методу.</li>
+            <li><b>Exception Filters:</b> Перехоплюють необроблені винятки, що виникли під час роботи Action або Action Filters.</li>
+            <li><b>Result Filters:</b> Спрацьовують <i>до</i> та <i>після</i> рендерингу або серіалізації фінального результату <code>IActionResult</code>.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 14 -->
+    <article class="q-card" id="q14">
+        <div class="q-header">
+            <h3 class="q-title">14. У чому принципова різниця між JWT токеном та Bearer токеном?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> `Bearer` — це назва схеми авторизації в HTTP-заголовку. `JWT` — це формат представлення даних самого токена.
+        </div>
+        <h4>Пояснення:</h4>
+        <p>Коли клієнт робить запит, він передає заголовок:</p>
+        <pre><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</code></pre>
+        <ul>
+            <li><b>Bearer (Пред'явник):</b> Схема протоколу OAuth 2.0 (RFC 6750). Вона каже серверу: <i>«Той, хто тримає (bears) цей токен, має вказані права»</i>. При цьому токен під схемою Bearer взагалі не зобов'язаний бути JWT — це може бути простий випадковий рядок (Reference Token або Opaque Token), збережений у Redis!</li>
+            <li><b>JWT (JSON Web Token):</b> Конкретний відкритий стандарт (RFC 7519), який описує, як закодувати JSON-структуру (Claims) у безпечний Base64-рядок із цифровим підписом.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 15 -->
+    <article class="q-card" id="q15">
+        <div class="q-header">
+            <h3 class="q-title">15. Що таке CORS (Cross-Origin Resource Sharing)? Як працює попередній запит `OPTIONS` (Preflight)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Політика безпеки браузера (Same-Origin Policy), яка забороняє JavaScript з сайту А відправляти запити на API сайту Б, якщо домен, протокол або порт відрізняються. Preflight запит `OPTIONS` перевіряє дозвіл сервера перед відправкою реального запиту.
+        </div>
+        <h4>Як працює Preflight:</h4>
+        <ol>
+            <li>Якщо запит не є «простим» (наприклад, містить кастомний заголовок <code>Authorization</code> або метод <code>PUT/DELETE</code>), браузер <b>автоматично</b> відправляє легкий запит методом <code>OPTIONS</code> на той самий URL.</li>
+            <li>Браузер запитує: <i>«Чи дозволено сайту frontend.com відправити POST-запит із заголовком Authorization?»</i></li>
+            <li>Сервер відповідає заголовками:
+                <pre><code>Access-Control-Allow-Origin: https://frontend.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Authorization, Content-Type</code></pre>
+            </li>
+            <li>Якщо сервер підтвердив дозвіл — браузер відправляє реальний запит. Якщо ні — браузер блокує відповідь із помилкою CORS у консолі.</li>
+        </ol>
+    </article>
+
+    <!-- ПИТАННЯ 16 -->
+    <article class="q-card" id="q16">
+        <div class="q-header">
+            <h3 class="q-title">16. Що таке концепція SPA (Single Page Application)?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Веб-додаток, який завантажує один єдиний HTML-документ при першому візиті. Переходи між сторінками відбуваються без перезавантаження всієї сторінки за допомогою клієнтського роутингу (React, Angular, Vue, Blazor WebAssembly).
+        </div>
+        <h4>SPA проти Традиційного MPA (Multi-Page App):</h4>
+        <ul>
+            <li><b>MPA (Razor Pages, ASP.NET MVC):</b> Кожен клік по посиланню робить повний перехід на сервер, сервер рендерить усю HTML-сторінку заново та відправляє її через мережу.</li>
+            <li><b>SPA:</b> Браузер завантажує бандл JS/WASM один раз. При зміні URL JavaScript динамічно перемальовує лише потрібну частину сторінки (DOM), звертаючись до бекенду суто за чистими JSON-даними через REST API або gRPC-Web.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 17 -->
+    <article class="q-card" id="q17">
+        <div class="q-header">
+            <h3 class="q-title">17. Minimal API проти класичних MVC-контролерів в ASP.NET Core: плюси та мінуси.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Minimal API (C# 10+) відкидає громіздкий оверхед MVC-пайплайну (фільтри, контролери, рефлексія), забезпечуючи вищу пропускну здатність та менше споживання RAM.
+        </div>
+        <h4>Порівняння підходів:</h4>
+        <pre><code>// Minimal API: прямий мапінг ендпоінта в Program.cs
+app.MapGet("/users/{id}", async (int id, AppDbContext db) =&gt; 
+    await db.Users.FindAsync(id) is User u ? Results.Ok(u) : Results.NotFound());</code></pre>
+        <ul>
+            <li><b>Переваги Minimal API:</b>
+                <ul>
+                    <li>Вища швидкість старту та продуктивність (RPS приблизно на 15–20% вище за контролери).</li>
+                    <li>Ідеально підходить для мікросервісів та AWS Lambda / Azure Functions.</li>
+                    <li>Підтримує Native AOT (компіляція в нативний двійковий файл без включення всього рантайму).</li>
+                </ul>
+            </li>
+            <li><b>Коли обирати контролери:</b> Великі Enterprise-моноліти з десятками уніфікованих фільтрів, складними валідаціями та десятками дієслів на один ресурс.</li>
+        </ul>
+    </article>
+
+    <!-- ПИТАННЯ 18 -->
+    <article class="q-card" id="q18">
+        <div class="q-header">
+            <h3 class="q-title">18. Нормальні форми реляційних баз даних (1NF, 2NF, 3NF). Навіщо роблять денормалізацію?</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Нормалізація усуває надлишкове дублювання даних та аномалії оновлення. Денормалізація — це свідоме повернення надлишковості для прискорення складних SELECT-запитів без важких JOIN'ів.
+        </div>
+        <h4>Три класичні нормальні форми:</h4>
+        <ol>
+            <li><b>1NF (Перша нормальна форма):</b> Усі значення колонок повинні бути <b>атомарними</b> (неподільними). В одній комірці не може бути списків значень на зразок <code>"Київ, Львів, Одеса"</code>. Рядки мають бути унікальними (наявність PK).</li>
+            <li><b>2NF (Друга нормальна форма):</b> Відповідає 1NF + будь-яка неключова колонка повинна залежати від <b>усього</b> складеного первинного ключа цілком, а не від його частини.</li>
+            <li><b>3NF (Третя нормальна форма):</b> Відповідає 2NF + відсутність транзитивних залежностей (неключові колонки повинні залежати ТІЛЬКИ від первинного ключа, а не одна від одної).</li>
+        </ol>
+        <p><b>Навіщо потрібна денормалізація:</b> Якщо для генерації одного звіту доводиться робити JOIN по 8 таблицях, це перевантажує дискову підсистему БД. Розробники додають дублюючі поля (наприклад, зберігають пораховану суму замовлення `TotalAmount` прямо в таблиці `Orders`), щоб читати рядок миттєво.</p>
+    </article>
+
+    <!-- ПИТАННЯ 19 -->
+    <article class="q-card" id="q19">
+        <div class="q-header">
+            <h3 class="q-title">19. Оптимістичне блокування (Optimistic Concurrency) та `DbUpdateConcurrencyException` в EF Core.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> Замість блокування рядка на час редагування, сутність отримує версійну колонку `RowVersion`. Якщо хтось встиг змінити рядок паралельно, EF Core викидає `DbUpdateConcurrencyException`.
+        </div>
+        <h4>Як це реалізувати:</h4>
+        <pre><code>public class Account
+{
+    public int Id { get; set; }
+    public decimal Balance { get; set; }
+
+    [Timestamp] // Атрибут версії рядка для MS SQL (або IsRowVersion() у Fluent API)
+    public byte[] RowVersion { get; set; }
+}</code></pre>
+        <p><b>Що генерує EF Core при збереженні:</b></p>
+        <pre><code>UPDATE Accounts SET Balance = @p0 
+WHERE Id = @p1 AND RowVersion = @originalRowVersion;</code></pre>
+        <p>Якщо між читанням та записом інший користувач змінив баланс, значення <code>RowVersion</code> у базі автоматично змінилося тригером СУБД. Запит <code>UPDATE</code> оновить рівно <b>0 рядків</b>. EF Core бачить, що жоден рядок не оновився, і викидає виняток <code>DbUpdateConcurrencyException</code>, не дозволяючи тихо затерти чужі фінансові дані.</p>
+    </article>
+
+    <!-- ПИТАННЯ 20 -->
+    <article class="q-card" id="q20">
+        <div class="q-header">
+            <h3 class="q-title">20. Хмарні моделі: IaaS проти PaaS проти SaaS. Зони відповідальності.</h3>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+        <div class="summary-box">
+            <b>Коротка суть:</b> IaaS — оренда «віртуального заліза» (ви самі адмініструєте ОС). PaaS — готова платформа виконання (ви деплоїте тільки код додатку). SaaS — готовий софт як послуга через браузер.
+        </div>
+        <h4>Розподіл зон відповідальності:</h4>
+        <ul>
+            <li><b>IaaS (Infrastructure as a Service):</b>
+                <ul>
+                    <li><i>Приклади:</i> AWS EC2, Azure Virtual Machines, DigitalOcean Droplets.</li>
+                    <li><i>Хмара керує:</i> Фізичні сервери, мережеве обладнання, дискові сховища, гіпервізор.</li>
+                    <li><i>Ви керуєте:</i> Встановлення ОС, патчі безпеки Windows/Linux, встановлення .NET Runtime, налаштування фаєрволів та бекапів.</li>
+                </ul>
+            </li>
+            <li><b>PaaS (Platform as a Service):</b>
+                <ul>
+                    <li><i>Приклади:</i> Azure App Service, AWS Elastic Beanstalk, Heroku.</li>
+                    <li><i>Хмара керує:</i> Усім залізом, операційною системою, оновленнями безпеки, масштабуванням (auto-scaling) та рантаймом .NET.</li>
+                    <li><i>Ви керуєте:</i> Тільки власним програмним кодом та налаштуваннями конфігурації.</li>
+                </ul>
+            </li>
+            <li><b>SaaS (Software as a Service):</b>
+                <ul>
+                    <li><i>Приклади:</i> Microsoft 365, Google Workspace, GitHub, Jira.</li>
+                    <li><i>Ви користуєтеся:</i> Готовим додатком через вебінтерфейс. Уся інфраструктура прихована.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>
