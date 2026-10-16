@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Патерни проєктування GoF на C#</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --code-bg: #0f172a;
+            --code-text: #f1f5f9;
+            
+            --badge-creational-bg: #e0f2fe;
+            --badge-creational-text: #0369a1;
+            --badge-structural-bg: #fef3c7;
+            --badge-structural-text: #92400e;
+            --badge-behavioral-bg: #dcfce7;
+            --badge-behavioral-text: #15803d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Навігація / Зміст */
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .toc-column h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.4rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* Картка патерну */
+        .pattern-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0f172a;
+        }
+
+        .top-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-creational { background: var(--badge-creational-bg); color: var(--badge-creational-text); }
+        .badge-structural { background: var(--badge-structural-bg); color: var(--badge-structural-text); }
+        .badge-behavioral { background: var(--badge-behavioral-bg); color: var(--badge-behavioral-text); }
+
+        h4 {
+            font-size: 1.15rem;
+            color: #334155;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        blockquote {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        ul, ol {
+            padding-left: 1.4rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Блоки коду */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        p > code, li > code {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.875em;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem 0.5rem; }
+            .pattern-card { padding: 1.25rem; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>23 Патерни проєктування GoF на C#</h1>
+        <p style="color: var(--text-muted);">Довідник класичних архітектурних рішень із прикладами коду</p>
+    </header>
+
+    <!-- ЗМІСТ -->
+    <nav class="toc-card" id="toc">
+        <h2>Швидка навігація</h2>
+        <div class="toc-grid">
+            <div class="toc-column">
+                <h3 style="color: var(--badge-creational-text);">Породжувальні</h3>
+                <ul class="toc-list">
+                    <li><a href="#p1">1. Singleton</a></li>
+                    <li><a href="#p2">2. Factory Method</a></li>
+                    <li><a href="#p3">3. Abstract Factory</a></li>
+                    <li><a href="#p4">4. Builder</a></li>
+                    <li><a href="#p5">5. Prototype</a></li>
+                </ul>
+            </div>
+            <div class="toc-column">
+                <h3 style="color: var(--badge-structural-text);">Структурні</h3>
+                <ul class="toc-list">
+                    <li><a href="#p6">6. Adapter</a></li>
+                    <li><a href="#p7">7. Bridge</a></li>
+                    <li><a href="#p8">8. Composite</a></li>
+                    <li><a href="#p9">9. Decorator</a></li>
+                    <li><a href="#p10">10. Facade</a></li>
+                    <li><a href="#p11">11. Flyweight</a></li>
+                    <li><a href="#p12">12. Proxy</a></li>
+                </ul>
+            </div>
+            <div class="toc-column">
+                <h3 style="color: var(--badge-behavioral-text);">Поведінкові</h3>
+                <ul class="toc-list">
+                    <li><a href="#p13">13. Chain of Responsibility</a></li>
+                    <li><a href="#p14">14. Command</a></li>
+                    <li><a href="#p15">15. Iterator</a></li>
+                    <li><a href="#p16">16. Mediator</a></li>
+                    <li><a href="#p17">17. Memento</a></li>
+                    <li><a href="#p18">18. Observer</a></li>
+                    <li><a href="#p19">19. State</a></li>
+                    <li><a href="#p20">20. Strategy</a></li>
+                    <li><a href="#p21">21. Template Method</a></li>
+                    <li><a href="#p22">22. Visitor</a></li>
+                    <li><a href="#p23">23. Interpreter</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================================== -->
+    <!-- ПОРОДЖУВАЛЬНІ ПАТЕРНИ                                      -->
+    <!-- ======================================================== -->
+
+    <!-- Патерн 1 -->
+    <article class="pattern-card" id="p1">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 1: Singleton (Одинак)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Гарантує, що клас має <b>лише один екземпляр</b> у межах програми, і надає глобальну точку доступу до цього екземпляра.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібен спільний ресурс (керування підключенням до апаратного пристрою, пулом ресурсів, кешем чи глобальною конфігурацією).</li>
+            <li>Необхідно суворо обмежити створення об'єктів лише однією копією.</li>
+        </ul>
+
+        <blockquote>
+            <b>Примітка для .NET:</b> У сучасному C# замість написання «класичного» Singleton зазвичай використовують механізм Dependency Injection (<code>services.AddSingleton&lt;TInterface, TImplementation&gt;()</code>). Проте розуміти канонічну реалізацію все одно необхідно.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <p>Найбільш ідіоматичний, потокобезпечний (thread-safe) та «лінивий» (lazy) спосіб реалізувати Singleton у C# — використати клас <code>Lazy&lt;T&gt;</code>.</p>
+        <pre><code>using System;
+
+// 'sealed' запобігає успадкуванню, що могло б порушити логіку одинака
+public sealed class ConfigurationManager
+{
+    // Lazy&lt;T&gt; гарантує потокобезпечність та створення об'єкта лише при першому зверненні
+    private static readonly Lazy&lt;ConfigurationManager&gt; _instance = 
+        new Lazy&lt;ConfigurationManager&gt;(() =&gt; new ConfigurationManager());
+
+    // 1. Приватний конструктор забороняє створення екземпляра через 'new ConfigurationManager()' ззовні
+    private ConfigurationManager()
+    {
+        Console.WriteLine("--&gt; Ініціалізація ConfigurationManager (відбувається лише один раз).");
+    }
+
+    // 2. Глобальна точка доступу до екземпляра
+    public static ConfigurationManager Instance =&gt; _instance.Value;
+
+    // Стан або методи сервісу
+    public string AppName { get; set; } = "MyApplication";
+
+    public void PrintSettings()
+    {
+        Console.WriteLine($"Назва додатку: {AppName}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Перше звернення: об'єкт створиться
+        ConfigurationManager config1 = ConfigurationManager.Instance;
+        config1.PrintSettings();
+
+        // Змінюємо дані через перше посилання
+        config1.AppName = "UpdatedApplication";
+
+        // Друге звернення: використовується вже створений об'єкт
+        ConfigurationManager config2 = ConfigurationManager.Instance;
+        config2.PrintSettings(); // Виведе: Назва додатку: UpdatedApplication
+
+        // Перевірка посилань
+        bool areSame = ReferenceEquals(config1, config2);
+        Console.WriteLine($"Чи це один і той самий екземпляр? {areSame}"); // True
+    }
+}</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong>
+                <ul>
+                    <li>Гарантована наявність лише одного об'єкта.</li>
+                    <li>Економія пам'яті (ініціалізація тільки тоді, коли об'єкт дійсно потрібен).</li>
+                </ul>
+            </li>
+            <li><strong>Недоліки:</strong>
+                <ul>
+                    <li>Порушує <em>Single Responsibility Principle</em> (клас відповідає і за свою роботу, і за контроль власного життєвого циклу).</li>
+                    <li>Ускладнює написання unit-тестів (створює приховані залежності та глобальний стан).</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- Патерн 2 -->
+    <article class="pattern-card" id="p2">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 2: Factory Method (Фабричний метод)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає спільний інтерфейс для створення об’єктів у базовому класі, але <b>дозволяє підкласам змінювати тип створюваних об’єктів</b>.</p>
+
+        <blockquote>
+            <b>Важливий нюанс:</b> Фабричний метод часто плутають із «Простою фабрикою» (клас зі <code>switch/case</code> або статичним методом <code>Create()</code>). Класичний GoF-патерн <em>Factory Method</em> базується саме на <b>успадкуванні та поліморфізмі</b>: базовий клас делегує інстанціювання підкласам.
+        </blockquote>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Заздалегідь невідомо, які конкретно типи об’єктів знадобляться вашому коду.</li>
+            <li>Ви хочете надати клієнтам бібліотеки чи фреймворку можливість розширювати внутрішні компоненти (додавати нові типи продуктів без зміни існуючого коду).</li>
+            <li>Потрібно дотримуватись принципів <b>Single Responsibility</b> та <b>Open/Closed</b>.</li>
+        </ul>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Загальний інтерфейс продукту
+public interface INotification
+{
+    void Send(string message);
+}
+
+// 2. Конкретні продукти
+public class EmailNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine($"[Email] Надіслано листа: \"{message}\"");
+    }
+}
+
+public class SmsNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine($"[SMS] Надіслано повідомлення на телефон: \"{message}\"");
+    }
+}
+
+// 3. Базовий клас-творець (Creator)
+public abstract class NotificationService
+{
+    // Оце і є Фабричний метод (Factory Method)
+    public abstract INotification CreateNotification();
+
+    public void SendAlert(string message)
+    {
+        INotification notification = CreateNotification();
+        notification.Send(message);
+    }
+}
+
+// 4. Конкретні творці
+public class EmailNotificationService : NotificationService
+{
+    public override INotification CreateNotification()
+    {
+        return new EmailNotification();
+    }
+}
+
+public class SmsNotificationService : NotificationService
+{
+    public override INotification CreateNotification()
+    {
+        return new SmsNotification();
+    }
+}
+
+// 5. Використання
+class Program
+{
+    static void Main()
+    {
+        NotificationService service;
+        string notificationType = "email"; // або "sms"
+
+        if (notificationType == "email")
+            service = new EmailNotificationService();
+        else
+            service = new SmsNotificationService();
+
+        service.SendAlert("Сервер перезавантажено!");
+    }
+}</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong>
+                <ul>
+                    <li>Усуває жорстке зв'язування між творцем і конкретними продуктами (<em>Loose Coupling</em>).</li>
+                    <li>Полегшує додавання нових типів (достатньо створити новий клас продукту і новий сервіс, не чіпаючи існуючий код).</li>
+                </ul>
+            </li>
+            <li><strong>Недоліки:</strong>
+                <ul>
+                    <li>Може призводити до розростання ієрархії класів: під кожен новий продукт доводиться створювати відповідний клас-творець.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- Патерн 3 -->
+    <article class="pattern-card" id="p3">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 3: Abstract Factory (Абстрактна фабрика)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає інтерфейс для створення <b>цілих родин взаємопов'язаних або залежних об'єктів</b>, не прив’язуючись до їхніх конкретних класів.</p>
+
+        <blockquote>
+            <b>У чому різниця з Factory Method?</b>
+            <ul>
+                <li><b>Factory Method</b> створює <em>один</em> продукт за допомогою успадкування (один метод у базовому класі).</li>
+                <li><b>Abstract Factory</b> створює <em>родину продуктів</em> через композицію (Кнопка + Чекбокс для Windows або для macOS).</li>
+            </ul>
+        </blockquote>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Програма повинна працювати з різними сімействами продуктів, які не мають змішуватися між собою.</li>
+            <li>Потрібно надати бібліотеку компонентів, приховавши деталі їх реалізації.</li>
+        </ul>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Абстрактні продукти
+public interface IButton { void Render(); }
+public interface ICheckbox { void Render(); }
+
+// 2. Конкретні продукти для Windows
+public class WindowsButton : IButton
+{
+    public void Render() =&gt; Console.WriteLine("Відмальовано кнопку в стилі Windows.");
+}
+public class WindowsCheckbox : ICheckbox
+{
+    public void Render() =&gt; Console.WriteLine("Відмальовано чекбокс у стилі Windows.");
+}
+
+// 3. Конкретні продукти для macOS
+public class MacButton : IButton
+{
+    public void Render() =&gt; Console.WriteLine("Відмальовано кнопку в стилі macOS.");
+}
+public class MacCheckbox : ICheckbox
+{
+    public void Render() =&gt; Console.WriteLine("Відмальовано чекбокс у стилі macOS.");
+}
+
+// 4. Абстрактна фабрика
+public interface IGuiFactory
+{
+    IButton CreateButton();
+    ICheckbox CreateCheckbox();
+}
+
+// 5. Конкретні фабрики
+public class WindowsFactory : IGuiFactory
+{
+    public IButton CreateButton() =&gt; new WindowsButton();
+    public ICheckbox CreateCheckbox() =&gt; new WindowsCheckbox();
+}
+public class MacFactory : IGuiFactory
+{
+    public IButton CreateButton() =&gt; new MacButton();
+    public ICheckbox CreateCheckbox() =&gt; new MacCheckbox();
+}
+
+// 6. Клієнтський код
+public class Application
+{
+    private readonly IButton _button;
+    private readonly ICheckbox _checkbox;
+
+    public Application(IGuiFactory factory)
+    {
+        _button = factory.CreateButton();
+        _checkbox = factory.CreateCheckbox();
+    }
+
+    public void Paint()
+    {
+        _button.Render();
+        _checkbox.Render();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        string osName = "mac"; // або "win"
+        IGuiFactory factory = osName == "win" ? new WindowsFactory() : new MacFactory();
+
+        var app = new Application(factory);
+        app.Paint();
+    }
+}</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong>
+                <ul>
+                    <li><b>Гарантована сумісність</b> усіх створюваних продуктів.</li>
+                    <li>Ізолює клієнтський код від конкретних класів реалізації.</li>
+                    <li>Полегшує заміну цілих родин компонентів у runtime або через конфігурацію DI.</li>
+                </ul>
+            </li>
+            <li><strong>Недоліки:</strong>
+                <ul>
+                    <li>Ускладнює структуру проєкту великою кількістю інтерфейсів.</li>
+                    <li><b>Складно додавати нові типи продуктів:</b> додавання нового продукту вимагає оновлення інтерфейсу фабрики та всіх її реалізацій.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- Патерн 4 -->
+    <article class="pattern-card" id="p4">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 4: Builder (Будівельник)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Відокремлює процес конструювання складного об'єкта від його представлення, дозволяючи <b>покроково створювати різні варіації об'єкта</b> за допомогою однакового процесу побудови.</p>
+
+        <blockquote>
+            <b>Знайомий контекст у .NET:</b> <code>StringBuilder</code>, <code>WebApplication.CreateBuilder()</code>, <code>ConfigurationBuilder</code>, <code>DbContextOptionsBuilder</code>.
+        </blockquote>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li><b>Антипатерн «Телескопічний конструктор»:</b> конструктор із 10+ параметрами, де більшість необов'язкові.</li>
+            <li>Створення об'єкта складається з багатьох послідовних або опціональних кроків.</li>
+            <li>Потрібно створювати незмінні (<em>immutable</em>) складні об'єкти.</li>
+        </ul>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Продукт
+public class Computer
+{
+    public string CPU { get; set; }
+    public string RAM { get; set; }
+    public string Storage { get; set; }
+    public string GPU { get; set; }
+    public bool HasWaterCooling { get; set; }
+
+    public void DisplayInfo()
+    {
+        Console.WriteLine("ПК конфігурація:");
+        Console.WriteLine($" - Процесор: {CPU}");
+        Console.WriteLine($" - ОЗП: {RAM}");
+        Console.WriteLine($" - Накопичувач: {Storage}");
+        Console.WriteLine($" - Відеокарта: {GPU ?? "Вбудована"}");
+        Console.WriteLine($" - Водяне охолодження: {(HasWaterCooling ? "Так" : "Ні")}\n");
+    }
+}
+
+// 2. Будівельник (Fluent Builder)
+public class ComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public ComputerBuilder SetCPU(string cpu)
+    {
+        _computer.CPU = cpu;
+        return this;
+    }
+
+    public ComputerBuilder SetRAM(string ram)
+    {
+        _computer.RAM = ram;
+        return this;
+    }
+
+    public ComputerBuilder SetStorage(string storage)
+    {
+        _computer.Storage = storage;
+        return this;
+    }
+
+    public ComputerBuilder SetGPU(string gpu)
+    {
+        _computer.GPU = gpu;
+        return this;
+    }
+
+    public ComputerBuilder EnableWaterCooling()
+    {
+        _computer.HasWaterCooling = true;
+        return this;
+    }
+
+    public Computer Build()
+    {
+        if (string.IsNullOrEmpty(_computer.CPU) || string.IsNullOrEmpty(_computer.RAM))
+        {
+            throw new InvalidOperationException("CPU та RAM є обов'язковими!");
+        }
+
+        Computer result = _computer;
+        _computer = new Computer(); // Скидання стану
+        return result;
+    }
+}
+
+// 3. Директор (Director) — опціонально
+public class ComputerDirector
+{
+    public void BuildGamingPC(ComputerBuilder builder)
+    {
+        builder.SetCPU("Intel Core i9")
+               .SetRAM("32GB DDR5")
+               .SetStorage("2TB NVMe SSD")
+               .SetGPU("NVIDIA RTX 4090")
+               .EnableWaterCooling();
+    }
+
+    public void BuildOfficePC(ComputerBuilder builder)
+    {
+        builder.SetCPU("Intel Core i3")
+               .SetRAM("8GB DDR4")
+               .SetStorage("512GB SSD");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var builder = new ComputerBuilder();
+
+        // Кастомний комп'ютер через Fluent API
+        Computer customPC = builder
+            .SetCPU("AMD Ryzen 7")
+            .SetRAM("16GB DDR5")
+            .SetStorage("1TB SSD")
+            .SetGPU("AMD Radeon RX 7800")
+            .Build();
+
+        customPC.DisplayInfo();
+
+        // Створення типового через Директора
+        var director = new ComputerDirector();
+        director.BuildGamingPC(builder);
+        Computer gamingPC = builder.Build();
+        gamingPC.DisplayInfo();
+    }
+}</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong>
+                <ul>
+                    <li>Дозволяє створювати об'єкт поетапно, комбінуючи лише потрібні кроки.</li>
+                    <li>Читабельний, самодокументований синтаксис (<em>Fluent syntax</em>).</li>
+                    <li>Інкапсулює валідацію в метод <code>Build()</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Недоліки:</strong>
+                <ul>
+                    <li>Збільшує кількість коду через потребу писати окремі класи-будівельники.</li>
+                </ul>
+            </li>
+        </ul>
+    </article>
+
+    <!-- Патерн 5 -->
+    <article class="pattern-card" id="p5">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 5: Prototype (Прототип)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє <b>копіювати існуючі об'єкти</b>, не прив'язуючись до деталей їхніх конкретних класів і не викликаючи їхні конструктори заново.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Створення об'єкта через <code>new</code> є ресурсомістким (важкі обчислення, запити в БД).</li>
+            <li>Необхідно створювати копії об'єктів, тип яких відомий клієнту лише через інтерфейс.</li>
+            <li>У системі є набір попередньо налаштованих шаблонів.</li>
+        </ul>
+
+        <h4>3. Поверхневе чи Глибоке копіювання?</h4>
+        <ul>
+            <li><b>Поверхнева копія (Shallow Copy):</b> копіює значення примітивних типів. Для посилальних копіюються лише посилання.</li>
+            <li><b>Глибока копія (Deep Copy):</b> створює повноцінні незалежні дублікати об'єкта та всіх його вкладених властивостей.</li>
+        </ul>
+
+        <blockquote>
+            <b>Порада для C#:</b> Інтерфейс <code>ICloneable</code> не рекомендується використовувати через його нетипізованість (<code>object</code>). Краще оголошувати типізований інтерфейс <code>IPrototype&lt;T&gt;</code>.
+        </blockquote>
+
+        <h4>4. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IPrototype&lt;T&gt;
+{
+    T Clone();
+}
+
+public class Author
+{
+    public string Name { get; set; }
+    public Author(string name) =&gt; Name = name;
+}
+
+public class Document : IPrototype&lt;Document&gt;
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public Author Author { get; set; }
+
+    public Document(string title, string content, Author author)
+    {
+        Title = title;
+        Content = content;
+        Author = author;
+    }
+
+    public Document Clone()
+    {
+        Document clone = (Document)this.MemberwiseClone();
+        // Глибоке копіювання посилального типу
+        clone.Author = new Author(this.Author.Name);
+        return clone;
+    }
+
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Документ: '{Title}', Автор: {Author.Name}, Зміст: '{Content}'");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var originalDoc = new Document("Шаблон", "Стандартний зміст...", new Author("Олександр"));
+        Document clonedDoc = originalDoc.Clone();
+
+        clonedDoc.Title = "Звіт за Q3";
+        clonedDoc.Author.Name = "Ірина"; // Зміна в клоні не зачіпає оригінал
+
+        Console.WriteLine("Клон:");
+        clonedDoc.DisplayInfo();
+
+        Console.WriteLine("Оригінал:");
+        originalDoc.DisplayInfo();
+    }
+}</code></pre>
+
+        <h4>5. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> швидке копіювання в runtime; уникнення дублювання логіки ініціалізації.</li>
+            <li><strong>Недоліки:</strong> реалізація глибокого копіювання графів об'єктів з циклічними посиланнями може бути складною.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- СТРУКТУРНІ ПАТЕРНИ                                         -->
+    <!-- ======================================================== -->
+
+    <!-- Патерн 6 -->
+    <article class="pattern-card" id="p6">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 6: Adapter (Адаптер)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє об'єктам із несумісними інтерфейсами <b>працювати разом</b>, відіграючи роль «перехідника»-обгортки.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IPaymentProcessor
+{
+    void Pay(decimal amount);
+}
+
+public class ModernPaymentProcessor : IPaymentProcessor
+{
+    public void Pay(decimal amount) =&gt; Console.WriteLine($"[ModernPay] Сплачено: {amount:C}");
+}
+
+// Сторонній / Legacy клас із несумісним інтерфейсом
+public class LegacyBankService
+{
+    public void MakeTransaction(long amountInCents, string transactionId)
+    {
+        Console.WriteLine($"[LegacyBank] Транзакція #{transactionId} на {amountInCents} копійок.");
+    }
+}
+
+// Адаптер
+public class LegacyBankAdapter : IPaymentProcessor
+{
+    private readonly LegacyBankService _legacyService;
+
+    public LegacyBankAdapter(LegacyBankService legacyService)
+    {
+        _legacyService = legacyService;
+    }
+
+    public void Pay(decimal amount)
+    {
+        long cents = (long)(amount * 100);
+        string id = Guid.NewGuid().ToString().Substring(0, 8);
+        _legacyService.MakeTransaction(cents, id);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IPaymentProcessor processor = new LegacyBankAdapter(new LegacyBankService());
+        processor.Pay(250.75m);
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> розділяє логіку конвертації від бізнес-коду (SRP); дозволяє підключати нові адаптери без змін у клієнті (OCP).</li>
+            <li><strong>Недоліки:</strong> збільшує кількість допоміжних класів у проєкті.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 7 -->
+    <article class="pattern-card" id="p7">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 7: Bridge (Міст)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Розділяє великий клас на дві окремі ієрархії — <b>Абстракцію</b> та <b>Реалізацію</b>, дозволяючи змінювати їх незалежно і запобігаючи комбінаторному вибуху класів ($M \times N$).</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Реалізація (Implementor)
+public interface IDevice
+{
+    bool IsEnabled();
+    void Enable();
+    void Disable();
+    int GetVolume();
+    void SetVolume(int percent);
+}
+
+public class TvDevice : IDevice
+{
+    private bool _on;
+    private int _vol = 30;
+    public bool IsEnabled() =&gt; _on;
+    public void Enable() { _on = true; Console.WriteLine("[TV] Увімкнено."); }
+    public void Disable() { _on = false; Console.WriteLine("[TV] Вимкнено."); }
+    public int GetVolume() =&gt; _vol;
+    public void SetVolume(int p) { _vol = Math.Clamp(p, 0, 100); Console.WriteLine($"[TV] Гучність: {_vol}%"); }
+}
+
+// 2. Абстракція (Abstraction)
+public class RemoteControl
+{
+    protected readonly IDevice _device;
+    public RemoteControl(IDevice device) =&gt; _device = device;
+
+    public void TogglePower()
+    {
+        if (_device.IsEnabled()) _device.Disable();
+        else _device.Enable();
+    }
+
+    public void VolumeUp() =&gt; _device.SetVolume(_device.GetVolume() + 10);
+}
+
+// 3. Розширена Абстракція
+public class AdvancedRemoteControl : RemoteControl
+{
+    public AdvancedRemoteControl(IDevice device) : base(device) { }
+    public void Mute()
+    {
+        Console.WriteLine("[Пульт] Mute.");
+        _device.SetVolume(0);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IDevice tv = new TvDevice();
+        var remote = new AdvancedRemoteControl(tv);
+        remote.TogglePower();
+        remote.VolumeUp();
+        remote.Mute();
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває вибух підкласів; дозволяє динамічно змінювати реалізації.</li>
+            <li><strong>Недоліки:</strong> ускладнює початкову архітектуру додатковими рівнями непрямого доступу.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 8 -->
+    <article class="pattern-card" id="p8">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 8: Composite (Компонувальник)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Згруповує об'єкти в <b>деревоподібну структуру</b> («частина — ціле»), дозволяючи клієнту однаково працювати як з окремими елементами, так і з їх групами.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public interface IItem
+{
+    string Name { get; }
+    decimal GetPrice();
+    void Display(int depth = 0);
+}
+
+// Листок (Leaf)
+public class Product : IItem
+{
+    public string Name { get; }
+    private readonly decimal _price;
+    public Product(string name, decimal price) { Name = name; _price = price; }
+    public decimal GetPrice() =&gt; _price;
+    public void Display(int depth = 0) =&gt; Console.WriteLine($"{new string(' ', depth * 2)}- {Name} ({_price:C})");
+}
+
+// Контейнер (Composite)
+public class Box : IItem
+{
+    private readonly List&lt;IItem&gt; _children = new();
+    public string Name { get; }
+    public Box(string name) =&gt; Name = name;
+
+    public void Add(IItem item) =&gt; _children.Add(item);
+    public decimal GetPrice() =&gt; _children.Sum(i =&gt; i.GetPrice());
+
+    public void Display(int depth = 0)
+    {
+        Console.WriteLine($"{new string(' ', depth * 2)}+ [{Name}]");
+        foreach (var item in _children) item.Display(depth + 1);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var box = new Box("Головна посилка");
+        box.Add(new Product("Телефон", 800m));
+
+        var subBox = new Box("Аксесуари");
+        subBox.Add(new Product("Чохол", 20m));
+        box.Add(subBox);
+
+        box.Display();
+        Console.WriteLine($"Разом: {box.GetPrice():C}");
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> спрощує роботу з деревами об'єктів завдяки поліморфізму; легке додавання нових компонентів.</li>
+            <li><strong>Недоліки:</strong> складно суворо обмежити типи дочірніх об'єктів на етапі компіляції.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 9 -->
+    <article class="pattern-card" id="p9">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 9: Decorator (Декоратор)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє <b>динамічно додавати об'єктам нові обов'язки та поведінку</b>, загортаючи їх у класи-обгортки без використання наслідування.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface INotifier { void Send(string message); }
+
+public class EmailNotifier : INotifier
+{
+    public void Send(string message) =&gt; Console.WriteLine($"[Email]: {message}");
+}
+
+public abstract class NotifierDecorator : INotifier
+{
+    protected readonly INotifier _wrappee;
+    protected NotifierDecorator(INotifier wrappee) =&gt; _wrappee = wrappee;
+    public virtual void Send(string message) =&gt; _wrappee.Send(message);
+}
+
+public class SmsDecorator : NotifierDecorator
+{
+    public SmsDecorator(INotifier wrappee) : base(wrappee) { }
+    public override void Send(string message)
+    {
+        base.Send(message);
+        Console.WriteLine($"[SMS]: {message}");
+    }
+}
+
+public class TelegramDecorator : NotifierDecorator
+{
+    public TelegramDecorator(INotifier wrappee) : base(wrappee) { }
+    public override void Send(string message)
+    {
+        base.Send(message);
+        Console.WriteLine($"[Telegram]: {message}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Багатошарова обгортка: Email + SMS + Telegram
+        INotifier notifier = new TelegramDecorator(
+            new SmsDecorator(
+                new EmailNotifier()
+            )
+        );
+        notifier.Send("Увага! Сервер перевантажено.");
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> динамічна комбінація функціоналу в рантаймі; дотримання Single Responsibility.</li>
+            <li><strong>Недоліки:</strong> порядок огортання має суттєве значення; важче відлагоджувати велику кількість обгорток.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 10 -->
+    <article class="pattern-card" id="p10">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 10: Facade (Фасад)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає <b>простий, високорівневий уніфікований інтерфейс</b> до складної підсистеми, що складається з багатьох класів.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public class InventoryService
+{
+    public bool CheckStock(string id) { Console.WriteLine($"[Склад] Товар {id} в наявності."); return true; }
+}
+public class PaymentService
+{
+    public bool Charge(string email, decimal amount) { Console.WriteLine($"[Банк] Списано {amount:C}."); return true; }
+}
+public class LogisticsService
+{
+    public string CreateShippingOrder(string id, string addr) { Console.WriteLine("[Доставка] Створено ТТН."); return "TTN-123"; }
+}
+
+// Фасад
+public class OrderFacade
+{
+    private readonly InventoryService _inventory = new();
+    private readonly PaymentService _payment = new();
+    private readonly LogisticsService _logistics = new();
+
+    public bool PlaceOrder(string productId, decimal amount, string email, string address)
+    {
+        if (!_inventory.CheckStock(productId)) return false;
+        if (!_payment.Charge(email, amount)) return false;
+        _logistics.CreateShippingOrder(productId, address);
+        Console.WriteLine("Замовлення успішно виконано!");
+        return true;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var facade = new OrderFacade();
+        facade.PlaceOrder("LAPTOP", 2500m, "alex@test.com", "Київ");
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> ізолює клієнтський код від деталей десятків сервісів; знижує поріг входження.</li>
+            <li><strong>Недоліки:</strong> ризик перетворення фасаду на <em>God Object</em> при надмірному розширенні.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 11 -->
+    <article class="pattern-card" id="p11">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 11: Flyweight (Легковаговик)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Економить оперативну пам'ять, розділяючи стан величезної кількості об'єктів на <b>внутрішній</b> (спільний, незмінний) та <b>зовнішній</b> (контекстний, передається ззовні).</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// Спільний стан (Flyweight)
+public class TreeType
+{
+    public string Name { get; }
+    public string Color { get; }
+    public TreeType(string name, string color) { Name = name; Color = color; }
+    public void Draw(int x, int y) =&gt; Console.WriteLine($"Дерево '{Name}' ({Color}) у ({x}, {y})");
+}
+
+// Фабрика пулу спільних екземплярів
+public static class TreeFactory
+{
+    private static readonly Dictionary&lt;string, TreeType&gt; _types = new();
+    public static TreeType GetTreeType(string name, string color)
+    {
+        string key = $"{name}_{color}";
+        if (!_types.TryGetValue(key, out var type))
+        {
+            type = new TreeType(name, color);
+            _types[key] = type;
+        }
+        return type;
+    }
+}
+
+// Контекст з унікальними координатами
+public class Tree
+{
+    private readonly int _x, _y;
+    private readonly TreeType _type;
+    public Tree(int x, int y, TreeType type) { _x = x; _y = y; _type = type; }
+    public void Draw() =&gt; _type.Draw(_x, _y);
+}
+
+class Program
+{
+    static void Main()
+    {
+        var forest = new List&lt;Tree&gt;();
+        var oakType = TreeFactory.GetTreeType("Дуб", "Зелений");
+
+        for (int i = 0; i &lt; 1000; i++)
+        {
+            forest.Add(new Tree(i, i * 2, oakType)); // Усі 1000 посилаються на 1 об'єкт oakType!
+        }
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> радикальна економія RAM при великій кількості однотипних даних.</li>
+            <li><strong>Недоліки:</strong> витрати CPU на пошук у пулі; ускладнення коду через поділ стану.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 12 -->
+    <article class="pattern-card" id="p12">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 12: Proxy (Замісник)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає <b>об'єкт-сурогат</b> іншого сервісу для контролю доступу: відкладеної (лінивої) ініціалізації, кешування, перевірки прав тощо.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+public interface IVideoDownloader
+{
+    void DownloadVideo(string videoId);
+}
+
+public class YouTubeDownloader : IVideoDownloader
+{
+    public YouTubeDownloader() =&gt; Console.WriteLine("[YouTube] Важке підключення...");
+    public void DownloadVideo(string id) =&gt; Console.WriteLine($"[YouTube] Завантаження відео #{id}...");
+}
+
+// Кешуючий та лінивий проксі
+public class CachedYouTubeProxy : IVideoDownloader
+{
+    private YouTubeDownloader _service;
+    private readonly HashSet&lt;string&gt; _cache = new();
+
+    public void DownloadVideo(string id)
+    {
+        _service ??= new YouTubeDownloader(); // Лінива ініціалізація
+
+        if (_cache.Contains(id))
+        {
+            Console.WriteLine($"[Proxy] Відео #{id} отримано з локального кешу!");
+            return;
+        }
+
+        _service.DownloadVideo(id);
+        _cache.Add(id);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IVideoDownloader downloader = new CachedYouTubeProxy();
+        downloader.DownloadVideo("patterns"); // Скачає з мережі
+        downloader.DownloadVideo("patterns"); // Візьме з кешу
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> оптимізація ресурсів (ліниве завантаження); прозорий контроль доступу.</li>
+            <li><strong>Недоліки:</strong> додатковий оверхед часу виконання при багатьох проміжних проксі.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПОВЕДІНКОВІ ПАТЕРНИ                                        -->
+    <!-- ======================================================== -->
+
+    <!-- Патерн 13 -->
+    <article class="pattern-card" id="p13">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 13: Chain of Responsibility (Ланцюжок обов'язків)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє передавати запити послідовно через <b>ланцюжок обробників</b>. Кожен обробник вирішує: обробити запит, передати далі чи перервати ланцюжок.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public class SupportTicket
+{
+    public string Description { get; set; }
+    public int SeverityLevel { get; set; } // 1 - Простий, 2 - Складний
+    public SupportTicket(string desc, int level) { Description = desc; SeverityLevel = level; }
+}
+
+public abstract class BaseHandler
+{
+    private BaseHandler _next;
+    public BaseHandler SetNext(BaseHandler next) { _next = next; return next; }
+
+    public virtual void Handle(SupportTicket ticket)
+    {
+        if (_next != null) _next.Handle(ticket);
+        else Console.WriteLine($"[!] Не вдалося обробити: {ticket.Description}");
+    }
+}
+
+public class BotHandler : BaseHandler
+{
+    public override void Handle(SupportTicket ticket)
+    {
+        if (ticket.SeverityLevel == 1)
+            Console.WriteLine($"[Бот] Вирішено: {ticket.Description}");
+        else
+            base.Handle(ticket);
+    }
+}
+
+public class EngineerHandler : BaseHandler
+{
+    public override void Handle(SupportTicket ticket)
+    {
+        if (ticket.SeverityLevel == 2)
+            Console.WriteLine($"[Інженер] Вирішено баг: {ticket.Description}");
+        else
+            base.Handle(ticket);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var bot = new BotHandler();
+        var engineer = new EngineerHandler();
+        bot.SetNext(engineer);
+
+        bot.Handle(new SupportTicket("Забув пароль", 1));
+        bot.Handle(new SupportTicket("База даних впала", 2));
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> розв'язує відправника та одержувачів; дозволяє змінювати порядок перевірок на льоту.</li>
+            <li><strong>Недоліки:</strong> запит може дійти до кінця ланцюжка і залишитися необробленим.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 14 -->
+    <article class="pattern-card" id="p14">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 14: Command (Команда)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Інкапсулює дію як самостійний об'єкт. Це дозволяє ставити запити в чергу, логувати їх та забезпечувати <b>скасування дій (Undo/Redo)</b>.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+public class BankAccount
+{
+    public decimal Balance { get; private set; }
+    public void Deposit(decimal amt) =&gt; Balance += amt;
+    public void Withdraw(decimal amt) =&gt; Balance -= amt;
+}
+
+public interface ICommand
+{
+    void Execute();
+    void Undo();
+}
+
+public class DepositCommand : ICommand
+{
+    private readonly BankAccount _acc;
+    private readonly decimal _amt;
+    public DepositCommand(BankAccount acc, decimal amt) { _acc = acc; _amt = amt; }
+    public void Execute() =&gt; _acc.Deposit(_amt);
+    public void Undo() =&gt; _acc.Withdraw(_amt);
+}
+
+public class TransactionManager
+{
+    private readonly Stack&lt;ICommand&gt; _history = new();
+    public void Execute(ICommand cmd)
+    {
+        cmd.Execute();
+        _history.Push(cmd);
+    }
+    public void Undo()
+    {
+        if (_history.Count &gt; 0) _history.Pop().Undo();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var acc = new BankAccount();
+        var manager = new TransactionManager();
+
+        manager.Execute(new DepositCommand(acc, 500m));
+        Console.WriteLine($"Баланс: {acc.Balance:C}"); // 500
+
+        manager.Undo();
+        Console.WriteLine($"Баланс після Undo: {acc.Balance:C}"); // 0
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> проста реалізація Undo/Redo; повне відокремлення ініціатора операції від її виконавця.</li>
+            <li><strong>Недоліки:</strong> розмноження класів команд під кожну операцію.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 15 -->
+    <article class="pattern-card" id="p15">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 15: Iterator (Ітератор)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дає можливість послідовно обходити елементи колекції, не розкриваючи її внутрішнього влаштування.</p>
+
+        <blockquote>
+            <b>У .NET:</b> реалізований через інтерфейси <code>IEnumerable&lt;T&gt;</code>, <code>IEnumerator&lt;T&gt;</code>, цикл <code>foreach</code> та оператор <code>yield return</code>.
+        </blockquote>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections;
+using System.Collections.Generic;
+
+public class Playlist : IEnumerable&lt;string&gt;
+{
+    private readonly List&lt;string&gt; _songs = new();
+    public void Add(string song) =&gt; _songs.Add(song);
+
+    public IEnumerator&lt;string&gt; GetEnumerator()
+    {
+        foreach (var s in _songs) yield return s;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() =&gt; GetEnumerator();
+
+    public IEnumerable&lt;string&gt; Backwards()
+    {
+        for (int i = _songs.Count - 1; i &gt;= 0; i--) yield return _songs[i];
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var list = new Playlist { "Song 1", "Song 2", "Song 3" };
+
+        foreach (var song in list.Backwards())
+        {
+            Console.WriteLine(song); // Song 3, Song 2, Song 1
+        }
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> незалежні паралельні обходи одних даних; підтримка різних алгоритмів обходу.</li>
+            <li><strong>Недоліки:</strong> для примітивних структур може бути зайвим.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 16 -->
+    <article class="pattern-card" id="p16">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 16: Mediator (Посередник)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Змушує компоненти взаємодіяти не напряму, а через єдиний об'єкт-посередник, переводячи зв'язки типу $M:N$ у просту форму $1:N$.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IMediator { void Notify(object sender, string ev); }
+
+public class Button
+{
+    private IMediator _m;
+    public bool IsEnabled { get; set; }
+    public void SetMediator(IMediator m) =&gt; _m = m;
+}
+
+public class Checkbox
+{
+    private IMediator _m;
+    public bool Checked { get; private set; }
+    public void SetMediator(IMediator m) =&gt; _m = m;
+    public void Toggle() { Checked = !Checked; _m.Notify(this, "toggle"); }
+}
+
+public class DialogMediator : IMediator
+{
+    private readonly Button _btn;
+    private readonly Checkbox _cb;
+
+    public DialogMediator(Button btn, Checkbox cb)
+    {
+        _btn = btn; _btn.SetMediator(this);
+        _cb = cb; _cb.SetMediator(this);
+    }
+
+    public void Notify(object sender, string ev)
+    {
+        if (ev == "toggle") _btn.IsEnabled = _cb.Checked;
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває хаос взаємних посилань між компонентами (SRP).</li>
+            <li><strong>Недоліки:</strong> посередник із часом може перетворитися на перевантажений <em>God Object</em>.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 17 -->
+    <article class="pattern-card" id="p17">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 17: Memento (Знімок)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє фіксувати та відновлювати минулий внутрішній стан об'єкта, <b>не порушуючи його інкапсуляцію</b>.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+public interface IMemento { }
+
+public class Editor
+{
+    private string _text = "";
+    public void Type(string words) =&gt; _text += words;
+    public string Text =&gt; _text;
+
+    public IMemento Save() =&gt; new Memento(_text);
+    public void Restore(IMemento m) { if (m is Memento s) _text = s.State; }
+
+    private class Memento : IMemento
+    {
+        public string State { get; }
+        public Memento(string state) =&gt; State = state;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var editor = new Editor();
+        var history = new Stack&lt;IMemento&gt;();
+
+        editor.Type("Версія 1");
+        history.Push(editor.Save());
+
+        editor.Type(" + помилка");
+        editor.Restore(history.Pop()); // Відновлює "Версія 1"
+        Console.WriteLine(editor.Text);
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> зберігає приватні поля незмінними для зовнішнього світу.</li>
+            <li><strong>Недоліки:</strong> споживає багато RAM при частих знімках великих об'єктів.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 18 -->
+    <article class="pattern-card" id="p18">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 18: Observer (Спостерігач)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Організовує механізм підписки, завдяки якому об'єкти автоматично дізнаються про зміни стану суб'єкта.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+public class Product
+{
+    private decimal _price;
+    public event Action&lt;decimal&gt; PriceChanged; // Ідіоматичний підхід у C#
+
+    public decimal Price
+    {
+        get =&gt; _price;
+        set
+        {
+            if (_price != value)
+            {
+                _price = value;
+                PriceChanged?.Invoke(_price);
+            }
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var product = new Product();
+        product.PriceChanged += price =&gt; Console.WriteLine($"Нова ціна: {price:C}");
+        product.Price = 120m;
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> слабке зв'язування джерела з підписниками; динамічна підписка.</li>
+            <li><strong>Недоліки:</strong> ризик витоку пам'яті через забуту відписку (<em>Lapsed Listener Problem</em>).</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 19 -->
+    <article class="pattern-card" id="p19">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 19: State (Стан)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє об'єкту змінювати свою поведінку залежно від внутрішнього стану, замінюючи громіздкі <code>switch/case</code> скінченним автоматом поліморфних класів.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IOrderState
+{
+    void Pay(OrderContext ctx);
+    void Ship(OrderContext ctx);
+}
+
+public class OrderContext
+{
+    private IOrderState _state = new NewState();
+    public void SetState(IOrderState state) =&gt; _state = state;
+    public void Pay() =&gt; _state.Pay(this);
+    public void Ship() =&gt; _state.Ship(this);
+}
+
+public class NewState : IOrderState
+{
+    public void Pay(OrderContext ctx) { Console.WriteLine("Оплачено."); ctx.SetState(new PaidState()); }
+    public void Ship(OrderContext ctx) =&gt; Console.WriteLine("Помилка: не можна відправити неоплачене!");
+}
+
+public class PaidState : IOrderState
+{
+    public void Pay(OrderContext ctx) =&gt; Console.WriteLine("Вже сплачено.");
+    public void Ship(OrderContext ctx) =&gt; Console.WriteLine("Відправлено кур'єром.");
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> прибирає спагеті-код умовних переходів; локалізує поведінку кожного стану.</li>
+            <li><strong>Недоліки:</strong> може бути надмірним ускладненням для систем із 2-3 простими статусами.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 20 -->
+    <article class="pattern-card" id="p20">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 20: Strategy (Стратегія)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає сімейство взаємозамінних алгоритмів і дозволяє перемикати їх у контексті безпосередньо під час виконання програми.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IShippingStrategy
+{
+    decimal Calculate(decimal total);
+}
+
+public class PostalShipping : IShippingStrategy
+{
+    public decimal Calculate(decimal total) =&gt; 50m;
+}
+
+public class CourierShipping : IShippingStrategy
+{
+    public decimal Calculate(decimal total) =&gt; 150m;
+}
+
+public class OrderCalculator
+{
+    private IShippingStrategy _strategy;
+    public OrderCalculator(IShippingStrategy s) =&gt; _strategy = s;
+    public void SetStrategy(IShippingStrategy s) =&gt; _strategy = s;
+    public decimal GetTotal(decimal subtotal) =&gt; subtotal + _strategy.Calculate(subtotal);
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> гнучка заміна алгоритмів у runtime; ізоляція математики від бізнес-моделі (OCP).</li>
+            <li><strong>Недоліки:</strong> клієнт повинен знати різницю між стратегіями для їхнього вибору.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 21 -->
+    <article class="pattern-card" id="p21">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 21: Template Method (Шаблонний метод)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Задає каркас алгоритму в базовому класі, дозволяючи підкласам змінювати окремі кроки без втручання в загальну структуру.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public abstract class DataExporter
+{
+    // Шаблонний метод
+    public void Export()
+    {
+        ReadData();
+        FormatData();
+        Save();
+    }
+
+    private void ReadData() =&gt; Console.WriteLine("Зчитування з бази...");
+    protected abstract void FormatData();
+    protected virtual void Save() =&gt; Console.WriteLine("Збереження за замовчуванням...");
+}
+
+public class PdfExporter : DataExporter
+{
+    protected override void FormatData() =&gt; Console.WriteLine("Форматування в PDF.");
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> повне повторне використання спільного коду (DRY); контроль за послідовністю дій.</li>
+            <li><strong>Недоліки:</strong> жорстка прив'язка через спадкування.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 22 -->
+    <article class="pattern-card" id="p22">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 22: Visitor (Відвідувач)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє додавати нові операції до класів, <b>не змінюючи їхній вихідний код</b>, за допомогою подвійної диспетчеризації (<em>Double Dispatch</em>).</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IVisitor
+{
+    void Visit(Bank b);
+    void Visit(Shop s);
+}
+
+public interface IPlace { void Accept(IVisitor v); }
+
+public class Bank : IPlace
+{
+    public void Accept(IVisitor v) =&gt; v.Visit(this);
+}
+
+public class Shop : IPlace
+{
+    public void Accept(IVisitor v) =&gt; v.Visit(this);
+}
+
+public class TaxVisitor : IVisitor
+{
+    public void Visit(Bank b) =&gt; Console.WriteLine("Податок банку: 10%");
+    public void Visit(Shop s) =&gt; Console.WriteLine("Податок магазину: 5%");
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> легке додавання нових операцій (OCP); об'єднання логіки операції в одному місці (SRP).</li>
+            <li><strong>Недоліки:</strong> складно додавати нові класи в ієрархію елементів; часто вимагає відкриття приватних полів.</li>
+        </ul>
+    </article>
+
+    <!-- Патерн 23 -->
+    <article class="pattern-card" id="p23">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 23: Interpreter (Інтерпретатор)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає граматику простої мови чи виразу та будує деревоподібне представлення (<em>AST</em>) для його обчислення.</p>
+
+        <h4>2. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+public interface IExpression
+{
+    int Interpret(Dictionary&lt;string, int&gt; context);
+}
+
+public class NumberExpression : IExpression
+{
+    private readonly int _num;
+    public NumberExpression(int n) =&gt; _num = n;
+    public int Interpret(Dictionary&lt;string, int&gt; ctx) =&gt; _num;
+}
+
+public class AddExpression : IExpression
+{
+    private readonly IExpression _left, _right;
+    public AddExpression(IExpression l, IExpression r) { _left = l; _right = r; }
+    public int Interpret(Dictionary&lt;string, int&gt; ctx) =&gt; _left.Interpret(ctx) + _right.Interpret(ctx);
+}
+
+class Program
+{
+    static void Main()
+    {
+        // 5 + 10
+        IExpression expr = new AddExpression(new NumberExpression(5), new NumberExpression(10));
+        Console.WriteLine($"Результат: {expr.Interpret(null)}"); // 15
+    }
+}</code></pre>
+
+        <h4>3. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> легке розширення граматики новими правилами; чудово підходить для предметно-орієнтованих мов (DSL).</li>
+            <li><strong>Недоліки:</strong> складно підтримувати для мов із великою граматикою.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>
