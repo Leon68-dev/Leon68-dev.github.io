@@ -222,43 +222,225 @@
             <div class="toc-column">
                 <h3 style="color: var(--badge-creational-text);">Породжувальні</h3>
                 <ul class="toc-list">
-                    <li><a href="#p1">1. Singleton*</a></li>
-                    <li><a href="#p2">2. Factory Method</a></li>
-                    <li><a href="#p3">3. Abstract Factory*</a></li>
-                    <li><a href="#p4">4. Builder</a></li>
+                    <li><a href="#p1">1. Singleton**</a></li>
+                    <li><a href="#p2">2. Factory Method*</a></li>
+                    <li><a href="#p3">3. Abstract Factory**</a></li>
+                    <li><a href="#p4">4. Builder*</a></li>
                     <li><a href="#p5">5. Prototype</a></li>
                 </ul>
             </div>
             <div class="toc-column">
                 <h3 style="color: var(--badge-structural-text);">Структурні</h3>
                 <ul class="toc-list">
-                    <li><a href="#p6">6. Adapter</a></li>
-                    <li><a href="#p7">7. Bridge*</a></li>
+                    <li><a href="#p6">6. Adapter*</a></li>
+                    <li><a href="#p7">7. Bridge**</a></li>
                     <li><a href="#p8">8. Composite</a></li>
-                    <li><a href="#p9">9. Decorator</a></li>
-                    <li><a href="#p10">10. Facade</a></li>
+                    <li><a href="#p9">9. Decorator*</a></li>
+                    <li><a href="#p10">10. Facade*</a></li>
                     <li><a href="#p11">11. Flyweight</a></li>
-                    <li><a href="#p12">12. Proxy</a></li>
+                    <li><a href="#p12">12. Proxy*</a></li>
                 </ul>
             </div>
             <div class="toc-column">
                 <h3 style="color: var(--badge-behavioral-text);">Поведінкові</h3>
                 <ul class="toc-list">
-                    <li><a href="#p13">13. Chain of Responsibility</a></li>
-                    <li><a href="#p14">14. Command</a></li>
+                    <li><a href="#p13">13. Chain of Responsibility*</a></li>
+                    <li><a href="#p14">14. Command*</a></li>
                     <li><a href="#p15">15. Iterator</a></li>
-                    <li><a href="#p16">16. Mediator</a></li>
+                    <li><a href="#p16">16. Mediator*</a></li>
                     <li><a href="#p17">17. Memento</a></li>
-                    <li><a href="#p18">18. Observer*</a></li>
+                    <li><a href="#p18">18. Observer**</a></li>
                     <li><a href="#p19">19. State</a></li>
-                    <li><a href="#p20">20. Strategy*</a></li>
-                    <li><a href="#p21">21. Template Method</a></li>
+                    <li><a href="#p20">20. Strategy**</a></li>
+                    <li><a href="#p21">21. Template Method*</a></li>
                     <li><a href="#p22">22. Visitor</a></li>
                     <li><a href="#p23">23. Interpreter</a></li>
                 </ul>
             </div>
         </div>
     </nav>
+
+<!-- ======================================================== -->
+    <!-- ТОП ПАТЕРНІВ ТА ПИТАННЯ-ПАСТКИ ДЛЯ СПІВБЕСІДИ           -->
+    <!-- ======================================================== -->
+    <section class="pattern-card" id="interview-traps" style="border-left: 6px solid var(--primary);">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Топ патернів для співбесіди: питання-пастки та інсайти</h3>
+                <span class="badge badge-behavioral">Interview Cheat Sheet</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <p>На технічних інтерв'ю рідко просять написати патерн «з нуля». Найчастіше перевіряють <b>розуміння корнер-кейсів, антипатернів та вміння порівнювати схожі архітектурні рішення</b>. Нижче зібрано найпопулярніші запитання-пастки:</p>
+
+        <!-- 1. Singleton -->
+        <h4>1. Singleton: Captive Dependency (Захоплена залежність)</h4>
+        <blockquote>
+            <b>Питання:</b> Що станеться, якщо в ASP.NET Core зареєструвати <code>Singleton</code>, який у конструкторі приймає <code>Scoped</code>-сервіс (наприклад, <code>DbContext</code>)?
+        </blockquote>
+        <ul>
+            <li><b>Пастка:</b> <code>Singleton</code> живе протягом усього часу роботи програми. Через це впроваджений <code>Scoped</code>-екземпляр ніколи не утилізується і стає «захопленим» (<em>Captive</em>).</li>
+            <li><b>Наслідки:</b> Неконтрольований витік пам'яті (кеш сутностей у <code>DbContext</code> лише зростатиме), застарілі дані (stale data) та падіння через багатопотоковий доступ (<code>DbContext</code> не є thread-safe).</li>
+            <li><b>Правильна відповідь:</b> Якщо синглтону дійсно потрібен сервіс зі scoped-життєвим циклом, слід інжектувати <code>IServiceScopeFactory</code> і створювати область видимості вручну через <code>using var scope = _scopeFactory.CreateScope()</code>.</li>
+        </ul>
+
+        <!-- 2. Adapter vs Decorator vs Proxy -->
+        <h4>2. «Битва трьох обгорток»: Adapter vs Decorator vs Proxy</h4>
+        <blockquote>
+            <b>Питання:</b> Усі три структурні патерни огортають інший об'єкт. Як розрізнити, де який застосовувати?
+        </blockquote>
+        <ul>
+            <li><b>Adapter:</b> <em>Змінює інтерфейс</em>. Мета — змусити два несумісні інтерфейси працювати разом (наприклад, перетворити сторонній XML API у внутрішній інтерфейс сервісу).</li>
+            <li><b>Decorator:</b> <em>Зберігає інтерфейс</em>, але <em>розширює або видозмінює поведінку</em> об'єкта (наприклад, додає кешування, шифрування чи логування до потоку даних).</li>
+            <li><b>Proxy:</b> <em>Зберігає інтерфейс</em>, але <em>контролює доступ</em> до цільового об'єкта (лінива ініціалізація, перевірка авторизації або клієнт віддаленого сервісу) без зміни бізнес-логіки.</li>
+        </ul>
+
+        <!-- 3. Factory Method vs Abstract Factory -->
+        <h4>3. Simple Factory vs Factory Method vs Abstract Factory</h4>
+        <blockquote>
+            <b>Питання:</b> Чи є клас зі статичним методом <code>Create(string type)</code> та конструкцією <code>switch/case</code> патерном <em>Factory Method</em>?
+        </blockquote>
+        <ul>
+            <li><b>Пастка:</b> Ні, це ідіома <b>«Проста фабрика» (Simple Factory)</b>. Вона порушує <em>Open/Closed Principle</em>, адже додавання нового продукту вимагає модифікації блоку <code>switch</code>.</li>
+            <li><b>Factory Method:</b> Базується на <b>успадкуванні та поліморфізмі</b>. Базовий клас оголошує метод, а конкретні підкласи вирішують, який саме екземпляр створити.</li>
+            <li><b>Abstract Factory:</b> Базується на <b>композиції</b>. Створює <em>цілі родини взаємопов'язаних продуктів</em> (наприклад, Кнопка + Чекбокс для певної ОС), гарантуючи їх взаємну сумісність.</li>
+        </ul>
+
+        <!-- 4. Observer vs Pub-Sub -->
+        <h4>4. Observer vs Publish-Subscribe та проблема «Lapsed Listener»</h4>
+        <blockquote>
+            <b>Питання:</b> Чи є Observer тим самим, що й Pub-Sub? Який витік пам'яті найчастіше виникає при роботі з подіями в C#?
+        </blockquote>
+        <ul>
+            <li><b>Різниця:</b> В <b>Observer</b> суб'єкт безпосередньо зберігає список підписників у пам'яті (прямий сильний зв'язок). У <b>Publish-Subscribe</b> з'являється незалежний посередник (Event Bus, Kafka, RabbitMQ), тому видавець і підписник повністю ізольовані.</li>
+            <li><b>Lapsed Listener Problem:</b> Якщо короткоживучий об'єкт підписався на подію довгоживучого об'єкта (наприклад, <code>publisher.PriceChanged += OnPriceChanged</code>) і не відписався через <code>-=</code>, Garbage Collector не зможе зібрати підписника. Довгоживучий видавець утримуватиме посилання на нього, що викликає витік пам'яті.</li>
+        </ul>
+
+        <!-- 5. Strategy vs State -->
+        <h4>5. Strategy vs State: однаковий UML, різний намір</h4>
+        <blockquote>
+            <b>Питання:</b> Діаграми класів патернів Strategy та State майже ідентичні. У чому полягає фундаментальна різниця?
+        </blockquote>
+        <ul>
+            <li><b>Strategy:</b> Клієнтський код зазвичай самостійно обирає та передає стратегію в контекст. Окремі стратегії нічого не знають одна про одну та не перемикають себе.</li>
+            <li><b>State:</b> Переходи між станами відбуваються <b>всередині самого контексту або в класах станів</b>. Класи станів зазвичай знають про можливі наступні стани (наприклад, перехід замовлення: <code>NewState</code> &rarr; <code>PaidState</code> &rarr; <code>ShippedState</code>).</li>
+        </ul>
+
+        <!-- 6. Visitor -->
+        <h4>6. Visitor: Навіщо потрібна подвійна диспетчеризація (Double Dispatch)?</h4>
+        <blockquote>
+            <b>Питання:</b> Чому не можна просто викликати <code>visitor.Visit(element)</code> замість двокрокового виклику <code>element.Accept(visitor)</code>?
+        </blockquote>
+        <ul>
+            <li><b>Пастка:</b> У C# вибір перевантаженого методу (метод з однаковою назвою, але різними типами аргументів) відбувається на етапі <b>компіляції</b> (Static Dispatch) за типом змінної, а не за її значенням у рантаймі.</li>
+            <li><b>Вирішення:</b> Якщо викликати <code>visitor.Visit(element)</code>, де змінна має базовий тип <code>IElement</code>, викличеться базовий метод. Метод <code>element.Accept(v)</code> робить перший віртуальний виклик, а всередині викликає <code>v.Visit(this)</code>, де ключове слово <code>this</code> має точний тип конкретного класу на етапі виконання.</li>
+        </ul>
+
+        <!-- 7. Template Method vs Strategy -->
+        <h4>7. Template Method vs Strategy: спадкування проти композиції</h4>
+        <blockquote>
+            <b>Питання:</b> Чому в сучасній архітектурі рекомендують віддавати перевагу Strategy над Template Method?
+        </blockquote>
+        <ul>
+            <li><b>Template Method</b> використовує наслідування (підхід «білий ящик»), що створює жорстку залежність підкласів від базового класу. Змінити алгоритм під час виконання (runtime) неможливо.</li>
+            <li><b>Strategy</b> базується на композиції інтерфейсів (підхід «чорний ящик»), що повністю втілює фундаментальний принцип проєктування <em>«Composition over inheritance»</em> і дозволяє перемикати поведінку на льоту.</li>
+        </ul>
+    </section>
+
+<!-- ======================================================== -->
+    <!-- АРХІТЕКТУРНІ ПАТЕРНИ: ПИТАННЯ-ПАСТКИ ДЛЯ СПІВБЕСІДИ      -->
+    <!-- ======================================================== -->
+    <section class="pattern-card" id="architectural-traps" style="border-left: 6px solid #8b5cf6;">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Архітектурні патерни: питання-пастки та інсайти</h3>
+                <span class="badge" style="background: #ede9fe; color: #6d28d9;">Architecture</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <p>Питання щодо патернів рівня архітектури (Enterprise Patterns) ставлять практично на кожній співбесіді рівня Middle+ та Senior. Вони перевіряють розуміння надійності розподілених систем, транзакційних меж та взаємодії сервісів.</p>
+
+        <!-- 1. Repository & Unit of Work -->
+        <h4>1. Repository та Unit of Work: поверх чи замість Entity Framework Core?</h4>
+        <blockquote>
+            <b>Питання:</b> Чи варто писати власні <code>Generic Repository</code> та <code>Unit of Work</code> поверх EF Core? У чому полягає пастка «Leaky Abstraction»?
+        </blockquote>
+        <ul>
+            <li><b>Пастка:</b> <code>DbContext</code> в EF Core <b>вже є повноцінною реалізацією Unit of Work</b>, а <code>DbSet&lt;T&gt;</code> — реалізацією патерну <code>Repository</code>. Написання поверхневих обгорток на кшталт <code>IRepository&lt;T&gt;</code> із методами <code>GetAll()</code>, <code>Add()</code>, <code>Save()</code> часто призводить до марного антипатерну дублювання коду.</li>
+            <li><b>Проблема IQueryable (Leaky Abstraction):</b> Якщо репозиторій повертає <code>IQueryable&lt;T&gt;</code>, логіка побудови SQL витікає у бізнес-шар, нівелюючи сенс ізоляції. Якщо ж повертати <code>IEnumerable&lt;T&gt;</code> або <code>List&lt;T&gt;</code> — втрачається оптимізація запитів на стороні БД (пагінація, фільтрація).</li>
+            <li><b>Коли дійсно потрібен:</b> У підході DDD (Domain-Driven Design), де репозиторій створюється <em>виключно під корені агрегатів (Aggregate Roots)</em> для інкапсуляції бізнес-правил завантаження сутностей, або для повної абстракції від зовнішніх NoSQL/сторонніх API джерел.</li>
+        </ul>
+
+        <!-- 2. CQRS -->
+        <h4>2. CQRS (Command Query Responsibility Segregation): міфи та реальність</h4>
+        <blockquote>
+            <b>Питання:</b> Чи вимагає патерн CQRS обов'язкової наявності двох різних баз даних (Read DB / Write DB) та Event Sourcing?
+        </blockquote>
+        <ul>
+            <li><b>Пастка:</b> Поширена помилка вважати, що CQRS неможливий без складної інфраструктури (Event Sourcing, Kafka, двох окремих БД).</li>
+            <li><b>Правильна відповідь:</b> Базовий CQRS — це лише <b>розділення коду на дві різні моделі</b> в межах однієї програми та однієї БД:
+                <ul>
+                    <li><b>Commands:</b> Змінюють стан системи, проходять валідацію, працюють із доменною моделлю через EF Core і нічого не повертають (або повертають ідентифікатор).</li>
+                    <li><b>Queries:</b> Лише зчитують дані, нічого не змінюють, оминають важкі доменні сутності й одразу мапляться у пласкі DTO через швидкі інструменти (Dapper або <code>AsNoTracking()</code> в EF Core).</li>
+                </ul>
+            </li>
+            <li>Окремі бази даних, черги та кінцева узгодженість (<em>Eventual Consistency</em>) потрібні лише за екстремальних навантажень, коли операцій читання в сотні разів більше, ніж запису.</li>
+        </ul>
+
+        <!-- 3. Transactional Outbox -->
+        <h4>3. Transactional Outbox Pattern: вирішення Dual-Write Problem</h4>
+        <blockquote>
+            <b>Питання:</b> Що станеться при виконанні коду:<br>
+            <code>await _dbContext.SaveChangesAsync();</code><br>
+            <code>await _messageBus.Publish(new OrderCreatedEvent());</code><br>
+            Як патерн Outbox гарантує надійність доставки?
+        </blockquote>
+        <ul>
+            <li><b>Пастка (Dual-Write Problem):</b> Дві операції не зв'язані єдиною розподіленою транзакцією. Якщо база даних зафіксувала замовлення, але брокер повідомлень (RabbitMQ/Kafka) був тимчасово недоступний або в процесу зникло живлення — подія буде назавжди втрачена, а інші мікросервіси ніколи про неї не дізнаються.</li>
+            <li><b>Рішення через Outbox:</b> Повідомлення зберігається <b>у тій самій базі даних</b> у спеціальну таблицю (наприклад, <code>OutboxMessages</code>) у межах <em>однієї локальної ACID-транзакції</em> разом із бізнес-даними.</li>
+            <li>Окремий фоновий процес (наприклад, <code>BackgroundService</code> або MassTransit Outbox Worker) періодично зчитує невідправлені записи з таблиці, публікує їх у брокер і позначає відправленими, гарантуючи семантику <b>At-Least-Once Delivery</b>.</li>
+        </ul>
+
+        <!-- 4. Saga Pattern -->
+        <h4>4. Saga Pattern: Orchestration vs Choreography</h4>
+        <blockquote>
+            <b>Питання:</b> Як організувати розподілену транзакцію між кількома мікросервісами без використання двофазного коміту (2PC)?
+        </blockquote>
+        <ul>
+            <li><b>Концепція:</b> Сага розбиває розподілену транзакцію на послідовність незалежних локальних транзакцій. Якщо одна з операцій падає (наприклад, немає грошей на картці), запускаються <b>компенсаційні транзакції (Compensating Transactions)</b> для відкату попередніх дій (повернення товару на склад).</li>
+            <li><b>Choreography (Хореографія):</b> Сервіси самостійно слухають події сусідніх сервісів і реагують на них. Плюс — немає єдиної точки відмови. Мінус — утворюється «павутина» залежностей, за якою важко відстежити ланцюжок виконання при ускладненні системи.</li>
+            <li><b>Orchestration (Оркестрація):</b> Створюється єдиний центральний координатор (Saga Orchestrator / State Machine), який явно надсилає команди кожному сервісу і відстежує його статус (наприклад, через бібліотеку MassTransit State Machine). Рекомендований підхід для складних бізнес-процесів із більш ніж 3–4 кроками.</li>
+        </ul>
+
+        <!-- 5. Circuit Breaker -->
+        <h4>5. Circuit Breaker (Запобіжник)</h4>
+        <blockquote>
+            <b>Питання:</b> Як запобігти лавинному ефекту відмови (Cascading Failure), коли один із залежних зовнішніх сервісів починає зависати чи відмовляти?
+        </blockquote>
+        <ul>
+            <li><b>Принцип роботи:</b> Патерн перехоплює виклики до ненадійного сервісу та має 3 стани:
+                <ul>
+                    <li><b>Closed (Вимкнено):</b> Запити проходять у звичайному режимі. Якщо відсоток помилок перевищує поріг, запобіжник перемикається у стан <em>Open</em>.</li>
+                    <li><b>Open (Увімкнено):</b> Усі наступні запити миттєво відхиляються без спроби виклику зовнішнього сервісу (Fast Fail), не витрачаючи пули потоків і пам'ять. Запускається таймер очікування.</li>
+                    <li><b>Half-Open (Напіввідкрито):</b> Після закінчення таймера пропускається невелика пробна кількість запитів. Якщо вони пройшли успішно — стан повертається до <em>Closed</em>, якщо знову впали — повертається до <em>Open</em>.</li>
+                </ul>
+            </li>
+            <li><b>Реалізація в .NET:</b> Стандартний стек — бібліотека <code>Polly</code> або вбудований у .NET 8+ пакет <code>Microsoft.Extensions.Resilience</code>.</li>
+        </ul>
+
+        <!-- 6. Specification Pattern -->
+        <h4>6. Specification Pattern: порятунок від God-репозиторіїв</h4>
+        <blockquote>
+            <b>Питання:</b> Як уникнути появи репозиторіїв із десятками методів на кшталт <code>GetActiveUsersByCountryAndAge(string country, int age)</code>?
+        </blockquote>
+        <ul>
+            <li><b>Проблема:</b> Додавання нових комбінацій критеріїв пошуку постійно роздуває інтерфейс репозиторію та дублює LINQ-вирази по всьому коду.</li>
+            <li><b>Рішення:</b> Патерн <b>Specification</b> інкапсулює бізнес-правило відбору сутностей в окремий невеликий клас, який формує <code>Expression&lt;Func&lt;T, bool&gt;&gt;</code>.</li>
+            <li>Специфікації можна поєднувати за допомогою логічних операторів (<code>And</code>, <code>Or</code>, <code>Not</code>), наприклад: <code>var spec = new ActiveUsersSpec().And(new MinAgeSpec(18));</code>. Репозиторій отримує лише один універсальний метод: <code>ListAsync(ISpecification&lt;T&gt; spec)</code>.</li>
+        </ul>
+    </section>
 
     <!-- ======================================================== -->
     <!-- ПОРОДЖУВАЛЬНІ ПАТЕРНИ                                      -->
