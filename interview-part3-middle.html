@@ -13,8 +13,11 @@
             --border: #e2e8f0;
             --primary: #4f46e5;
             --primary-light: #eef2ff;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --accent-badge: #e0e7ff;
+            --accent-badge-text: #4338ca;
         }
 
         * { box-sizing: border-box; }
@@ -40,8 +43,8 @@
         }
 
         .badge-level {
-            background-color: #e0e7ff;
-            color: #4338ca;
+            background-color: var(--accent-badge);
+            color: var(--accent-badge-text);
             padding: 0.35rem 0.9rem;
             border-radius: 9999px;
             font-size: 0.85rem;
@@ -88,7 +91,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -124,6 +127,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid #4f46e5;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #312e81;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #4338ca;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -133,6 +171,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -198,8 +237,20 @@ IEnumerable&lt;object&gt; objects = strings; // Працює, бо IEnumerable&l
                 <pre><code>Action&lt;object&gt; actObject = obj =&gt; Console.WriteLine(obj);
 Action&lt;string&gt; actString = actObject; // Працює, бо Action&lt;in T&gt;</code></pre>
             </li>
-            <li><b>Чому НЕ працює з Value Types:</b> Структури мають різний бінарний розмір у пам'яті (наприклад, <code>int</code> — 4 байти, а <code>double</code> — 8 байт). Посилальні типи завжди мають розмір 4 або 8 байт (покажчик), тому CLR може безпечно працювати з ними на рівні масивів та регістрів без конвертації/боксингу.</li>
+            <li><b>Чому НЕ працює з Value Types:</b> Структури мають різний бінарний розмір у пам'яті (наприклад, <code>int</code> — 4 байти, а <code>double</code> — 8 байт). Посилальні типи завжди мають однаковий розмір покажчика (4 байти на x86 або 8 байт на x64), тому CLR може безпечно працювати з ними на рівні масивів та регістрів без конвертації/боксингу.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому звичайні масиви в C# є коваріантними і чому це вважається історичною помилкою проєктування?</span>
+                <p class="qa-answer">В: Масиви успадкували коваріантність із ранніх версій .NET 1.0 (до появи дженериків). Можна написати `object[] arr = new string[5]; arr[0] = 123;`. Код скомпілюється, але під час виконання впаде з `ArrayTypeMismatchException`, оскільки CLR змушена перевіряти тип кожного запису в масив у рантаймі.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи можна застосувати `out` або `in` до параметрів у звичайних класах (наприклад, `class MyClass<out T>`)?</span>
+                <p class="qa-answer">В: Ні. Варіантність у C# підтримується виключно для інтерфейсів (`interface`) та делегатів (`delegate`). Класи завжди інваріантні.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -221,6 +272,7 @@ Func&lt;int, int&gt; multiplier = x =&gt; x * factor;</code></pre>
 private sealed class &lt;&gt;c__DisplayClass0_0
 {
     public int factor; // Локальна змінна перетворилася на поле класу в Купі!
+
     public int &lt;Main&gt;b__0(int x) =&gt; x * factor;
 }</code></pre>
         <p><b>Небезпеки та пастки:</b>
@@ -229,6 +281,18 @@ private sealed class &lt;&gt;c__DisplayClass0_0
                 <li><b>Захоплення змінної в циклі (історичний баг у <code>for</code>):</b> Якщо лямбда захоплює лічильник <code>for (int i = 0; i &lt; 5; i++)</code>, всі лямбди посилаються на <i>одне й те саме спільне поле</i> <code>displayClass.i</code>, тому в кінці виконання всі виведуть <code>5</code>. (У циклі <code>foreach</code> це виправили в C# 5).</li>
             </ul>
         </p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як захоплення `this` усередині лямбди може спричинити прихований витік пам'яті?</span>
+                <p class="qa-answer">В: Якщо лямбда звертається до будь-якого поля або методу свого класу (`() =&gt; _service.Call()`), згенерований `DisplayClass` збереже посилання на екземпляр `this`. Якщо цей делегат передати довгоживучому сервісу, весь батьківський об'єкт ніколи не звільниться з купи.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Навіщо в C# 9+ з'явився модифікатор `static` для лямбд (`static x =&gt; x * 2`)?</span>
+                <p class="qa-answer">В: Модифікатор `static` дає компілятору вказівку гарантувати, що лямбда не захоплює локальні змінні чи `this`. Якщо розробник випадково спробує використати зовнішній стан, виникне помилка компіляції, що захищає від небажаних алокацій у пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -254,6 +318,18 @@ private sealed class &lt;&gt;c__DisplayClass0_0
             <li>Наступний виклик <code>MoveNext()</code> заходить у метод і через <code>switch (_state)</code> миттєво стрибає на той рядок, де зупинився минулого разу.</li>
             <li><b>Підступний нюанс:</b> Якщо перед першим <code>yield return</code> кинути виняток валідації аргументів (<code>if (arg == null) throw ...</code>), цей виняток НЕ викинеться в момент виклику методу! Він викинеться лише тоді, коли хтось уперше викличе <code>foreach</code> або <code>MoveNext()</code>.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як вирішити проблему відкладеної валідації параметрів у методах з `yield return`?</span>
+                <p class="qa-answer">В: Розділити метод на два: публічний звичайний метод, який негайно валідує параметри і кидає винятки, та внутрішній локальний або приватний метод із `yield return`, який повертає ітератор.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи гарантується виконання блоку `finally` всередині генератора з `yield return`, якщо споживач зробив `break` у циклі `foreach`?</span>
+                <p class="qa-answer">В: Так! Цикл `foreach` завжди загортає ітерацію в блок `try/finally`, де викликає `enumerator.Dispose()`. Метод `Dispose()` згенерованої стан-машини автоматично викликає код із блоку `finally`. Але якщо перебирати `IEnumerator` вручну через `while (MoveNext())` і забути викликати `Dispose()`, блок `finally` виконаний не буде!</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -271,15 +347,23 @@ private sealed class &lt;&gt;c__DisplayClass0_0
 ReadOnlySpan&lt;char&gt; span = str.AsSpan(0, 3); // "123" БЕЗ створення нового string у купі!
 int num = int.Parse(span);</code></pre>
         <p><b>Чому <code>Span&lt;T&gt;</code> є <code>ref struct</code>:</b><br/>
-        Він містить керований покажчик (by-ref pointer). Щоб уникнути ситуації, коли потік або GC втратить покажчик, <code>ref struct</code> гарантовано розміщується <b>виключно на стеку</b>.</p>
+        Він містить керований покажчик (by-ref pointer: <code>ref T _pointer</code> та довжину <code>int _length</code>). Щоб уникнути ситуації, коли потік або GC втратить покажчик на стек після повернення з фрейму методу, <code>ref struct</code> гарантовано розміщується <b>виключно на стеку</b>.</p>
         <p><b>Де <code>Span&lt;T&gt;</code> ЗАБОРОНЕНО використовувати:</b></p>
         <ul>
             <li>Не може бути полем звичайного класу (бо клас живе в купі).</li>
-            <li>Не можна використовувати всередині асинхронних методів (<code>async / await</code>) між точками зупинки (бо асинхронна стан-машина є класом у купі).</li>
+            <li>Не можна використовувати всередині асинхронних методів (<code>async / await</code>) між точками зупинки (бо асинхронна стан-машина є класом або структурою, що копіюється в купу).</li>
             <li>Не можна пакувати (Boxing в <code>object</code>).</li>
             <li>Не може бути типом аргументу в дженериках (<code>List&lt;Span&lt;int&gt;&gt;</code> — помилка компіляції).</li>
         </ul>
-        <p><b>Рішення для асинхронного коду:</b> Використовувати <code>Memory&lt;T&gt;</code> / <code>ReadOnlyMemory&lt;T&gt;</code> — це звичайні структури, які можуть лежати в купі та перетворюватися на <code>Span</code> безпосередньо перед синхронною обробкою.</p>
+        <p><b>Рішення для асинхронного коду:</b> Використовувати <code>Memory&lt;T&gt;</code> / <code>ReadOnlyMemory&lt;T&gt;</code> — це звичайні структури, які можуть лежати в купі та перетворюватися на <code>Span</code> через метод <code>.Span</code> безпосередньо перед синхронною обробкою.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Скільки байт займає структура `Span<T>` на 64-бітній системі?</span>
+                <p class="qa-answer">В: Рівно 16 байт: 8 байт під by-ref вказівник (`ref T _pointer`) і 4 байти під довжину (`int _length`) плюс 4 байти вирівнювання (padding).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -310,6 +394,18 @@ decimal GetDeliveryCost(object order) =&gt; order switch
     null =&gt; throw new ArgumentNullException(nameof(order)),
     _ =&gt; 100m // Discard pattern (default)
 };</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо у виразі `switch` жоден із патернів не підійде, а патерн `_` (discard) відсутній?</span>
+                <p class="qa-answer">В: Компілятор видасть попередження про неповне охоплення станів (exhaustiveness warning CS8509), а під час виконання викинеться виняток `SwitchExpressionException`.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Що нового додав List Pattern у C# 11?</span>
+                <p class="qa-answer">В: Можливість зіставляти послідовності та масиви за елементами та довжиною, включаючи зрізи: `array is [1, 2, .. var rest, 10]` перевіряє перший і останній елементи, поміщаючи середину в змінну `rest`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -327,9 +423,21 @@ decimal GetDeliveryCost(object order) =&gt; order switch
             <li><b>Gen 0:</b> Сюди потрапляють абсолютно всі нові малі об'єкти. Збір відбувається найчастіше і за мілісекунди. Ті, хто вижив, переходять у Gen 1.</li>
             <li><b>Gen 1:</b> Буфер між новими та старими об'єктами.</li>
             <li><b>Gen 2:</b> Довгожителі (статичні змінні, кеші, синглтони). Збір сміття тут називається <i>Full GC</i>, він зупиняє потоки додатку (Stop-The-World) на відчутніший час.</li>
-            <li><b>LOH (Large Object Heap):</b> Об'єкти розміром <b>від 85 000 байт</b> (та великі масиви чисел від 1000 елементів) створюються одразу тут, оминаючи Gen 0. <i>Особливість:</i> через дорожнечу копіювання пам'яті LOH за замовчуванням <b>не дефрагментується</b>, що може призводити до фрагментації віртуальної пам'яті.</li>
-            <li><b>POH (Pinned Object Heap):</b> З'явився в .NET 5. Окремий пул для об'єктів, закріплених у пам'яті через <code>GCHandle.Alloc(..., GCHandleType.Pinned)</code> (наприклад, для передачі в C++ бібліотеки), щоб GC не дефрагментував решту звичайної купи.</li>
+            <li><b>LOH (Large Object Heap):</b> Об'єкти розміром <b>від 85 000 байт</b> (та масиви чисел `double[]` від 1000 елементів) створюються одразу тут, оминаючи Gen 0. <i>Особливість:</i> через дорожнечу копіювання пам'яті LOH за замовчуванням <b>не дефрагментується</b>, що може призводити до фрагментації віртуальної пам'яті.</li>
+            <li><b>POH (Pinned Object Heap):</b> З'явився в .NET 5. Окремий пул для об'єктів, закріплених у пам'яті через <code>GC.AllocateArray(..., pinned: true)</code> або <code>GCHandle.Alloc(..., GCHandleType.Pinned)</code> (наприклад, для передачі буферів у нативний C++ код), щоб закріплення не заважало дефрагментації звичайної купи.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що конкретно є корінням збирача сміття (GC Roots)?</span>
+                <p class="qa-answer">В: 1) Локальні змінні потоку у відкритих стекових фреймах; 2) Регістри CPU; 3) Статичні змінні класів; 4) Черга об'єктів для фіналізації (Finalization queue); 5) Записи в таблиці дескрипторів CLR (GCHandles).</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Як примусово увімкнути дефрагментацію LOH?</span>
+                <p class="qa-answer">В: Задати налаштування `GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;` перед викликом `GC.Collect()`. Це виконає компактифікацію LOH під час наступного повного збору Gen 2.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -347,6 +455,14 @@ decimal GetDeliveryCost(object order) =&gt; order switch
             <li><b>Server GC:</b> Стандартний режим для ASP.NET Core на серверах. CLR створює окрему пам'ять (heap) та окремий потік збору сміття для кожного логічного процесора. Пропускна здатність набагато вища, але споживає більше базової пам'яті.</li>
             <li><b>Background GC:</b> Прийшов на зміну Concurrent GC. Дозволяє збирати сміття в Gen 0 та Gen 1 паралельно, навіть коли в цей самий момент триває важкий збір у Gen 2, зменшуючи тривалість блокувань Stop-the-World.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому мікросервіс у Docker-контейнері з жорстким лімітом пам'яті (наприклад, 256 МБ) падає з OOM під Server GC?</span>
+                <p class="qa-answer">В: Якщо контейнеру виділено багато віртуальних ядер CPU (наприклад, 8 ядер хоста), Server GC створює 8 окремих куп, кожна з яких резервує пам'ять наперед. Досягнувши ліміту контейнера, GC ще не відчуває потреби збирати сміття, і ОС аварійно завершує процес (OOMKilled). Рішення: використовувати `DOTNET_gcServer=0` або задати `DOTNET_GCHeapHardLimit`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -392,6 +508,18 @@ decimal GetDeliveryCost(object order) =&gt; order switch
         Dispose(false); // disposing = false, бо керовані об'єкти вже могли бути зібрані GC!
     }
 }</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому не можна чіпати керовані поля всередині `Dispose(false)` (у виклику з фіналізатора)?</span>
+                <p class="qa-answer">В: Порядок виконання фіналізаторів у CLR не визначений. На момент спрацьовування фіналізатора вашого класу пов'язані керовані об'єкти вже можуть бути фіналізовані або зібрані GC, тому звернення до них спричинить падіння.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому в сучасному коді не рекомендується писати власні фіналізатори взагалі?</span>
+                <p class="qa-answer">В: Замість прямого зберігання `IntPtr` слід інкапсулювати некеровані покажчики у похідні від `SafeHandle`. `SafeHandle` вже містить критичний фіналізатор і гарантує коректне звільнення без ризику витоку дескрипторів навіть при ThreadAbort.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
@@ -411,6 +539,14 @@ decimal GetDeliveryCost(object order) =&gt; order switch
             <li><b>Неочищені ресурси `IDisposable`:</b> Створення пулів з'єднань або потоків без виклику Dispose.</li>
         </ol>
         <p><b>Як шукати:</b> Зняття дампів пам'яті (Memory Dump) та аналіз за допомогою профайлерів: <b>JetBrains dotMemory</b>, <b>PerfView</b> або команди <code>dotnet-dump</code> у Linux/Docker.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як патерн `WeakReference<T>` допомагає боротися з витоками пам'яті?</span>
+                <p class="qa-answer">В: `WeakReference<T>` посилається на об'єкт, не заважаючи Garbage Collector'у знищити його при зборі сміття. Це ідеально для кешів у пам'яті: якщо об'єкт ще живий, його можна дістати (`TryGetTarget`), а якщо пам'яті забракло — GC очистить його автоматично.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -436,6 +572,14 @@ decimal GetDeliveryCost(object order) =&gt; order switch
             </li>
             <li>Коли асинхронна операція введення-виведення (I/O) завершується (наприклад, драйвер мережевої карти отримує байти від БД), потік із пулу викликає <code>MoveNext()</code> знову, відновлює локальні змінні та продовжує виконання коду після <code>await</code>.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `async void` категорично заборонено використовувати всюди, крім обробників подій UI?</span>
+                <p class="qa-answer">В: 1) Викликаючий код не може зачекати завершення методу через `await`; 2) Будь-який виняток усередині `async void` не можна зловити через зовнішній `try/catch` — він пробиває стек і призводить до аварійного падіння всього процесу додатку.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -454,6 +598,14 @@ decimal GetDeliveryCost(object order) =&gt; order switch
             <li><b><code>ConfigureAwait(false)</code>:</b> Вказує рантайму: <i>«Мені все одно, в якому потоці продовжувати код після await — візьми будь-який вільний потік із пулу»</i>.
             <br/><i>Порада:</i> У бібліотеках загального призначення (Class Libraries, NuGet) завжди слід писати <code>ConfigureAwait(false)</code>. В сучасному <b>ASP.NET Core</b> контекст синхронізації було видалено взагалі, тому там ризику такого дедлоку немає.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому різниця між `SynchronizationContext` та `ExecutionContext`?</span>
+                <p class="qa-answer">В: `SynchronizationContext` відповідає за те, ДЕ (в якому саме потоці) запустити продовження. `ExecutionContext` відповідає за перенесення контексту оточення (Ambient Context): токен безпеки, культури та значення `AsyncLocal<T>` між потоками.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -481,6 +633,14 @@ public ValueTask&lt;string&gt; GetCachedDataAsync(string key)
             <li><b>НЕ можна викликати <code>await</code> двічі:</b> Об'єкт усередині пулиться та перевикористовується через <code>IValueTaskSource</code>. Подвійний await призведе до невизначеної поведінки або винятку.</li>
             <li><b>НЕ можна викликати <code>.AsTask()</code> кілька разів</b> або паралельно очікувати через <code>Task.WhenAll()</code> без явної конвертації в Task.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Коли використання `ValueTask` буде ПОВІЛЬНІШИМ за звичайний `Task`?</span>
+                <p class="qa-answer">В: Якщо метод майже завжди завершується асинхронно. `ValueTask` — це структура більшого розміру (від 9 до 16 байт), яку дорожче копіювати через стек, ніж простий 8-байтний покажчик на `Task`. Крім того, перехід до реального Task всередині ValueTask додає додаткову обгортку.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -498,6 +658,14 @@ public ValueTask&lt;string&gt; GetCachedDataAsync(string key)
             <li><b>Алгоритм Work-Stealing:</b> У пулі є одна глобальна черга завдань FIFO і локальна черга LIFO для кожного потоку. Коли робочий потік звільняється, він спочатку розгрібає власну чергу, а якщо вона порожня — «краде» задачі з хвоста черги інших зайнятих потоків. Це мінімізує конкуренцію за блокування між потоками.</li>
             <li><b>Thread Starvation (голодування пулу):</b> Виникає, коли асинхронний код блокують синхронно через <code>.Result</code> або <code>Thread.Sleep()</code>. Пул потоків повільно ін'єктує нові потоки (приблизно 1 потік на 500 мс за алгоритмом Hill Climbing). Запити шикуються в гігантську чергу, і сервіс перестає відповідати на HTTP-запити.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому синхронне очікування асинхронних операцій (`task.Result` / `task.Wait()`) називають "Sync-over-Async" і чому це вбиває масштабованість?</span>
+                <p class="qa-answer">В: Потік блокується і не може виконувати корисну роботу, очікуючи I/O. Під високим навантаженням усі потоки пулу виявляються заблокованими, алгоритм Hill Climbing додає потоки надто повільно, і час відгуку серверу експоненційно зростає аж до відмови обслуговування.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -516,6 +684,14 @@ public ValueTask&lt;string&gt; GetCachedDataAsync(string key)
             <li><code>Mutex</code>: Важкий примітив рівня ядра ОС. Дозволяє синхронізувати різні процеси (наприклад, заборонити запуск двох копій одного додатку в операційній системі за допомогою іменованого м'ютексу).</li>
             <li><code>ManualResetEventSlim</code> / <code>AutoResetEvent</code>: Події-сигнали для очікування завершення операції іншим потоком («ворота відкриті / закриті»).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому не можна блокуватися через `lock` на об'єктах типу `string` або на типах-значеннях (Value Types)?</span>
+                <p class="qa-answer">В: Якщо взяти `lock` на рядковому літералі (`lock("my_lock")`), через інтернування рядків у CLR цей рядок єдиний на весь AppDomain — чужий сторонній код може заблокуватися на тому самому рядку і викликати глобальний дедлок. А блокування на value-типі (`lock(42)`) щоразу пакує його в новий об'єкт у купі (boxing), тому кожен потік отримає унікальний замок і синхронізація просто не відбудеться.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 15 -->
@@ -540,6 +716,14 @@ Interlocked.CompareExchange(ref _location, newValue, comparand); // CAS опер
             <li><b>Бар'єри пам'яті (Memory Barriers):</b> Сучасні процесори та JIT-компілятор можуть переставляти інструкції читання/запису місцями для прискорення (Out-of-order execution). Бар'єр гарантує, що всі операції до бар'єра будуть виконані суворо раніше за операції після нього.</li>
             <li><code>volatile</code>: Підказує компілятору, що поле може змінюватися іншими паралельними потоками. Забороняє кешувати його значення в регістрах CPU і змушує завжди читати актуальне значення напряму з оперативної пам'яті.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи робить ключове слово `volatile` операцію інкременту `_counter++` потокобезпечною?</span>
+                <p class="qa-answer">В: Ні! Модифікатор `volatile` гарантує виключно видимість останнього записаного значення та порядок читання/запису, але він не робить складені операції (читання + зміна + запис) атомарними. Для цього обов'язково потрібен `Interlocked.Increment()`.</p>
+            </div>
+        </div>
     </article>
 
 </div>

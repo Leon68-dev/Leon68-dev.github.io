@@ -13,8 +13,11 @@
             --border: #e2e8f0;
             --primary: #0284c7;
             --primary-light: #f0f9ff;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --accent-badge: #e0f2fe;
+            --accent-badge-text: #0369a1;
         }
 
         * { box-sizing: border-box; }
@@ -40,8 +43,8 @@
         }
 
         .badge-level {
-            background-color: #e0f2fe;
-            color: #0369a1;
+            background-color: var(--accent-badge);
+            color: var(--accent-badge-text);
             padding: 0.35rem 0.9rem;
             border-radius: 9999px;
             font-size: 0.85rem;
@@ -88,7 +91,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -124,6 +127,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #0369a1;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #0369a1;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -133,6 +171,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -189,7 +228,7 @@
         </div>
         <h4>Розгорнута відповідь:</h4>
         <ul>
-            <li><b>Middleware:</b> Двосторонній конвеєр (російська матрьошка). Запит іде вперед через <code>next()</code>, а відповідь повертається назад у зворотному порядку:
+            <li><b>Middleware:</b> Двосторонній конвеєр. Запит іде вперед через <code>next()</code>, а відповідь повертається назад у зворотному порядку:
                 <pre><code>app.Use(async (context, next) =&gt;
 {
     // Логіка ДО наступного middleware
@@ -200,6 +239,18 @@
             </li>
             <li><b>Action Filters:</b> Спрацьовують значно пізніше — лише після того, як Middleware маршрутизації (Routing) знайшов відповідний Controller і Action. Фільтри можуть маніпулювати параметрами методу (<code>ActionExecutingContext.ActionArguments</code>) та результатом <code>IActionResult</code>.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому різниця між `app.Use()` та `app.Run()`?</span>
+                <p class="qa-answer">В: Метод `Use()` приймає делегат `next` і може передавати керування далі по конвеєру. Метод `Run()` є термінальним (Terminal Middleware) — він не приймає делегат `next`, завершує пайплайн і повертає HTTP-відповідь назад клієнту.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому глобальний Exception Handling Middleware має реєструватися першим у списку `app.Use...`?</span>
+                <p class="qa-answer">В: Оскільки конвеєр працює за принципом матрьошки (вхід і вихід), перше зареєстроване middleware огортає виклик усіх інших у свій блок `try/catch`. Якщо зареєструвати його пізніше, винятки, викинуті в попередніх middleware (наприклад, під час аутентифікації), не будуть перехоплені.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -216,6 +267,7 @@
         <pre><code>public class CacheManager // Зареєстрований як Singleton!
 {
     private readonly AppDbContext _db; // Scoped залежність потрапила в полон!
+
     public CacheManager(AppDbContext db) =&gt; _db = db;
 }</code></pre>
         <p><b>Чому це ламає систему:</b></p>
@@ -223,7 +275,15 @@
             <li><code>AppDbContext</code> не є потокобезпечним (thread-safe). Якщо 10 паралельних запитів звернуться до Singleton'а, виникне аварія <code>InvalidOperationException: A second operation was started on this context before a previous operation completed</code>.</li>
             <li>Change Tracker контексту ніколи не очиститься, що роздує споживання RAM до гігабайтів.</li>
         </ol>
-        <p><b>Захист:</b> Вмикати валідацію скоупів при створенні хоста (у <i>Development</i> режимі ASP.NET Core це ввімкнено за замовчуванням): <code>builder.Host.UseDefaultServiceProvider(o => o.ValidateScopes = true);</code>. Якщо Singleton'у дійсно потрібен Scoped сервіс, створюйте явний скоуп через <code>IServiceScopeFactory</code>.</p>
+        <p><b>Захист:</b> Вмикати валідацію скоупів при створенні хоста (у <i>Development</i> режимі ASP.NET Core це ввімкнено за замовчуванням): <code>builder.Host.UseDefaultServiceProvider(o =&gt; o.ValidateScopes = true);</code>. Якщо Singleton'у дійсно потрібен Scoped сервіс, створюйте явний скоуп через <code>IServiceScopeFactory</code>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як правильно використовувати `DbContext` або інший Scoped сервіс усередині фонового `BackgroundService`?</span>
+                <p class="qa-answer">В: Не можна інжектувати Scoped сервіс напряму в конструктор `BackgroundService` (бо він живе як Singleton). Потрібно інжектувати `IServiceScopeFactory`, створювати скоуп вручну у виклику `ExecuteAsync` за допомогою `using var scope = _scopeFactory.CreateScope();` і діставати `scope.ServiceProvider.GetRequiredService&lt;AppDbContext&gt;()`, очищуючи ресурси на кожній ітерації фонового циклу.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -241,6 +301,14 @@
             <li><code>IOptionsSnapshot&lt;TOptions&gt;</code>: Реєструється як <b>Scoped</b>. Перевіряє зміни конфігурації для кожного окремого HTTP-запиту. Гарантує стабільність налаштувань протягом обробки одного запиту. <i>Не можна інжектувати в Singleton!</i></li>
             <li><code>IOptionsMonitor&lt;TOptions&gt;</code>: Реєструється як <b>Singleton</b>. Дозволяє читати актуальні дані будь-коли через <code>.CurrentValue</code> та підтримує подію <code>OnChange(opt =&gt; ...)</code> для підписки на гарячу зміну конфігурації без перезапуску додатку.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому спроба заінжектувати `IOptionsSnapshot<T>` у Singleton призводить до помилки ще під час запуску додатку?</span>
+                <p class="qa-answer">В: Оскільки `IOptionsSnapshot<T>` зареєстровано як Scoped-сервіс, впровадження його в Singleton-сервіс є класичною Captive Dependency. Вбудована перевірка `ValidateScopes` в ASP.NET Core викидає `InvalidOperationException` при збірці контейнера.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -263,6 +331,14 @@
             </li>
             <li><b>Access vs Refresh:</b> Якщо вкрадуть Access-токен, він протухне за 15 хвилин. Refresh-токен зберігається у захищених `HttpOnly, Secure` куках або в базі даних клієнта, і при його компрометації адміністратор може миттєво відкликати запис із бази даних.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як відкликати скомпрометований JWT Access-токен до настання його `exp`, якщо він повністю stateless?</span>
+                <p class="qa-answer">В: Оскільки сервер перевіряє токен криптографічно без бази даних, відкликати його нативно неможливо. Рішення: 1) Робити час життя токена мінімальним (5-15 хв); 2) Вести Blacklist відкликаних ідентифікаторів токенів (`jti`) у швидкій in-memory пам'яті (Redis) і перевіряти його через кастомний `OnTokenValidated` івент у JwtBearer Middleware.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -286,6 +362,14 @@ await db.SaveChangesAsync(); // Автоматично генерує: UPDATE Us
             <li>Під час виклику <code>SaveChangesAsync()</code> запускає важкий процес <code>DetectChanges()</code>, скануючи кожне поле кожного об'єкта в пам'яті на відмінність від вихідного зліпка.</li>
         </ol>
         <p><b>Чому важливий <code>.AsNoTracking()</code>:</b> Для будь-яких запитів читання (Read-Only) трекінг не потрібен. Відключення трекінгу позбавляє EF Core необхідності виділяти пам'ять під копії об'єктів та прискорює виконання запиту у 2–3 рази.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке `.AsNoTrackingWithIdentityResolution()` і коли звичайного `.AsNoTracking()` недостатньо?</span>
+                <p class="qa-answer">В: Звичайний `.AsNoTracking()` створює новий екземпляр C#-класу для кожного рядка результату запиту, навіть якщо в навігаційних властивостях зустрічається один і той самий об'єкт. `.AsNoTrackingWithIdentityResolution()` відстежує унікальність сутностей за їхнім Id (Identity Map) у межах запиту, гарантуючи, що повторювані об'єкти посилатимуться на один екземпляр у пам'яті, не вмикаючи при цьому повний Change Tracking.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -314,6 +398,14 @@ foreach (var order in orders)
             </li>
             <li><b>Split Queries (<code>.AsSplitQuery()</code>):</b> Якщо ви робите <code>.Include()</code> для кількох колекцій одночасно (наприклад, <code>Include(OrderItems).Include(OrderLogs)</code>), один гігантський <code>LEFT JOIN</code> створює «картезіанський вибух» (дублювання мільйонів рядків у трафіку). <code>.AsSplitQuery()</code> змушує EF зробити 2–3 швидких паралельних SQL-запити замість одного монструозного JOIN'а.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Який головний ризик або недолік використання `.AsSplitQuery()`?</span>
+                <p class="qa-answer">В: Ризик порушення узгодженості даних (Data Consistency). Оскільки виконується декілька окремих SQL-запитів до бази, якщо паралельна транзакція змінить або видалить рядки між виконанням першого та другого запиту, матеріалізований граф сутностей у C# виявиться неконсистентним (якщо вибірка не загорнута в транзакцію з рівнем ізоляції Serializable/Snapshot).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -333,6 +425,14 @@ foreach (var order in orders)
                 <pre><code>await db.Entry(order).Reference(o =&gt; o.Customer).LoadAsync();</code></pre>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо спробувати виконати Lazy Loading після того, як `DbContext` було звільнено (disposed)?</span>
+                <p class="qa-answer">В: Виникне помилка `ObjectDisposedException: Cannot access a disposed context instance`. Оскільки Lazy Loading використовує посилання на початковий контекст для надсилання SQL-запиту, звернення до властивості за межами скоупу запиту завжди закінчується аварією.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -357,6 +457,14 @@ foreach (var order in orders)
             <li><code>Repeatable Read</code>: Забороняє Dirty Read та Non-repeatable Read (блокує прочитані рядки).</li>
             <li><code>Serializable</code>: Повна ізоляція, блокує цілі діапазони ключів (Range Locks). Жодних аномалій, але викликає часті Deadlock'и.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як рівень ізоляції Snapshot (або MVCC у PostgreSQL) вирішує проблему блокувань між читачами та письменниками?</span>
+                <p class="qa-answer">В: Замість встановлення блокувань на прочитані рядки (Shared Locks), база створює копії старих версій рядків у системному сховищі (tempdb або undo logs). Читання завжди повертає стан даних на момент старту транзакції: письменники ніколи не блокують читачів, а читачі не блокують письменників.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
@@ -375,6 +483,14 @@ foreach (var order in orders)
             <li><b>Складений індекс (Composite Index):</b> Індекс по кількох колонках: <code>(LastName, FirstName)</code>. Працює за правилом «лівого префікса»: допоможе для пошуку по <code>LastName</code> або <code>LastName + FirstName</code>, але марний для пошуку тільки по <code>FirstName</code>!</li>
             <li><b>Покриваючий індекс (Covering Index / INCLUDE):</b> Якщо індекс містить усі колонки, які запитує SELECT (через <code>CREATE INDEX ... INCLUDE (Email, Age)</code>), СУБД віддає дані прямо з індексу без жодного звернення до самої таблиці (0 Key Lookups).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `SELECT *` нівелює переваги більшості некластеризованих індексів?</span>
+                <p class="qa-answer">В: Оскільки некластеризований індекс містить лише індексовані колонки, для вибірки символу `*` серверу доведеться робити `Key Lookup` до основної таблиці для кожного знайденого запису. Якщо знайдених рядків багато, оптимізатор запитів взагалі відмовиться від індексу і перейде на повільний `Full Table Scan`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -397,6 +513,14 @@ foreach (var order in orders)
             </li>
             <li><b>Коли кастомний Repository має сенс:</b> Коли репозиторій інкапсулює складну доменну логіку (DDD-підхід): агрегат завжди завантажується цілком з усіма обов'язковими дочірніми сутностями за інваріантом, захищаючи базу від некоректного часткового читання.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як тестувати бізнес-логіку без Repository-обгорток, якщо напряму використовується `DbContext`?</span>
+                <p class="qa-answer">В: Сучасний підхід — відмовитися від юніт-тестування викликів EF через мокування `DbSet` і писати швидкі інтеграційні тести за допомогою `WebApplicationFactory` та бібліотеки `Testcontainers`, які піднімають реальну тестову БД в Docker за частки секунди.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -430,6 +554,14 @@ public class GetUserByIdHandler : IRequestHandler&lt;GetUserByIdQuery, UserDto&g
 [HttpGet("{id}")]
 public async Task&lt;IActionResult&gt; Get(int id) =&gt; Ok(await _mediator.Send(new GetUserByIdQuery(id)));</code></pre>
         <p><i>Перевага:</i> Контролери стають ультратонкими, дотримано Single Responsibility Principle (кожна операція — окремий файл/клас), зручно додавати наскрізну функціональність (валідацію FluentValidation або логування) через <code>IPipelineBehavior</code>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Коли використання MediatR перетворюється на архітектурний антипатерн?</span>
+                <p class="qa-answer">В: Коли він перетворюється на "God Object" посередника для простого CRUD без наскрізних PipelineBehaviors. Це ускладнює навігацію кодом в IDE (неможливо перейти до реалізації методу за F12) і створює зайвий оверхед алокацій у пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -447,6 +579,14 @@ public async Task&lt;IActionResult&gt; Get(int id) =&gt; Ok(await _mediator.Send
             <li><b>gRPC (HTTP/2 + Protocol Buffers):</b> Двійкова серіалізація через контрактні <code>.proto</code> файли. У 5–10 разів швидший за REST, споживає мінімум мережевого трафіку, підтримує двосторонній стрімінг (bidirectional streaming) та мультиплексування з'єднань. Ідеальний для синхронних викликів між бекенд-мікросервісами.</li>
             <li><b>Message Brokers (RabbitMQ, Apache Kafka):</b> Асинхронна шина подій (Event-Driven). Якщо Сервіс оплат впав, Сервіс замовлень все одно публікує подію в чергу повідомлень. Коли сервіс підніметься — він спокійно дочитає повідомлення. Гарантує слабке зв'язування (Loose Coupling) та стійкість до відмов.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке патерн Transactional Outbox і яку проблему він вирішує в мікросервісах?</span>
+                <p class="qa-answer">В: Проблему неконсистентності: коли потрібно одночасно зберегти дані в базу та опублікувати подію в RabbitMQ/Kafka (розподілені транзакції 2PC повільні й ненадійні). За патерном Outbox подія зберігається в таблицю `OutboxMessages` у тій самій транзакції БД, що й основна сутність, а фоновий воркер гарантовано вичитує її та відправляє у брокер.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -463,8 +603,16 @@ public async Task&lt;IActionResult&gt; Get(int id) =&gt; Ok(await _mediator.Send
             <li><code>IMemoryCache</code>: Працює прямо в оперативній пам'яті процесу .NET. Доступ миттєвий ($O(1)$ без мережевих затримок). <i>Проблема:</i> якщо у вас запущено 5 копій (інстансів) програми під балансувальником, у кожної буде свій незалежний розсинхронізований кеш.</li>
             <li><b>Розподілений кеш (Redis через <code>IDistributedCache</code>):</b> Окремий спільний сервіс. Усі інстанси додатка бачать один і той самий стан. При перезапуску додатка кеш зберігається.</li>
             <li><b>Cache Stampede (Лавина запитів):</b> Відбувається, коли закінчується TTL (термін життя) дуже популярного запису (наприклад, каталогу товарів на Чорну П'ятницю). Сотні паралельних користувацьких запитів виявляють, що в кеші порожньо, і одночасно надсилають важкий запит у SQL-базу, що миттєво «кладе» базу.
-            <br/><i>Рішення:</i> Використання бібліотеки <b>FusionCache</b> або блокувань (Probabilistic early expiration, семафори), щоб лише ОДИН потік ішов у базу для оновлення кешу, а решта чекали на результат.</li>
+            <br/><i>Рішення:</i> Використання <b>HybridCache</b> (у .NET 9+) або бібліотеки <b>FusionCache</b> із механізмом блокувань (Stampede lock), щоб лише один потік ішов у базу для оновлення, а інші отримували результат очікування.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як новий `HybridCache` у .NET 9 вирішує проблему швидкодії та синхронізації кешів?</span>
+                <p class="qa-answer">В: `HybridCache` об'єднує швидкий локальний L1-кеш (in-process RAM) і надійний розподілений L2-кеш (Redis), самостійно забезпечуючи вбудований захист від Cache Stampede та дедуплікацію паралельних запитів на рівні фабрики генерації даних.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -510,6 +658,14 @@ public class OrderApiTests : IAsyncLifetime
 
     public async Task DisposeAsync() =&gt; await _dbContainer.DisposeAsync();
 }</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому не варто запускати міграції бази на кожен окремий тест у Testcontainers?</span>
+                <p class="qa-answer">В: Накат міграцій — це важка I/O операція, яка роздує час виконання тестів до десятків хвилин. Правильний підхід: підняти контейнер один раз на всю тестову колекцію (ICollectionFixture), накатити міграції, а між тестами очищати виключно дані за допомогою інструменту Respawn.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 15 -->
@@ -539,6 +695,14 @@ _logger.LogInformation("Замовлення {OrderId} створено кліє
 app.MapHealthChecks("/healthz"); // Ендпоінт для k8s Liveness/Readiness проби</code></pre>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому різниця між Liveness Probe та Readiness Probe у Kubernetes?</span>
+                <p class="qa-answer">В: `Liveness` перевіряє, чи взагалі живий процес додатку (якщо проба падає, Kubernetes примусово перезавантажує контейнер). `Readiness` перевіряє, чи готовий додаток приймати трафік користувачів (наприклад, чи підключився до БД). Якщо Readiness падає, контейнер не перезапускають, а тимчасово виключають із балансувальника трафіку.</p>
+            </div>
+        </div>
     </article>
 
 </div>

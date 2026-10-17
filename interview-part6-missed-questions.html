@@ -13,8 +13,11 @@
             --border: #e2e8f0;
             --primary: #be185d;
             --primary-light: #fdf2f8;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --accent-badge: #fce7f3;
+            --accent-badge-text: #9d174d;
         }
 
         * { box-sizing: border-box; }
@@ -40,8 +43,8 @@
         }
 
         .badge-level {
-            background-color: #fce7f3;
-            color: #9d174d;
+            background-color: var(--accent-badge);
+            color: var(--accent-badge-text);
             padding: 0.35rem 0.9rem;
             border-radius: 9999px;
             font-size: 0.85rem;
@@ -88,7 +91,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -124,6 +127,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #9d174d;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #be185d;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -133,6 +171,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -241,6 +280,14 @@
                 </tr>
             </tbody>
         </table>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як компілятор зберігає імена полів `(int Id, string Name)` у згенерованому IL-коді?</span>
+                <p class="qa-answer">В: На рівні байт-коду IL полів із кастомними іменами не існує — вони завжди називаються `Item1` та `Item2`. Компілятор додає до методів чи властивостей службовий атрибут `[TupleElementNames(new[] {"Id", "Name"})]`, завдяки якому IDE та компілятор C# знають їхні псевдоніми під час збірки.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -259,6 +306,7 @@
 public class EndpointRoleAttribute : Attribute
 {
     public string RequiredRole { get; }
+
     public EndpointRoleAttribute(string role) =&gt; RequiredRole = role;
 }
 
@@ -269,6 +317,14 @@ public class AdminController { }
 // Читання через рефлексію:
 var attr = typeof(AdminController).GetCustomAttribute&lt;EndpointRoleAttribute&gt;();
 Console.WriteLine(attr?.RequiredRole); // Admin</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому конструктор атрибута приймає лише константи або `typeof()`?</span>
+                <p class="qa-answer">В: Оскільки екземпляри атрибутів формуються під час компіляції і серіалізуються напряму в таблиці метаданих збірки (.dll), їх параметри повинні бути обчислені на етапі збірки (compile-time constants: примітиви, рядки, enum або типи).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -317,6 +373,14 @@ Console.WriteLine(attr?.RequiredRole); // Admin</code></pre>
                 </tr>
             </tbody>
         </table>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Який SQL генерує EF Core для `First()` у порівнянні з `Single()`?</span>
+                <p class="qa-answer">В: Метод `First()` генерує `SELECT TOP(1) ...`, оскільки СУБД достатньо повернути один перший рядок. Метод `Single()` генерує `SELECT TOP(2) ...`, тому що ORM зобов'язана перевірити наявність другого рядка, щоб викинути `InvalidOperationException` у разі дублювання записів.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -345,6 +409,14 @@ Console.WriteLine(attr?.RequiredRole); // Admin</code></pre>
 var cache = new KeyValueCache();
 cache["theme"] = "dark"; // Працює як словник
 Console.WriteLine(cache["theme"]);</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як індексатор компілюється в IL-байткод?</span>
+                <p class="qa-answer">В: Він перетворюється на звичайні методи `get_Item(key)` та `set_Item(key, value)`, а сам клас маркується атрибутом `[DefaultMember("Item")]`. У мовах, які не підтримують синтаксис квадратних дужок (наприклад, старий VB), звернення відбувається саме через виклик `obj.get_Item(...)`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -361,6 +433,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li><b>Переваги:</b> Миттєва вставка або видалення вузла з будь-якого місця списку за $O(1)$ без зсуву сусідніх елементів у пам'яті та без необхідності перевиділення внутрішнього масиву.</li>
             <li><b>Недоліки:</b> Немає доступу за індексом `list[i]` — щоб знайти 100-й елемент, треба послідовно пройти 99 вузлів ($O(N)$). Вузли розкидані по всій купі, що ламає кеш процесора (CPU Cache Misses) та вимагає додаткових байтів пам'яті на кожен елемент під покажчики.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому на практиці `List<T>` майже завжди швидший за `LinkedList<T>` навіть при частих вставках?</span>
+                <p class="qa-answer">В: Через локальність даних у кеші CPU (Cache Locality). Елементи `List<T>` лежать у пам'яті щільно один за одним, і процесор зчитує їх цілими кеш-лініями по 64 байти наперед. У `LinkedList<T>` кожен вузол — це окремий об'єкт у купі, тому перехід за вказівником викликає постійні Cache Misses.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -379,6 +459,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li>При виклику методів через <code>MethodInfo.Invoke(obj, params)</code> для значущих типів відбувається масовий Boxing/Unboxing параметрів у масив <code>object[]</code>.</li>
         </ol>
         <p><i>Сучасна альтернатива:</i> У сучасному .NET 8/9 рефлексію замінюють на <b>Source Generators</b> (генерація C# коду під час компіляції), що дає максимальну швидкість без втрати гнучкості.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як прискорити виклики методів через рефлексію у сотні разів, якщо тип відомий лише в рантаймі?</span>
+                <p class="qa-answer">В: Використати компіляцію виразів `Expression.Compile()` або `Delegate.CreateDelegate()`. Знайдений метод один раз загортається у строго типізований делегат, після чого всі наступні виклики виконуються з нативною швидкістю прямого виклику.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -399,6 +487,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
                 Оскільки будь-який посилальний тип представлений у пам'яті звичайним покажчиком (адресою розміром 8 байт на x64 системі), JIT компілює машинний код <b>рівно один раз</b>, і всі класи ділять між собою одну реалізацію методів.
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке канонічний тип `__Canon` у контексті JIT-компіляції узагальнень?</span>
+                <p class="qa-answer">В: `System.__Canon` — це внутрішній службовий тип CLR. Усі спеціалізації узагальненого класу для Reference-типів ділять між собою один єдиний набір машинних інструкцій, згенерований для типу `__Canon`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -431,6 +527,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
         OrderId = orderId;
     }
 }</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому в .NET 8+ більше не потрібно додавати конструктор серіалізації `protected CustomException(SerializationInfo info, StreamingContext context)`?</span>
+                <p class="qa-answer">В: Технологія `BinaryFormatter` була визнана небезпечною та повністю відключена за замовчуванням у сучасному .NET. Відповідно, підтримка бінарної серіалізації для винятків застаріла (obsolete).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
@@ -447,6 +551,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li><b>Процес (Process):</b> Повна ізоляція пам'яті. Падіння одного процесу не впливає на інші процеси ОС. Комунікація між процесами (IPC) повільна (іменовані канали, сокети, файли).</li>
             <li><b>Потік (Thread):</b> Має власний стек (~1 МБ), але ділить пам'ять купи (Heap), дескриптори файлів та мережеві з'єднання з усіма іншими потоками свого процесу. Перемикання контексту між потоками одного процесу набагато швидше, але спільна пам'ять вимагає синхронізації (<code>lock</code>, семафори), інакше виникає стан гонитви (Race Condition).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що саме скидається під час перемикання контексту між процесами, чого не відбувається при перемиканні між потоками одного процесу?</span>
+                <p class="qa-answer">В: При перемиканні між процесами операційна система змушена перемикати таблиці сторінок віртуальної пам'яті (CR3 регістр у x86/x64). Це повністю інвалідує буфер асоціативної трансляції CPU (TLB — Translation Lookaside Buffer), що веде до тимчасового падіння швидкодії доступу до RAM.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -461,6 +573,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
         <h4>Чому StackOverflowException не можна перехопити через catch:</h4>
         <p>Починаючи з .NET 2.0, переповнення стека є фатальною помилкою CLR. Рантайм негайно завершує весь процес без виконання блоків <code>catch</code> або <code>finally</code>, оскільки для обробки винятку банально не залишилося вільної пам'яті стека!</p>
         <p><b>Як уникнути:</b> Переписати алгоритм з рекурсивного на ітеративний (використовуючи звичайний цикл <code>while</code> та колекцію <code>Stack&lt;T&gt;</code> у купі Heap).</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи гарантує компілятор C# оптимізацію хвостової рекурсії (Tail Call Optimization)?</span>
+                <p class="qa-answer">В: Ні! Компілятор C# не гарантує перетворення хвостової рекурсії на цикл (хоча в IL є інструкція `tail.`). Для збереження повноти трасування стеку безпеки (Security Stack Walk) JIT-компілятор у більшості випадків створює повноцінний стековий фрейм.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -487,6 +607,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що стверджує Закон Деметри (Law of Demeter) і як він пов'язаний із Coupling?</span>
+                <p class="qa-answer">В: Принцип "найменшої обізнаності": модуль повинен спілкуватися лише зі своїми безпосередніми сусідами. Ланцюжки викликів на зразок `order.Customer.Address.City.ZipCode` створюють сильне зачеплення (tight coupling) з усією структурою вкладених класів.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -504,6 +632,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li><b>Рівномірний розподіл (Uniform distribution):</b> Мінімізує колізії, розподіляючи ключі по всьому діапазону від <code>int.MinValue</code> до <code>int.MaxValue</code>.</li>
             <li><b>Швидкість обчислення:</b> Повинна виконуватися за лічені такти процесора, інакше вставка в `Dictionary` стане вузьким місцем.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Яке збалансоване дерево використовується у вбудованому класі `SortedDictionary<TKey, TValue>` у .NET?</span>
+                <p class="qa-answer">В: Під капотом `SortedDictionary` реалізований як червоно-чорне дерево (Red-Black Tree), що гарантує складність вставки, видалення та пошуку $O(\log N)$.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -523,6 +659,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li><b>Exception Filters:</b> Перехоплюють необроблені винятки, що виникли під час роботи Action або Action Filters.</li>
             <li><b>Result Filters:</b> Спрацьовують <i>до</i> та <i>після</i> рендерингу або серіалізації фінального результату <code>IActionResult</code>.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `ExceptionFilter` не перехоплює помилки, які виникають усередині `ResultFilter` або під час запису відповіді в сокет?</span>
+                <p class="qa-answer">В: `ExceptionFilter` охоплює виключно виконання `ActionFilter` та коду самого Action-методу. Якщо помилка виникає під час рендерингу результату у `ResultFilter`, її зможе перехопити лише глобальний `ExceptionHandlerMiddleware` у конвеєрі.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -541,6 +685,14 @@ Console.WriteLine(cache["theme"]);</code></pre>
             <li><b>Bearer (Пред'явник):</b> Схема протоколу OAuth 2.0 (RFC 6750). Вона каже серверу: <i>«Той, хто тримає (bears) цей токен, має вказані права»</i>. При цьому токен під схемою Bearer взагалі не зобов'язаний бути JWT — це може бути простий випадковий рядок (Reference Token або Opaque Token), збережений у Redis!</li>
             <li><b>JWT (JSON Web Token):</b> Конкретний відкритий стандарт (RFC 7519), який описує, як закодувати JSON-структуру (Claims) у безпечний Base64-рядок із цифровим підписом.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Коли краще обрати Reference (Opaque) токен замість JWT?</span>
+                <p class="qa-answer">В: Коли потрібне миттєве відкликання токена або коли Claims містять забагато даних, роздуваючи розмір кожного HTTP-заголовка. Тоді токен є просто випадковим ідентифікатором у Redis, а сервер перевіряє його за $O(1)$.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 15 -->
@@ -563,6 +715,14 @@ Access-Control-Allow-Headers: Authorization, Content-Type</code></pre>
             </li>
             <li>Якщо сервер підтвердив дозвіл — браузер відправляє реальний запит. Якщо ні — браузер блокує відповідь із помилкою CORS у консолі.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому POST-запит із `Content-Type: application/json` завжди викликає Preflight OPTIONS, а `text/plain` — ні?</span>
+                <p class="qa-answer">В: За специфікацією CORS тільки три типи вмісту вважаються "простими" (Simple Requests): `text/plain`, `multipart/form-data` та `application/x-www-form-urlencoded`. Будь-який інший тип, включаючи `application/json`, браузер зобов'язаний попередньо узгодити з сервером через Preflight.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 16 -->
@@ -579,6 +739,14 @@ Access-Control-Allow-Headers: Authorization, Content-Type</code></pre>
             <li><b>MPA (Razor Pages, ASP.NET MVC):</b> Кожен клік по посиланню робить повний перехід на сервер, сервер рендерить усю HTML-сторінку заново та відправляє її через мережу.</li>
             <li><b>SPA:</b> Браузер завантажує бандл JS/WASM один раз. При зміні URL JavaScript динамічно перемальовує лише потрібну частину сторінки (DOM), звертаючись до бекенду суто за чистими JSON-даними через REST API або gRPC-Web.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Яка головна проблема чистого SPA з погляду SEO та як її вирішують сучасні фреймворки?</span>
+                <p class="qa-answer">В: Пошукові роботи пошуковиків отримують порожній HTML-каркас (`<div id="app"></div>`) без контенту, оскільки рендеринг виконується клієнтським JS. Вирішується через Server-Side Rendering (SSR) або Server Components (Next.js, Nuxt або Blazor SSR у .NET 8).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 17 -->
@@ -604,6 +772,14 @@ app.MapGet("/users/{id}", async (int id, AppDbContext db) =&gt;
             </li>
             <li><b>Коли обирати контролери:</b> Великі Enterprise-моноліти з десятками уніфікованих фільтрів, складними валідаціями та десятками дієслів на один ресурс.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: За рахунок чого Minimal API працює швидше за Controller-based API?</span>
+                <p class="qa-answer">В: Minimal API не створює екземпляр контролера на кожен запит (нуль рефлексії через `IControllerFactory`), оминає фільтри дій MVC та використовує скомпільовані під час старту виклики `RequestDelegate`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 18 -->
@@ -622,6 +798,14 @@ app.MapGet("/users/{id}", async (int id, AppDbContext db) =&gt;
             <li><b>3NF (Третя нормальна форма):</b> Відповідає 2NF + відсутність транзитивних залежностей (неключові колонки повинні залежати ТІЛЬКИ від первинного ключа, а не одна від одної).</li>
         </ol>
         <p><b>Навіщо потрібна денормалізація:</b> Якщо для генерації одного звіту доводиться робити JOIN по 8 таблицях, це перевантажує дискову підсистему БД. Розробники додають дублюючі поля (наприклад, зберігають пораховану суму замовлення `TotalAmount` прямо в таблиці `Orders`), щоб читати рядок миттєво.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Які три аномалії даних вирішує нормалізація таблиць?</span>
+                <p class="qa-answer">В: 1) Аномалію вставки (неможливо додати сутність без прив'язки до іншої); 2) Аномалію видалення (видалення одного запису випадково знищує іншу потрібну сутність); 3) Аномалію оновлення (зміна адреси клієнта вимагає оновлення тисяч рядків замовлень, інакше дані розсинхронізуються).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 19 -->
@@ -646,6 +830,14 @@ app.MapGet("/users/{id}", async (int id, AppDbContext db) =&gt;
         <pre><code>UPDATE Accounts SET Balance = @p0 
 WHERE Id = @p1 AND RowVersion = @originalRowVersion;</code></pre>
         <p>Якщо між читанням та записом інший користувач змінив баланс, значення <code>RowVersion</code> у базі автоматично змінилося тригером СУБД. Запит <code>UPDATE</code> оновить рівно <b>0 рядків</b>. EF Core бачить, що жоден рядок не оновився, і викидає виняток <code>DbUpdateConcurrencyException</code>, не дозволяючи тихо затерти чужі фінансові дані.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як правильно обробити `DbUpdateConcurrencyException`, коли потрібно реалізувати стратегію "Store Wins" або "Client Wins"?</span>
+                <p class="qa-answer">В: Через об'єкт винятку: `var entry = ex.Entries.Single();`. Для стратегії "Store Wins" (перемагає база) викликають `entry.Reload()`. Для стратегії "Client Wins" актуалізують оригінальні значення з бази `entry.OriginalValues.SetValues(databaseValues)` і повторюють `SaveChanges()`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 20 -->
@@ -680,6 +872,14 @@ WHERE Id = @p1 AND RowVersion = @originalRowVersion;</code></pre>
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: До якої категорії належать безсерверні обчислення Serverless (Azure Functions / AWS Lambda)?</span>
+                <p class="qa-answer">В: Це спеціалізований підвид PaaS, який часто виділяють як FaaS (Function as a Service). Головна відмінність від звичайного PaaS — автоматичне масштабування до нуля (Scale to Zero) та оплата суто за мілісекунди виконання конкретного коду.</p>
+            </div>
+        </div>
     </article>
 
 </div>

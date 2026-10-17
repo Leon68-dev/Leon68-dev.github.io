@@ -13,8 +13,11 @@
             --border: #e2e8f0;
             --primary: #2563eb;
             --primary-light: #eff6ff;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --accent-badge: #dbeafe;
+            --accent-badge-text: #1e40af;
         }
 
         * { box-sizing: border-box; }
@@ -87,7 +90,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -123,6 +126,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #1e3a8a;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #1e40af;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -132,6 +170,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -198,6 +237,18 @@
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як оптимізувати створення List&lt;T&gt;, якщо заздалегідь відома приблизна кількість елементів?</span>
+                <p class="qa-answer">В: Вказати початкову ємність у конструкторі: `var list = new List&lt;int&gt;(1000);`. Це запобігає множинним алокаціям нових масивів та зайвому копіюванню даних у процесі росту списку.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `list.RemoveAt(0)` є повільною операцією?</span>
+                <p class="qa-answer">В: Тому що масив під капотом суцільний. При видаленні першого елемента всі решта N-1 елементів мають бути зсунуті вліво через виклик `Array.Copy()`, що має складність $O(N)$.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -212,15 +263,27 @@
         <h4>Розгорнута відповідь:</h4>
         <p>Для збереження пари ключ-значення Dictionary робить таке:</p>
         <ol>
-            <li>Викликає <code>key.GetHashCode()</code> та вираховує індекс бакета: <code>bucketIndex = hash % buckets.Length</code>.</li>
-            <li>Зберігає запис у масив <code>Entry[]</code> (містить хеш, ключ, значення та індекс наступного елемента <code>next</code>).</li>
+            <li>Викликає <code>key.GetHashCode()</code> та вираховує індекс бакета: <code>bucketIndex = (hash &amp; 0x7FFFFFFF) % buckets.Length</code> (розмір бакетів завжди є простим числом).</li>
+            <li>Зберігає запис у масив <code>Entry[]</code> (структура містить числовий хеш, ключ, значення та індекс наступного елемента <code>next</code>).</li>
         </ol>
         <p><b>Хеш-колізія</b> виникає у двох випадках:
             1) Різні ключі видали однаковий `GetHashCode()`; 
             2) Різні хеші після взяття залишку від ділення дали однаковий номер бакета.
         </p>
-        <p><b>Як C# вирішує колізію:</b> Метод ланцюжків (Chaining). У бакет кладеться посилання на останній доданий елемент, а його поле <code>next</code> вказує на попередній. При пошуку перевіряється точний хеш, а потім викликається <code>Equals()</code>.</p>
+        <p><b>Як C# вирішує колізію:</b> Метод ланцюжків (Chaining на масивах без виділення окремих Node у Heap). У бакет кладеться індекс останнього доданого елемента, а його поле <code>next</code> вказує на попередній за цим самим бакетом. При пошуку перевіряється точний хеш, а потім викликається <code>Equals()</code>.</p>
         <p><i>Вимога:</i> Якщо ви перевизначаєте <code>Equals()</code> у своєму класі, ви <b>зобов'язані</b> узгоджено перевизначити і <code>GetHashCode()</code>!</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо модифікувати властивість об'єкта-ключа після того, як його поклали в Dictionary?</span>
+                <p class="qa-answer">В: Якщо ця властивість бере участь у розрахунку `GetHashCode()`, його хеш зміниться. У результаті об'єкт "загубиться" всередині Dictionary: за новим ключем шукатиметься інший бакет, а за старим значенням ключ не пройде перевірку Equals(). Ключі завжди мають бути незмінними (immutable).</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: До якої складності може деградувати пошук у Dictionary у найгіршому випадку?</span>
+                <p class="qa-answer">В: До лінійної складності $O(N)$, якщо всі ключі потраплять в один бакет (наприклад, метод `GetHashCode()` реалізовано некоректно і він повертає константу).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -239,6 +302,14 @@
             <li><code>IList&lt;T&gt; : ICollection&lt;T&gt;</code>: Додає індексатор (<code>list[0]</code>), можливість вставки за індексом (<code>Insert</code>) та видалення за індексом (<code>RemoveAt</code>).</li>
             <li><code>IReadOnlyCollection&lt;T&gt;</code> та <code>IReadOnlyList&lt;T&gt;</code>: Використовуються, коли клієнту потрібно віддати колекцію тільки на читання.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому полягає небезпека багаторазового перебору (Multiple Enumeration) для IEnumerable&lt;T&gt;?</span>
+                <p class="qa-answer">В: Якщо джерелом `IEnumerable` є LINQ-вираз або генератор з `yield return`, кожен виклик `foreach`, `Count()` чи `Any()` повторно виконуватиме всю послідовність дій (наприклад, повторне читання файлу чи повторний запит до БД). Щоб уникнути цього, колекцію перед багаторазовим читанням матеріалізують через `.ToList()`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -263,6 +334,14 @@
                 <pre><code>Predicate&lt;int&gt; isEven = x =&gt; x % 2 == 0;</code></pre>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться при виклику MulticastDelegate (ланцюжка делегатів), якщо один із методів кине виняток?</span>
+                <p class="qa-answer">В: Виконання ланцюжка негайно перерветься на цьому винятку, а всі наступні підписані методи викликані не будуть. Якщо потрібно виконати всі гарантовано, слід вручну отримати список підписників через `delegate.GetInvocationList()` та викликати кожен метод у власному блоці try-catch.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -281,6 +360,14 @@
             <li>Викликати подію напряму ззовні: <code>obj.OnChange();</code>, коли це має робити тільки сам власник.</li>
         </ol>
         <p>Ключове слово <code>event</code> обмежує права зовнішнього коду: клієнти можуть <b>тільки підписуватися (+=) або відписуватися (-=)</b>. Смикати виклик події може виключно той клас, у якому вона оголошена.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як події (events) можуть призвести до витоку пам'яті (Memory Leak)?</span>
+                <p class="qa-answer">В: Підписка на подію створює сильне посилання (strong reference) від об'єкта-видавця (publisher) до об'єкта-підписника (через поле `_target` делегата). Якщо видавець є довгоживучим (наприклад, Singleton), а підписник короткоживучим і не відписався через `-=` або `Dispose()`, Garbage Collector не зможе звільнити підписника з пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -304,6 +391,14 @@ button.Click += (sender, e) =&gt; Console.WriteLine("Click!");</code></pre>
             <li><b>Expression Lambda:</b> Має один вираз праворуч: <code>x =&gt; x * 2</code> (результат повертається автоматично).</li>
             <li><b>Statement Lambda:</b> Має блок інструкцій у фігурних дужках: <code>(x, y) =&gt; { int res = x + y; return res; }</code>.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке замикання (closure) і як воно працює під капотом?</span>
+                <p class="qa-answer">В: Коли лямбда використовує локальну змінну зі свого зовнішнього методу, компілятор створює прихований допоміжний клас (`DisplayClass`) у купі, переносить туди цю змінну як поле, а лямбду перетворює на метод цього класу. Це дозволяє зберегти стан змінної навіть після виходу з зовнішнього методу, але генерує додаткову алокацію в пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -335,6 +430,14 @@ foreach (var n in query)
                 <li>Вибірка одного елемента: <code>First()</code>, <code>FirstOrDefault()</code>, <code>Single()</code>.</li>
             </ul>
         </p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи є метод `OrderBy()` потоковим (streaming) або буферизуючим (buffering)?</span>
+                <p class="qa-answer">В: `OrderBy()` має відкладене виконання, проте є буферизуючим: для повернення хоча б одного першого елемента він змушений вичитати абсолютно всю вхідну послідовність у внутрішній буфер і повністю її відсортувати.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -363,12 +466,20 @@ foreach (var n in query)
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке проблема N+1 запиту в ORM і як її уникнути?</span>
+                <p class="qa-answer">В: Ситуація, коли додаток виконує 1 запит для отримання списку сутностей, а потім у циклі робить ще N запитів для завантаження залежних даних кожної з них (lazy loading). Вирішується жадібним завантаженням (Eager Loading) за допомогою методу `.Include(x =&gt; x.Orders)` або проекцією через `.Select()`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
     <article class="q-card" id="q9">
         <div class="q-header">
-            <h3 class="q-title">9. Обробка винятків: різниця між `throw` та `throw ex`? Чи завжди спрацьовує `finally`? Що таке фільтри винятків (`when`)?</h3>
+            <h3 class="q-title">9. Обробка винятків: різниця між `throw` та `throw ex`, блок `finally`? Що таке фільтри винятків (`when`)?</h3>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
         <div class="summary-box">
@@ -391,6 +502,14 @@ catch (Exception ex)
 {
     Console.WriteLine("Ресурс не знайдено 404");
 }</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому генерація винятків для керування бізнес-логікою є антипатерном?</span>
+                <p class="qa-answer">В: Створення та викидання винятку — дуже дорога операція з погляду продуктивності: CLR повинна призупинити потік, зібрати повний StackTrace, пройти через таблиці структур обробки помилок SEH в ОС. Замість цього слід використовувати патерни на кшталт Result pattern або методи типу TryParse.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -411,6 +530,14 @@ catch (Exception ex)
         <pre><code>// Сучасний using statement (C# 8+)
 using var stream = new FileStream("data.txt", FileMode.Open);
 // В кінці видимості методу автоматично викличеться stream.Dispose()!</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Навіщо в стандартному патерні Dispose викликається `GC.SuppressFinalize(this)`?</span>
+                <p class="qa-answer">В: Щоб повідомити Garbage Collector, що ресурси вже очищено вручну, і фіналізатор (`~MyClass()`) викликати непотрібно. Це дозволяє об'єкту звільнитися за один прохід GC, не потрапляючи в чергу фіналізації (Finalization Queue), яка відкладає звільнення пам'яті до наступного покоління.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -429,6 +556,14 @@ using var stream = new FileStream("data.txt", FileMode.Open);
             <li>При запуску програми стартує <b>CLR (Common Language Runtime)</b> — віртуальне середовище виконання .NET.</li>
             <li><b>JIT-компілятор (Just-In-Time):</b> компілює інструкції IL у реальний нативний код процесора (x86, x64, ARM) «на льоту» прямо перед першим викликом конкретного методу. Наступні виклики виконують уже скомпільований нативний код.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке Tiered Compilation (багаторівнева компіляція) у сучасному .NET?</span>
+                <p class="qa-answer">В: Спочатку JIT швидко компілює код без глибокої оптимізації (Tier 0), щоб додаток запустився миттєво. Якщо окремий метод викликається дуже часто (стає "гарячим"), фоновий JIT компілює його заново з максимальними оптимізаціями (Tier 1), замінюючи старий код на льоту.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -452,6 +587,14 @@ using var stream = new FileStream("data.txt", FileMode.Open);
                 <br/>Створюється рівно <b>один раз</b> при першому зверненні і живе до вимкнення сервера. Повинен бути обов'язково потокобезпечним (thread-safe). Наприклад: сервіс локального in-memory кешування.
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке Captive Dependency (захоплена залежність) і чому вона небезпечна?</span>
+                <p class="qa-answer">В: Ситуація, коли сервіс із довшим життєвим циклом (наприклад, Singleton) залежить від сервісу з коротшим життєвим циклом (наприклад, Scoped DbContext). Singleton захоплює цей Scoped-екземпляр назавжди, що веде до багатопотокових конфліктів у DbContext і витоків пам'яті. У Development-середовищі контейнер .NET кидає виняток при спробі такої реєстрації.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -480,6 +623,14 @@ using var stream = new FileStream("data.txt", FileMode.Open);
             <li><b>404 Not Found:</b> Запитуваний ресурс не існує.</li>
             <li><b>500 Internal Server Error:</b> Необроблена аварія або виняток на бекенді.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що означає властивість "ідемпотентності" HTTP-методу? Чи є метод DELETE ідемпотентним?</span>
+                <p class="qa-answer">В: Метод називається ідемпотентним, якщо повторне надсилання одного й того самого запиту N разів призводить до того ж стану сервера, що й один виклик. Так, DELETE є ідемпотентним: після першого виклику запис видаляється, а повторні виклики не змінюють стан бази даних (навіть якщо сервер поверне 404 замість 204/200).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -503,6 +654,14 @@ using var stream = new FileStream("data.txt", FileMode.Open);
             </li>
             <li><b>Індекси:</b> Спеціальні допоміжні структури (найчастіше B-Tree дерева). Без індексу СУБД робить <i>Full Table Scan</i> (перебирає кожен рядок таблиці $O(N)$). Індекс дозволяє миттєво знаходити записи за логарифмічний час $O(\log N)$. <i>Плата:</i> сповільнює операції запису (`INSERT`, `UPDATE`), бо дерево індексу потрібно перебудовувати.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому різниця між кластеризованим (Clustered) та некластеризованим (Non-Clustered) індексом?</span>
+                <p class="qa-answer">В: Кластеризований індекс фізично впорядковує самі дані таблиці на диску (листові сторінки B-Tree і є самими рядками даних), тому для однієї таблиці може існувати лише один кластеризований індекс (зазвичай за Primary Key). Некластеризований індекс зберігається окремо і містить лише копію ключових колонок та вказівник на рядок (rid або кластеризований ключ).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 15 -->
@@ -530,6 +689,14 @@ public void CalculateDiscount_ForVipUser_ShouldReturn20Percent()
     Assert.Equal(20m, discount);
 }</code></pre>
         <p><b>Mock (макет / заглушка):</b> Спеціальний фіктивний об'єкт (створюється за допомогою бібліотек на зразок <i>Moq</i> або <i>NSubstitute</i>), який емулює поведінку реального інтерфейсу (наприклад, <code>IUserRepository</code>) і повертає заздалегідь запрограмовані дані, щоб тест не залежав від реальної БД.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому різниця між Stub (заглушкою) та Mock (макетом)?</span>
+                <p class="qa-answer">В: Stub лише повертає підготовлені фіктивні дані на виклики (State verification). Mock, крім повернення даних, веде облік взаємодій і перевіряє поведінку (Behavior verification): чи викликався певний метод, скільки разів і з якими конкретними параметрами (наприклад, `mock.Verify(x =&gt; x.SendEmail(It.IsAny&lt;string&gt;()), Times.Once)`).</p>
+            </div>
+        </div>
     </article>
 
 </div>

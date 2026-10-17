@@ -13,8 +13,9 @@
             --border: #e2e8f0;
             --primary: #2563eb;
             --primary-light: #eff6ff;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
             --accent-badge: #dbeafe;
             --accent-badge-text: #1e40af;
         }
@@ -89,7 +90,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -125,6 +126,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #1e3a8a;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #1e40af;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -134,6 +170,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -154,7 +191,7 @@
     <header>
         <span class="badge-level">Рівень: Junior • Порція 1 з 4</span>
         <h1 style="margin-top: 0.5rem;">Базовий C# та Типи Даних</h1>
-        <p style="color: var(--text-muted);">Об'єднані питання з DOU («Співбесіда з .NET» + «Співбесіда з C# розробником») без дублікатів із готовими відповідями</p>
+        <p style="color: var(--text-muted);">Об'єднані питання з DOU («Співбесіда з .NET» + «Співбесіда з C# розробником») без дублікатів із готовими розширеними відповідями та підводними каменями</p>
     </header>
 
     <!-- НАВІГАЦІЯ -->
@@ -195,7 +232,19 @@
             <li><b>Абстракція:</b> Відокремлення концептуального контракту («що об'єкт робить») від його конкретної реалізації («як саме») за допомогою <code>interface</code> та <code>abstract class</code>.</li>
         </ul>
         <p><b>Базовий тип:</b> Абсолютно всі типи в .NET (як класи, так і структури через ланцюжок <code>ValueType</code>) прямо або неявно успадковуються від класу <code>System.Object</code> (аліас у C# — <code>object</code>).</p>
-        <p><b>Множинне успадкування:</b> C# <b>не підтримує</b> множинне успадкування класів (щоб уникнути «проблеми ромба» — Diamond Problem). Але клас може реалізовувати <b>будь-яку кількість інтерфейсів</b>.</p>
+        <p><b>Множинне успадкування:</b> C# <b>не підтримує</b> множинне успадкування класів (щоб уникнути «проблеми ромба» — Diamond Problem, коли незрозуміло, з якого саме предка брати стан та реалізацію поля чи методу). Але клас може реалізовувати <b>будь-яку кількість інтерфейсів</b>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи принесли Default Interface Methods у C# 8 множинне успадкування?</span>
+                <p class="qa-answer">В: Лише частково — множинне успадкування поведінки (методів), але не стану! Інтерфейси досі не можуть містити поля екземплярів, тому класична апаратна проблема ромба щодо конфлікту дублювання полів пам'яті виключена.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чим відрізняється поведінка методів Equals/GetHashCode у System.ValueType від System.Object?</span>
+                <p class="qa-answer">В: `System.Object` порівнює посилання на адресу в пам'яті (Reference equality). `System.ValueType` перевизначає їх і порівнює всі поля структури по черзі за значенням (Value equality), використовуючи під капотом Reflection (що робить дефолтне порівняння структур повільним).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -224,6 +273,15 @@
     }
 }</code></pre>
         <p><b>Автоматичні властивості:</b> <code>public string Name { get; set; }</code> автоматично генерують приховане анонімне поле компілятора (Backing Field).</p>
+        <p><b>Init-only властивості (C# 9+):</b> <code>public int Id { get; init; }</code> дозволяють встановлювати значення лише під час конструювання об'єкта (в ініціалізаторі <code>new Item { Id = 1 }</code>), забезпечуючи незмінність (immutability).</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому не варто використовувати публічні поля замість авто-властивостей `{ get; set; }`?</span>
+                <p class="qa-answer">В: По-перше, порушується бінарна сумісність: заміна поля на властивість вимагає повної перекомпіляції всіх залежних бібліотек. По-друге, поля не можна додати до інтерфейсу, їх не можна зробити віртуальними для перевизначення, і вони не підтримуються більшістю бібліотек серіалізації/рефлексії (наприклад, EF Core, JSON-серіалізатори, WPF DataBinding).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -237,12 +295,21 @@
         </div>
         <h4>Розгорнута відповідь:</h4>
         <ul>
-            <li><b>Статичний поліморфізм (Compile-time):</b> Компілятор визначає потрібний метод ще на етапі збірки за сигнатурою (назвою та типами аргументів). Приклад: перевантаження методів:
+            <li><b>Статичний поліморфізм (Compile-time / Early binding):</b> Компілятор визначає потрібний метод ще на етапі збірки за сигнатурою (назвою та типами аргументів). Приклад: перевантаження методів:
                 <pre><code>public int Add(int a, int b) =&gt; a + b;
+
 public double Add(double a, double b) =&gt; a + b;</code></pre>
             </li>
-            <li><b>Динамічний поліморфізм (Run-time):</b> Який саме метод викликати, вирішується в момент виконання програми на основі реального типу об'єкта в пам'яті (через механізм vtable — таблиці віртуальних методів). Реалізується через ключові слова <code>virtual</code>, <code>override</code> або інтерфейси.</li>
+            <li><b>Динамічний поліморфізм (Run-time / Late binding):</b> Який саме метод викликати, вирішується в момент виконання програми на основі реального типу об'єкта в пам'яті (через механізм vtable — таблиці віртуальних методів TypeHandle в CLR). Реалізується через ключові слова <code>virtual</code>, <code>override</code> або інтерфейси.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи можна перевантажити метод, змінивши виключно тип повертаного значення?</span>
+                <p class="qa-answer">В: У мові C# — категорично ні! Сигнатура методу в C# формується з його назви, кількості та типів параметрів (включаючи ref/out модифікатори). Тип поверненого значення не входить у сигнатуру для вирішення неоднозначностей компілятором.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -258,12 +325,14 @@ public double Add(double a, double b) =&gt; a + b;</code></pre>
         <pre><code>public class BaseClass
 {
     public virtual void MethodA() =&gt; Console.WriteLine("Base A");
+
     public void MethodB() =&gt; Console.WriteLine("Base B");
 }
 
 public class DerivedClass : BaseClass
 {
     public override void MethodA() =&gt; Console.WriteLine("Derived A");
+
     public new void MethodB() =&gt; Console.WriteLine("Derived B"); // Приховування
 }
 
@@ -271,6 +340,14 @@ public class DerivedClass : BaseClass
 BaseClass obj = new DerivedClass();
 obj.MethodA(); // Виведе: "Derived A" (поліморфізм відпрацював)
 obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseClass, new розірвав віртуальність!)</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо опустити ключове слово `new` при приховуванні методу?</span>
+                <p class="qa-answer">В: Код успішно скомпілюється і працюватиме точно так само, але компілятор видасть попередження (Warning CS0108). Ключове слово `new` служить явним сигналом для розробника та компілятора, що приховування зроблено свідомо, а не випадково.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -286,9 +363,17 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
         <ul>
             <li><b>Успадкування:</b> Абстрактний клас — одиничне успадкування; Інтерфейси — множинна реалізація.</li>
             <li><b>Стан (Fields):</b> Абстрактний клас може містити власні нестатичні поля стану (<code>private int _id;</code>). Інтерфейс <b>не може</b> містити стан екземпляра (поля).</li>
-            <li><b>Конструктори:</b> Абстрактний клас має конструктор (викликається нащадками через <code>base()</code>). Інтерфейс конструкторів мати не може.</li>
-            <li><i>(Починаючи з C# 8):</i> В інтерфейсах з'явилися Default Interface Methods (дефолтні реалізації), проте вони призначені для еволюції API без ламання клієнтів і не роблять інтерфейс повноцінним класом.</li>
+            <li><b>Конструктори:</b> Абстрактний клас має конструктор (викликається нащадками через <code>base()</code>). Інтерфейс конструкторів екземпляра мати не може.</li>
+            <li><i>(Починаючи з C# 8):</i> В інтерфейсах з'явилися Default Interface Methods (дефолтні реалізації), проте вони призначені для еволюції API бібліотек без ламання існуючих клієнтів.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке явна реалізація інтерфейсу (Explicit Interface Implementation) і коли вона корисна?</span>
+                <p class="qa-answer">В: Це запис вигляду `void IDisposable.Dispose()`. Метод доступний виключно тоді, коли звернення до об'єкта йде через посилання типу інтерфейсу. Корисно, коли клас реалізує два інтерфейси з однаковими іменами методів або коли потрібно сховати службовий метод від публічного API класу.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -304,7 +389,7 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
         <ul>
             <li><b><code>sealed</code> (запечатаний):</b>
                 <ul>
-                    <li>Для класу: забороняє будь-яке успадкування від нього (наприклад, <code>public sealed class String</code>). Це оптимізує виклики методів (JIT-девіртуалізація).</li>
+                    <li>Для класу: забороняє будь-яке успадкування від нього (наприклад, <code>public sealed class String</code>). Це оптимізує виклики методів (JIT-девіртуалізація — виклик через команду <code>call</code> замість <code>callvirt</code>).</li>
                     <li>Для методу: забороняє подальше перевизначення у нащадках (<code>public sealed override void DoWork()</code>).</li>
                 </ul>
             </li>
@@ -313,10 +398,18 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
                     <li>Не можна створити через <code>new</code>.</li>
                     <li>Не може містити нестатичних конструкторів, полів або методів.</li>
                     <li>Завжди неявно є <code>sealed</code> і успадковується напряму від <code>System.Object</code>.</li>
-                    <li>Має статичний конструктор, який викликається автоматично CLR рівно один раз перед першим зверненням до класу.</li>
+                    <li>Має статичний конструктор, який викликається автоматично CLR рівно один раз перед першим зверненням до будь-якого члена класу.</li>
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо статичний конструктор кине виняток?</span>
+                <p class="qa-answer">В: CLR перехопить його та викине `TypeInitializationException`. Клас стане повністю непридатним для використання до кінця життя процесу AppDomain (будь-яка наступна спроба звернення знову кидатиме цей виняток без повторного запуску конструктора).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -326,7 +419,7 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
         <div class="summary-box">
-            <b>Коротка суть:</b> 6 основних рівнів видимості: <code>public</code>, <code>private</code>, <code>protected</code>, <code>internal</code>, <code>protected internal</code>, <code>private protected</code>.
+            <b>Коротка суть:</b> 6 основних рівнів видимості: <code>public</code>, <code>private</code>, <code>protected</code>, <code>internal</code>, <code>protected internal</code>, <code>private protected</code> (+ `file` у C# 11).
         </div>
         <h4>Розгорнута відповідь:</h4>
         <ul>
@@ -336,7 +429,16 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
             <li><code>public</code>: Доступний звідусіль без обмежень.</li>
             <li><code>protected internal</code>: Доступний нащадкам <b>АБО</b> будь-якому коду в тій самій збірці (логічне АБО).</li>
             <li><code>private protected</code>: Доступний нащадкам, але <b>ТІЛЬКИ</b> якщо вони знаходяться в тій самій збірці (логічне І).</li>
+            <li><code>file</code> (C# 11): Видимий виключно всередині конкретного фізичного вихідного файлу `.cs` (ідеально для Source Generators).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Які модифікатори доступу діють за замовчуванням, якщо їх не вказати?</span>
+                <p class="qa-answer">В: Для типів вищого рівня (класи, інтерфейси, структури в namespace) — `internal`. Для членів класів та структур — `private`. Для членів інтерфейсів — `public`. Для елементів `enum` — завжди `public` без можливості зміни.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -352,17 +454,25 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
         <ul>
             <li><b>Value Types (типи-значення):</b> <code>struct</code>, примітиви (<code>int</code>, <code>bool</code>, <code>double</code>), <code>enum</code>. Змінна містить самі дані.
                 <ul>
-                    <li>Якщо оголошені локально всередині методу — живуть на <b>стеку (Stack)</b>.</li>
+                    <li>Якщо оголошені локально всередині методу — живуть на <b>стеку (Stack)</b> у фреймі виклику.</li>
                     <li><b>Увага підступне питання:</b> Якщо структура чи примітив є полем класу (reference type), вони зберігаються разом із класом у <b>купі (Managed Heap)</b>!</li>
                 </ul>
             </li>
             <li><b>Reference Types (типи-посилання):</b> <code>class</code>, <code>interface</code>, <code>delegate</code>, <code>string</code>, масиви.
                 <ul>
                     <li>Сам об'єкт із даними завжди живе в <b>купі (Heap)</b> і очищується Garbage Collector'ом.</li>
-                    <li>Змінна містить лише посилання (адресу в пам'яті розміром 4 або 8 байт), яке лежить на стеку.</li>
+                    <li>Змінна містить лише посилання (адресу в пам'яті розміром 4 байти на x86 або 8 байт на x64), яке лежить на стеку.</li>
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Коли локальна змінна-структура (Value Type) опиняється в купі замість стека?</span>
+                <p class="qa-answer">В: У 4 випадках: 1) Boxing (приведення до `object` або інтерфейсу); 2) Захоплення змінної в анонімний метод або лямбду (closure); 3) Всередині блоків з `yield return` (компілятор створює клас стану ітератора); 4) Всередині методів з `async/await` (компілятор генерує структуру/клас state machine в купі при виході в асинхронне очікування).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
@@ -382,10 +492,19 @@ obj.MethodB(); // Виведе: "Base B" (бо тип змінної — BaseCla
                 <ul>
                     <li><b>Потокобезпечність (Thread-safety):</b> Незмінні об'єкти можна безпечно читати з кількох потоків без синхронізації/блокувань.</li>
                     <li><b>Інтернування рядків (String Interning):</b> CLR тримає таблицю унікальних літералів. Якщо в коді 100 разів написати <code>"hello"</code>, у пам'яті буде лише один екземпляр.</li>
+                    <li><b>Безпека ключів:</b> Рядок є ідеальним стабільним ключем для <code>Dictionary&lt;string, T&gt;</code>, оскільки його <code>GetHashCode()</code> не зміниться ніколи.</li>
                 </ul>
             </li>
-            <li>При частій конкатенації (наприклад, у циклі) слід використовувати <code>StringBuilder</code>, щоб не засмічувати купу десятками проміжних рядків.</li>
+            <li>При частій конкатенації слід використовувати <code>StringBuilder</code> або <code>ReadOnlySpan&lt;char&gt;</code> для уникнення непотрібних алокацій у GC.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `string.Equals()` або оператор `==` порівнює рядки за значенням символів, хоча string — це Reference Type?</span>
+                <p class="qa-answer">В: Клас `System.String` явно перевантажує оператори `==`, `!=` та перевизначає методи `Equals()` та `GetHashCode()`, щоб посимвольно перевіряти еквівалентність замість простого порівняння адрес вказівників у пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -404,9 +523,17 @@ int y = (int)obj;      // Unboxing (перевірка типу в runtime + к�
         <p><b>Оверхед упаковки:</b></p>
         <ol>
             <li>Виділяється пам'ять у купі (розмір даних + заголовок об'єкта 8/16 байт під TypeHandle та SyncBlockIndex).</li>
-            <li>Витрачається час процесора на копіювання байтів.</li>
+            <li>Витрачається час процесора на копіювання байтів зі стека в купу і навпаки.</li>
             <li>Збільшується навантаження на Garbage Collector, який змушений чистити ці тимчасові об'єкти в Gen 0.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи відбувається boxing, якщо викликати метод інтерфейсу на структурі?</span>
+                <p class="qa-answer">В: Якщо привести структуру до інтерфейсу (`IMyInterface item = myStruct; item.DoWork();`) — так, відбувається boxing! Але якщо викликати через узагальнений дженерік-метод з обмеженням (`void Run&lt;T&gt;(T item) where T : IMyInterface`), компілятор генерує прямий виклик без боксингу.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -434,6 +561,14 @@ int y = (int)obj;      // Unboxing (перевірка типу в runtime + к�
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому полягає ризик використання `public const` у бібліотеках, що поширюються окремо?</span>
+                <p class="qa-answer">В: Це так звана проблема "Binary Versioning Break". Оскільки значення константи під час компіляції замінюється на конкретний літерал у зовнішньому коді, зміна константи у версії v2.0 не вплине на раніше скомпільовану клієнтську збірку v1.0 без її повторної перекомпіляції. Для відкритих API завжди рекомендується `static readonly`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -451,6 +586,14 @@ int y = (int)obj;      // Unboxing (перевірка типу в runtime + к�
             <li><code>out</code>: Змінна може бути неініціалізованою до виклику, але викликаний метод <b>зобов'язаний</b> присвоїти їй значення перед завершенням (використовується для повернення кількох значень, як у <code>int.TryParse(s, out int res)</code>).</li>
             <li><code>in</code> (додано в C# 7.2): Передає аргумент за посиланням, але <b>забороняє його зміну</b> всередині методу (read-only reference). Використовується для оптимізації продуктивності: передача великих структур без їх копіювання в стек.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому модифікатори `ref`, `out` та `in` не можна використовувати в асинхронних методах (`async`) та ітераторах (`yield return`)?</span>
+                <p class="qa-answer">В: Асинхронні методи та ітератори можуть призупиняти виконання та перемикати потоки. Стек потоку при цьому звільняється, а вказівник на фрейм стеку (`ref` pointer) став би невалідним (dangling pointer), викликавши пошкодження пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -473,6 +616,14 @@ var p2 = p1 with { Age = 26 }; // новий об'єкт із тим самим 
             </li>
             <li><b><code>record struct</code> (C# 10):</b> дозволяє отримати ті самі переваги порівняння та оператора <code>with</code>, але у вигляді структури на стеку (Value Type).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Яку копію робить оператор `with` у записах: глибоку чи поверхневу (Shallow copy)?</span>
+                <p class="qa-answer">В: Виключно поверхневу (Shallow copy)! Якщо всередині record є властивість, що вказує на змінюваний список або клас (наприклад, `List&lt;string&gt;`), то новий record посилатиметься на той самий екземпляр списку в пам'яті.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -490,6 +641,14 @@ var p2 = p1 with { Age = 26 }; // новий об'єкт із тим самим 
             <li><b>Nullable Reference Types (C# 8+):</b> Якщо ввімкнено <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code>, посилальні типи за замовчуванням вважаються такими, що <b>не можуть містити null</b> (<code>string name</code>). Якщо поле може бути порожнім, його треба явно позначити знаком питання: <code>string? middleName</code>.
             <br/><i>Важливо:</i> Це підказка для компілятора та попередження під час збірки (Warnings), в IL-коді тип <code>string?</code> залишається звичайним <code>string</code>.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що робить null-forgiving оператор `!` (dammit operator) у виразах на зразок `item!.DoSomething()`?</span>
+                <p class="qa-answer">В: Він каже компілятору придушити статичне попередження про можливий `NullReferenceException`. Втім, у скомпільованому рантаймі він не виконує жодної перевірки: якщо об'єкт дійсно виявиться `null`, програма все одно впаде з помилкою.</p>
+            </div>
+        </div>
     </article>
 
 </div>

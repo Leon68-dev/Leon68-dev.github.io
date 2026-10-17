@@ -13,8 +13,11 @@
             --border: #e2e8f0;
             --primary: #0d9488;
             --primary-light: #f0fdfa;
-            --code-bg: #0f172a;
-            --code-text: #f8fafc;
+            /* Updated code block theme: blue background and bright yellow text */
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --accent-badge: #ccfbf1;
+            --accent-badge-text: #115e59;
         }
 
         * { box-sizing: border-box; }
@@ -40,8 +43,8 @@
         }
 
         .badge-level {
-            background-color: #ccfbf1;
-            color: #115e59;
+            background-color: var(--accent-badge);
+            color: var(--accent-badge-text);
             padding: 0.35rem 0.9rem;
             border-radius: 9999px;
             font-size: 0.85rem;
@@ -88,7 +91,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
@@ -124,6 +127,41 @@
             font-weight: 500;
         }
 
+        .interview-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .interview-box h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #115e59;
+        }
+
+        .qa-item {
+            margin-bottom: 0.85rem;
+        }
+
+        .qa-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #0f766e;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .qa-answer {
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
         pre {
             background: var(--code-bg);
             color: var(--code-text);
@@ -133,6 +171,7 @@
             font-family: Consolas, Monaco, "Courier New", monospace;
             font-size: 0.875rem;
             line-height: 1.5;
+            margin: 1rem 0;
         }
 
         code { font-family: inherit; }
@@ -202,6 +241,14 @@ foreach (var action in actions)
         <p>Компілятор створює <b>один-єдиний</b> екземпляр службового класу (Display Class) для всього циклу <code>for</code>. Локальна змінна <code>i</code> стає єдиним спільним полем цього класу: <code>displayClass.i</code>. Коли цикл завершується, значення <code>displayClass.i</code> дорівнює <code>3</code>. При послідовному виклику делегатів усі три лямбди звертаються до однієї й тієї ж ділянки пам'яті в купі.</p>
         <p><b>Як виправити:</b> Створити локальну копію всередині тіла циклу: <code>int copy = i; actions.Add(() =&gt; Console.Write(copy));</code>. Для кожної ітерації буде виділено свій окремий контекст.</p>
         <p><i>Примітка:</i> У циклі <code>foreach</code> у C# 5.0+ це виправили автоматично — там компілятор сам створює новий скоуп на кожну ітерацію.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому компілятор виправив проблему замикання в циклі `foreach`, але не виправив її для `for`?</span>
+                <p class="qa-answer">В: Зміна поведінки циклу `for` зламала б зворотну бінарну сумісність у величезній кількості існуючого коду, де розробники навмисно покладалися на спільну змінну-лічильник між ітераціями. Для `foreach` нова семантика була очевидним виправленням очікувань без побічних ефектів.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 2 -->
@@ -248,6 +295,14 @@ new Child();</code></pre>
             </li>
         </ol>
         <p><i>Золоте правило C#:</i> <b>Ніколи не викликайте віртуальні методи з конструктора</b>, тому що нащадок виконуватиме свій код у напівініціалізованому стані.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чим відрізняється поведінка віртуального виклику в конструкторі в C# від C++?</span>
+                <p class="qa-answer">В: У C++ динамічна таблиця методів vtable налаштовується поступово, тому виклик віртуального методу з базового конструктора викличе базову реалізацію. У C# vtable одразу вказує на похідний тип Child, тому метод нащадка виконається ще до виклику власного конструктора нащадка.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 3 -->
@@ -277,6 +332,18 @@ Console.WriteLine(GetNumber());</code></pre>
         </div>
         <h4>Чому так відбувається:</h4>
         <p>Коли виконання доходить до <code>return x;</code> у блоці <code>try</code>, значення змінної <code>x</code> (число <code>10</code>) <b>обчислюється та копіюється в стек виконання (або регістр процесора) як значення, що повертається</b>. Після цього обов'язково виконується блок <code>finally</code>, де локальна змінна <code>x</code> перезаписується на <code>20</code>, проте значення на стеку повернення залишається незмінним. Метод повертає початкові <code>10</code>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що станеться, якщо `x` буде посилальним типом (Reference Type), наприклад екземпляром класу `Person`, і у блоці `finally` змінити властивість `x.Age = 20`?</span>
+                <p class="qa-answer">В: Змінена властивість збережеться! На стек повернення копіюється адреса (вказівник) на об'єкт у купі. Оскільки об'єкт у купі один і той самий, зміна його внутрішнього стану у `finally` буде видима викликаючому коду.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи дозволено писати `return` або `goto` всередині блоку `finally` в C#?</span>
+                <p class="qa-answer">В: Ні! Компілятор C# генерує помилку CS0157 ("Control cannot leave the body of a finally clause"), повністю забороняючи вихід із `finally` через return або переходи.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 4 -->
@@ -301,6 +368,14 @@ Console.WriteLine(object.ReferenceEquals(s1, s3)); // ???</code></pre>
             <li><code>s1 == s2 (True):</code> Рядок <code>"hello " + "world"</code> складається з двох строкових літералів. Компілятор Roslyn на етапі збірки виконує оптимізацію <i>Constant Folding</i> (згортання констант) і перетворює це на <code>"hello world"</code>. Обидва посилання вказують на один і той самий об'єкт із глобальної таблиці інтернування рядків CLR.</li>
             <li><code>s1 == s3 (False):</code> Оскільки <code>part</code> є змінною, конкатенація відбувається динамічно в рантаймі через виклик <code>string.Concat()</code>. Створюється абсолютно новий об'єкт у купі, тому посилання в пам'яті різні. (Зробити посилання однаковими можна було б лише явним викликом <code>string.Intern(s3)</code>).</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому небезпечно викликати `string.Intern()` для довільних рядків, отриманих від користувача ззовні?</span>
+                <p class="qa-answer">В: Таблиця інтернування рядків живе в CLR протягом усього часу роботи процесу, і об'єкти в ній ніколи не очищуються збирачем сміття (GC). Інтернування тисяч унікальних рядків користувача призведе до невиправного витоку пам'яті в Gen 2.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 5 -->
@@ -330,6 +405,18 @@ foreach (var item in list)
                 <li>Або звичайний цикл <code>for</code> з кінця до початку: <code>for (int i = list.Count - 1; i &gt;= 0; i--)</code>.</li>
             </ul>
         </p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому `List<T>.GetEnumerator()` повертає `struct`, а не посилальний інтерфейс `IEnumerator<T>`?</span>
+                <p class="qa-answer">В: Для оптимізації продуктивності: компілятор створює ітератор-структуру прямо на стеку без виділення об'єкта в Heap (zero-allocation foreach). Приведення до інтерфейсу `IEnumerator<T>` викликало б непотрібний boxing.</p>
+            </div>
+            <div class="qa-item">
+                <span class="qa-question">П: Чи випаде такий виняток під час ітерації потокобезпечної колекції `ConcurrentDictionary` або `ConcurrentBag`?</span>
+                <p class="qa-answer">В: Ні! Ітератори колекцій з простору `System.Collections.Concurrent` проєктуються так, щоб повертати знімок (snapshot) або безпечно проходити елементи без падіння при паралельних модифікаціях іншими потоками.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 6 -->
@@ -346,6 +433,7 @@ foreach (var item in list)
 public struct Counter : ICounter
 {
     public int Value { get; private set; }
+
     public void Increment() =&gt; Value++;
 }
 
@@ -364,6 +452,14 @@ Console.WriteLine(((Counter)ic).Value); // ???</code></pre>
         <h4>Чому значення <code>c.Value</code> не змінилося:</h4>
         <p>Присвоєння <code>ICounter ic = c;</code> запаковує (boxing) структуру <code>c</code> у новий об'єкт у купі. Виклик <code>ic.Increment()</code> змінює поле <b>всередині об'єкта в купі</b>, тоді як оригінальна локальна структура <code>c</code> на стеку залишається незмінною зі значенням <code>1</code>.</p>
         <p><i>Висновок:</i> Мутабельні структури (Mutable Structs) — це антипатерн. Структури в C# завжди повинні бути незмінними: <code>readonly struct</code>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Як викликати інтерфейсний метод на структурі БЕЗ упаковки в купу (Boxing)?</span>
+                <p class="qa-answer">В: Використовувати узагальнений метод із generic-обмеженням: `void Run&lt;T&gt;(ref T item) where T : struct, ICounter { item.Increment(); }`. Компілятор JIT спеціалізує нативний код для типу T без виклику команди box.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 7 -->
@@ -391,6 +487,14 @@ Console.WriteLine(((Counter)ic).Value); // ???</code></pre>
             <li><b>Обробка на сервері:</b> Запит приймає Reverse Proxy (Nginx/Cloudflare/Envoy) → передає на Kestrel (.NET) → прохід через конвеєр Middleware → повернення HTTP 200 OK з контентом.</li>
             <li><b>Рендеринг у браузері:</b> Парсинг HTML → побудова DOM-дерева → завантаження CSS/JS → виконання скриптів.</li>
         </ol>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: У чому полягає ключова відмінність HTTP/2 від HTTP/3 на транспортному рівні?</span>
+                <p class="qa-answer">В: HTTP/2 працює поверх TCP і страждає від проблеми блокування початку черги (Head-of-Line Blocking): втрата одного TCP-пакета призупиняє всі паралельні стріми. HTTP/3 перейшов на протокол QUIC поверх UDP, де кожен потік повністю ізольований від втрати пакетів сусідніх потоків.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 8 -->
@@ -405,6 +509,14 @@ Console.WriteLine(((Counter)ic).Value); // ???</code></pre>
         <h4>Чому не шифрувати все асиметрично?</h4>
         <p>Асиметричне шифрування (з публічним і приватним ключами) вимагає складних математичних операцій з гігантськими простими числами і працює у сотні разів повільніше за симетричне. Воно б миттєво перевантажило процесори серверів.</p>
         <p><b>Роль цифрового сертифіката X.509:</b> Сертифікат підтверджує, що публічний ключ дійсно належить саме компанії Google, а не зловмиснику посередині (захист від Man-in-the-Middle атаки). Справжність сертифіката підтверджується цифровим підписом акредитованого Центру Сертифікації (Certificate Authority — Let's Encrypt, DigiCert), кореневі сертифікати яких вшиті прямо в операційну систему.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке Perfect Forward Secrecy (PFS) у TLS і навіщо вона потрібна?</span>
+                <p class="qa-answer">В: PFS гарантує, що навіть якщо приватний ключ сервера буде скомпрометований або викрадений у майбутньому, зловмисник не зможе розшифрувати раніше перехоплений записаний трафік. Це досягається завдяки генерації унікальних одноразових сесійних ключів через алгоритм Діффі-Хеллмана (ECDHE).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 9 -->
@@ -434,6 +546,14 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "MyApi.dll"]</code></pre>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому директиву ENTRYPOINT в Dockerfile краще записувати в exec-формі `["dotnet", "App.dll"]`, а не в shell-формі `dotnet App.dll`?</span>
+                <p class="qa-answer">В: Exec-форма запускає процес додатку як PID 1 всередині контейнера. Це дозволяє .NET додатку напряму отримувати системні сигнали ОС (SIGTERM, SIGINT) для коректного Graceful Shutdown. Shell-форма запускає `/bin/sh -c`, який часто перехоплює і не пересилає сигнали процесу C#.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 10 -->
@@ -462,6 +582,14 @@ ENTRYPOINT ["dotnet", "MyApi.dll"]</code></pre>
                 </ul>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому після `git rebase` локальної гілки команда `git push` видає помилку відхилення (rejected)?</span>
+                <p class="qa-answer">В: Оскільки rebase переписує батьківські зв'язки та створює абсолютно нові хеші комітів (SHA), віддалена гілка та локальна розходяться історією. Оновлення потребує виклику `git push --force-with-lease` (безпечніший аналог --force).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 11 -->
@@ -487,6 +615,14 @@ ENTRYPOINT ["dotnet", "MyApi.dll"]</code></pre>
     }
 }</code></pre>
         <p><b>Використання в ASP.NET Core:</b> Кожен метод контролера або ендпоінт може приймати <code>CancellationToken ct</code>. Якщо користувач у браузері закрив вкладку або обірвав з'єднання до того, як бекенд відповів, ASP.NET Core автоматично надсилає сигнал скасування. Завдяки цьому важкий SQL-запит у базі миттєво анулюється, заощаджуючи ресурси сервера.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке `CancellationTokenSource.CreateLinkedTokenSource` і коли він незамінний?</span>
+                <p class="qa-answer">В: Він об'єднує декілька токенів в один. Наприклад, якщо операція повинна перерватися або коли клієнт розірвав зв'язок (токен запиту), або коли вичерпано внутрішній таймаут у 5 секунд (токен таймауту). Спрацювання будь-якого з них активує результуючий пов'язаний токен.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 12 -->
@@ -513,6 +649,14 @@ bool result = name.IsNullOrEmpty(); // НЕ ВПАДЕ з NullReferenceException
         <p><b>Чому код не падає:</b> Компілятор Roslyn перетворює рядок <code>name.IsNullOrEmpty()</code> на прямий статичний виклик:</p>
         <pre><code>bool result = StringExtensions.IsNullOrEmpty(name); // Звичайний виклик, куди передано аргумент null!</code></pre>
         <p>Помилка <code>NullReferenceException</code> виникне лише тоді, коли ви всередині самого методу розширення спробуєте звернутися до властивостей або методів аргументу (<code>str.Length</code>) без попередньої перевірки на <code>null</code>.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Яку IL-інструкцію генерує компілятор для виклику Extension Method: `call` чи `callvirt`?</span>
+                <p class="qa-answer">В: Компілятор генерує статичну інструкцію `call Class.Method()`. Оскільки немає інструкції `callvirt`, рантайм взагалі не перевіряє нульовий покажчик `this` перед входом у метод.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 13 -->
@@ -540,6 +684,14 @@ bool result = name.IsNullOrEmpty(); // НЕ ВПАДЕ з NullReferenceException
 }</code></pre>
             </li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому оператор `as` не можна застосувати до звичайних значущих типів (наприклад, `obj as int`)?</span>
+                <p class="qa-answer">В: Тому що значущий тип (Value Type) не може приймати значення `null`, яке оператор `as` повертає у разі невдалого касту. Щоб спрацювало, тип слід зробити nullable: `obj as int?`.</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 14 -->
@@ -562,6 +714,14 @@ public int AddAndLog(int a, int b)
     return a + b;
 }</code></pre>
         <p><b>Переваги чистих функцій:</b> Не викликають Race Conditions у багатопотоковому середовищі, для них не потрібні Mock-об'єкти в тестах, їх виконання можна безпечно розпаралелювати на будь-яку кількість ядер процесора.</p>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Що таке посилальна прозорість (Referential Transparency)?</span>
+                <p class="qa-answer">В: Властивість виразу або виклику функції, за якої його можна без зміни поведінки програми замінити безпосередньо на обчислене значення. Чисті функції завжди мають посилальну прозорість, що дозволяє застосовувати мемоізацію (кешування результатів).</p>
+            </div>
+        </div>
     </article>
 
     <!-- ПИТАННЯ 15 -->
@@ -579,6 +739,14 @@ public int AddAndLog(int a, int b)
             <li><b>Protocol Buffers (Protobuf):</b> Бінарний контрактний формат від Google. Використовує суворі файли <code>.proto</code>, стискає цілі числа за алгоритмом Varint. Не передає назви полів у повідомленні (тільки числові теги 1, 2, 3), що робить пейлоад у 3–5 разів меншим за JSON. Стандарт для <b>gRPC</b>.</li>
             <li><b>MessagePack:</b> «Бінарний JSON». Не вимагає обов'язкових контрактних proto-файлів, може серіалізувати довільні C# об'єкти на льоту, забезпечуючи швидкість, близьку до Protobuf. Популярний для кешування великих об'єктів у Redis.</li>
         </ul>
+
+        <div class="interview-box">
+            <h5>Підступні питання на співбесіді:</h5>
+            <div class="qa-item">
+                <span class="qa-question">П: Чому Protobuf передає дані через мережу в рази швидше та компактніше за JSON?</span>
+                <p class="qa-answer">В: JSON у кожному повідомленні дублює текстові назви полів (наприклад, `{"userName": "Ivan"}`), тоді як Protobuf передає лише компактний числовий тег поля (1 байт) та закодоване значення в бінарному форматі (Varint), що суттєво заощаджує пропускну здатність каналу.</p>
+            </div>
+        </div>
     </article>
 
 </div>
