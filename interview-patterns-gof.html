@@ -1903,6 +1903,70 @@ public class DialogMediator : IMediator
     {
         if (ev == "toggle") _btn.IsEnabled = _cb.Checked;
     }
+}
+
+using System;
+
+public interface IMediator { void Notify(object sender, string ev); }
+
+public class Button
+{
+    private IMediator _m;
+    public bool IsEnabled { get; set; }
+    public void SetMediator(IMediator m) => _m = m;
+}
+
+public class Checkbox
+{
+    private IMediator _m;
+    public bool Checked { get; private set; }
+    public void SetMediator(IMediator m) => _m = m;
+    public void Toggle() { Checked = !Checked; _m?.Notify(this, "toggle"); }
+}
+
+public class DialogMediator : IMediator
+{
+    private readonly Button _btn;
+    private readonly Checkbox _cb;
+
+    public DialogMediator(Button btn, Checkbox cb)
+    {
+        _btn = btn; _btn.SetMediator(this);
+        _cb = cb; _cb.SetMediator(this);
+    }
+
+    public void Notify(object sender, string ev)
+    {
+        if (ev == "toggle") _btn.IsEnabled = _cb.Checked;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var button = new Button();
+        var checkbox = new Checkbox();
+
+        // Ініціалізуємо посередника, який пов'язує кнопку та чекбокс
+        var mediator = new DialogMediator(button, checkbox);
+
+        Console.WriteLine($"Початковий стан:");
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}\n");
+
+        // 1. Користувач ставить галочку (наприклад, «Погоджуюсь з умовами»)
+        Console.WriteLine("--> Перемикаємо чекбокс (Toggle)");
+        checkbox.Toggle();
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}\n");
+
+        // 2. Користувач знімає галочку
+        Console.WriteLine("--> Знову перемикаємо чекбокс (Toggle)");
+        checkbox.Toggle();
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}");
+    }
 }</code></pre>
 
         <h4>4. Плюси та мінуси</h4>
