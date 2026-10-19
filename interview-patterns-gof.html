@@ -2149,7 +2149,27 @@ public class OrderCalculator
     public OrderCalculator(IShippingStrategy s) =&gt; _strategy = s;
     public void SetStrategy(IShippingStrategy s) =&gt; _strategy = s;
     public decimal GetTotal(decimal subtotal) =&gt; subtotal + _strategy.Calculate(subtotal);
-}</code></pre>
+}
+
+class Program
+{
+    static void Main()
+    {
+        decimal subtotal = 1000m;
+        Console.WriteLine($"Базова вартість замовлення: {subtotal} грн\n");
+
+        // 1. Використовуємо доставку поштою (+50 грн)
+        var calculator = new OrderCalculator(new PostalShipping());
+        decimal postalTotal = calculator.GetTotal(subtotal);
+        Console.WriteLine($"Разом із поштовою доставкою: {postalTotal} грн");
+
+        // 2. Змінюємо стратегію на кур'єрську доставку (+150 грн)
+        calculator.SetStrategy(new CourierShipping());
+        decimal courierTotal = calculator.GetTotal(subtotal);
+        Console.WriteLine($"Разом із кур'єрською доставкою: {courierTotal} грн");
+    }
+}
+</code></pre>
 
         <h4>4. Плюси та мінуси</h4>
         <ul>
