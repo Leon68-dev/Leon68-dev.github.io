@@ -2093,6 +2093,30 @@ public class PaidState : IOrderState
 {
     public void Pay(OrderContext ctx) =&gt; Console.WriteLine("Вже сплачено.");
     public void Ship(OrderContext ctx) =&gt; Console.WriteLine("Відправлено кур'єром.");
+}
+
+class Program
+{
+    static void Main()
+    {
+        var order = new OrderContext();
+
+        // 1. Спроба відправити нове, ще неоплачене замовлення
+        Console.WriteLine("1. Спроба відправити:");
+        order.Ship();
+
+        // 2. Оплачуємо замовлення (стан зміниться на PaidState)
+        Console.WriteLine("\n2. Оплата замовлення:");
+        order.Pay();
+
+        // 3. Спроба оплатити повторно
+        Console.WriteLine("\n3. Повторна спроба оплати:");
+        order.Pay();
+
+        // 4. Відправка оплаченого замовлення
+        Console.WriteLine("\n4. Відправка замовлення:");
+        order.Ship();
+    }
 }</code></pre>
 
         <h4>4. Плюси та мінуси</h4>
