@@ -2275,6 +2275,18 @@ public abstract class DataExporter
 public class PdfExporter : DataExporter
 {
     protected override void FormatData() =&gt; Console.WriteLine("Форматування в PDF.");
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("--- Експорт у PDF ---");
+        DataExporter exporter = new PdfExporter();
+        
+        // Виклик шаблонного методу, який задає послідовність кроків
+        exporter.Export();
+    }
 }</code></pre>
 
         <h4>4. Плюси та мінуси</h4>
@@ -2332,6 +2344,33 @@ public class TaxVisitor : IVisitor
 {
     public void Visit(Bank b) =&gt; Console.WriteLine("Податок банку: 10%");
     public void Visit(Shop s) =&gt; Console.WriteLine("Податок магазину: 5%");
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // Створюємо колекцію різних об'єктів
+        var places = new List<IPlace>
+        {
+            new Bank(),
+            new Shop(),
+            new Bank()
+        };
+
+        // Створюємо відвідувача (операцію над об'єктами)
+        IVisitor taxVisitor = new TaxVisitor();
+
+        Console.WriteLine("--- Розрахунок податків ---");
+        
+        // Застосовуємо відвідувача до кожного елемента
+        foreach (var place in places)
+        {
+            // Завдяки подвійній диспетчеризації (place.Accept -> v.Visit(this))
+            // автоматично викличеться правильне перевантаження методу Visit
+            place.Accept(taxVisitor);
+        }
+    }
 }</code></pre>
 
         <h4>4. Плюси та мінуси</h4>
