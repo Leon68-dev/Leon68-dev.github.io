@@ -825,8 +825,8 @@ OrderFacade (Фасад)
     if (!_inventory.CheckStock(productId)) 
         return false;
     
-    if (!_payment.Charge(email, amount)) return 
-        false;
+    if (!_payment.Charge(email, amount)) 
+        return false;
     
     _logistics.CreateShippingOrder(productId, address);
 
