@@ -1498,15 +1498,29 @@ class Program
 
 public class InventoryService
 {
-    public bool CheckStock(string id) { Console.WriteLine($"[Склад] Товар {id} в наявності."); return true; }
+    public bool CheckStock(string id) 
+    { 
+        Console.WriteLine($"[Склад] Товар {id} в наявності."); 
+        return true; 
+    }
 }
+
 public class PaymentService
 {
-    public bool Charge(string email, decimal amount) { Console.WriteLine($"[Банк] Списано {amount:C}."); return true; }
+    public bool Charge(string email, decimal amount) 
+    { 
+        Console.WriteLine($"[Банк] Списано {amount:C}."); 
+        return true; 
+    }
 }
+
 public class LogisticsService
 {
-    public string CreateShippingOrder(string id, string addr) { Console.WriteLine("[Доставка] Створено ТТН."); return "TTN-123"; }
+    public string CreateShippingOrder(string id, string addr) 
+    { 
+        Console.WriteLine("[Доставка] Створено ТТН."); 
+        return "TTN-123"; 
+    }
 }
 
 // Фасад
