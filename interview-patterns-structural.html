@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Структурні патерни GoF на C#</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --badge-structural-bg: #fef3c7;
+            --badge-structural-text: #92400e;
+            --analysis-bg: #f8fafc;
+            --analysis-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Головне навігаційне меню між сторінками сайту */
+        .site-nav {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .site-nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .site-nav a:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .site-nav a.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-list a:hover {
+            text-decoration: underline;
+        }
+
+        .pattern-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0f172a;
+        }
+
+        .top-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-structural { background: var(--badge-structural-bg); color: var(--badge-structural-text); }
+
+        h4 {
+            font-size: 1.15rem;
+            color: #334155;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        blockquote {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        ul, ol {
+            padding-left: 1.4rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        p > code, li > code {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.875em;
+        }
+
+        .code-analysis {
+            background: var(--analysis-bg);
+            border: 1px solid var(--analysis-border);
+            border-left: 5px solid #d97706;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-analysis h5 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            color: #b45309;
+        }
+
+        .code-analysis h6 {
+            margin-top: 1.25rem;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .step-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem 0.5rem; }
+            .pattern-card { padding: 1.25rem; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ВЕРХНЄ МЕНЮ МІЖ СТОРІНКАМИ -->
+    <nav class="site-nav">
+        <a href="interview-patterns-gof.html">← Головна (Питання-пастки)</a>
+        <a href="interview-patterns-creational.html">Породжувальні (Creational)</a>
+        <a href="interview-patterns-structural.html" class="active">Структурні (Structural)</a>
+        <a href="interview-patterns-behavioral.html">Поведінкові (Behavioral)</a>
+    </nav>
+
+    <header>
+        <h1>Структурні патерни GoF на C#</h1>
+        <p style="color: var(--text-muted);">Відповідають за зручне об'єднання класів та об'єктів у більші структури без втрати гнучкості</p>
+    </header>
+
+    <!-- ЗМІСТ СТОРІНКИ -->
+    <nav class="toc-card" id="toc">
+        <h2>Швидкий перехід по розділу</h2>
+        <ul class="toc-list">
+            <li><a href="#p6">6. Adapter* (Адаптер)</a></li>
+            <li><a href="#p7">7. Bridge* (Міст)</a></li>
+            <li><a href="#p8">8. Composite (Компонувальник)</a></li>
+            <li><a href="#p9">9. Decorator* (Декоратор)</a></li>
+            <li><a href="#p10">10. Facade* (Фасад)</a></li>
+            <li><a href="#p11">11. Flyweight (Легковаговик)</a></li>
+            <li><a href="#p12">12. Proxy* (Замісник)</a></li>
+        </ul>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+            * Патерни з зірочкою містять розгорнутий аналіз архітектури та покрокове виконання коду.
+        </p>
+    </nav>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 6: ADAPTER                                        -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p6">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 6: Adapter (Адаптер)*</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє об'єктам із несумісними інтерфейсами <b>працювати разом</b>, виступаючи перехідником-обгорткою між ними.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно підключити сторонню бібліотеку або legacy-сервіс, інтерфейс якого не відповідає вимогам вашої системи.</li>
+            <li>Необхідно узгодити несумісні типи даних (наприклад, сума в копійках проти <code>decimal</code> у гривнях, JSON проти XML), не переписуючи вихідний код обох сторін.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> <code>StreamReader(Stream)</code> (адаптує низькорівневий потік байтів до текстового зчитування символів), <code>DbDataAdapter</code> в ADO.NET.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Target interface expected by the client
+public interface IPaymentProcessor
+{
+    void Pay(decimal amount);
+}
+
+// 2. Existing modern implementation
+public class ModernPaymentProcessor : IPaymentProcessor
+{
+    public void Pay(decimal amount) => Console.WriteLine($"[ModernPay] Paid: {amount:C}");
+}
+
+// 3. Adaptee: legacy service with an incompatible contract
+public class LegacyBankService
+{
+    public void MakeTransaction(long amountInCents, string transactionId)
+    {
+        Console.WriteLine($"[LegacyBank] Transaction #{transactionId} for {amountInCents} cents.");
+    }
+}
+
+// 4. Adapter: translates IPaymentProcessor calls into LegacyBankService calls
+public class LegacyBankAdapter : IPaymentProcessor
+{
+    private readonly LegacyBankService _legacyService;
+
+    public LegacyBankAdapter(LegacyBankService legacyService)
+    {
+        _legacyService = legacyService;
+    }
+
+    public void Pay(decimal amount)
+    {
+        long cents = (long)(amount * 100);
+        string id = Guid.NewGuid().ToString().Substring(0, 8);
+        _legacyService.MakeTransaction(cents, id);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IPaymentProcessor processor = new LegacyBankAdapter(new LegacyBankService());
+        processor.Pay(250.75m);
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[LegacyBank] Transaction #3f8a1b2c for 25075 cents.
+*(де 3f8a1b2c — випадковий згенерований ID транзакції)*
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн Adapter вирішує проблему несумісності сигнатур та типів даних за допомогою чотирьох учасників:</p>
+            <ul>
+                <li><b>Target (Цільовий інтерфейс) <code>IPaymentProcessor</code>:</b> Стандартний контракт, з яким уміє взаємодіяти клієнтська система.</li>
+                <li><b>Adaptee (Адаптований клас) <code>LegacyBankService</code>:</b> Готовий клас зі сторонньої бібліотеки або legacy-модуля. Має метод <code>MakeTransaction(long, string)</code>, несумісний із клієнтським кодом.</li>
+                <li><b>Adapter (Адаптер) <code>LegacyBankAdapter</code>:</b> Реалізує <code>IPaymentProcessor</code> та огортає посилання на <code>LegacyBankService</code>.</li>
+                <li><b>Клієнт <code>Program</code>:</b> Спілкується виключно через цільовий інтерфейс, не підозрюючи про існування застарілого класу.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Конструктор адаптера:</b> Приймає екземпляр <code>LegacyBankService</code> через композицію та зберігає його в <code>private readonly</code> поле.</p>
+
+            <p><b>Метод <code>Pay(decimal amount)</code>:</b> Це серце патерну. Тут виконується мапінг між двома різними світами:
+            <br>1. Конвертація типу: <code>amount * 100</code> перетворює дробове значення грошей у копійки типу <code>long</code>.
+            <br>2. Генерація додаткових параметрів: застаріла служба вимагає обов'язковий ідентифікатор <code>transactionId</code>, якого немає у вхідному виклику. Адаптер самостійно генерує його: <code>Guid.NewGuid().ToString().Substring(0, 8)</code>.
+            <br>3. Делегування: викликається реальний метод адаптованого об'єкта <code>_legacyService.MakeTransaction(cents, id)</code>.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Ініціалізація адаптера</div>
+                Клієнт створює об'єкт <code>LegacyBankService</code> і передає його в конструктор <code>LegacyBankAdapter</code>. Змінна зберігається під абстрактним типом <code>IPaymentProcessor</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Виклик стандартного методу</div>
+                Викликається <code>processor.Pay(250.75m)</code>. Клієнт вважає, що працює зі звичайною сучасною платіжною системою.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Перетворення та делегування</div>
+                Адаптер перераховує <code>250.75m</code> у <code>25075</code> копійок, генерує випадковий ID і передає виклик у <code>LegacyBankService</code>. Консоль виводить повідомлення банку.
+            </div>
+
+            <h6>4. У чому саме полягає патерн Adapter?</h6>
+            <p>Патерн <b>змінює інтерфейс</b> об'єкта, не чіпаючи його вихідний код. Він рятує від необхідності переписувати надійний старий код або підлаштовувати всю свою архітектуру під чужі сторонні SDK.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> відокремлює логіку перетворення даних від бізнес-коду (SRP); дозволяє додавати нові адаптери без модифікації існуючого клієнтського коду (OCP).</li>
+            <li><strong>Недоліки:</strong> збільшує кількість дрібних класів-обгорток у проєкті.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 7: BRIDGE                                         -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p7">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 7: Bridge (Міст)*</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Розділяє великий клас на дві окремі незалежні ієрархії — <b>Абстракцію</b> та <b>Реалізацію</b>, дозволяючи змінювати їх незалежно і запобігаючи комбінаторному вибуху кількості класів ($M \times N$).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Клас розвивається у двох незалежних площинах (наприклад, типи пультів керування та конкретні пристрої; форми вікон ОС та графічні рушії DirectX/OpenGL).</li>
+            <li>Потрібно динамічно підміняти рушій реалізації під час виконання програми.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> <code>DbConnection</code> (абстракція зв'язку з БД відокремлена від платформних драйверів: SqlClient, Npgsql, SqliteConnection).
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Implementor interface
+public interface IDevice
+{
+    bool IsEnabled();
+
+    void Enable();
+
+    void Disable();
+
+    int GetVolume();
+
+    void SetVolume(int percent);
+}
+
+// Concrete Implementor: TV
+public class TvDevice : IDevice
+{
+    private bool _on;
+    private int _vol = 30;
+
+    public bool IsEnabled() => _on;
+
+    public void Enable()
+    {
+        _on = true;
+        Console.WriteLine("[TV] Enabled.");
+    }
+
+    public void Disable()
+    {
+        _on = false;
+        Console.WriteLine("[TV] Disabled.");
+    }
+
+    public int GetVolume() => _vol;
+
+    public void SetVolume(int p)
+    {
+        _vol = Math.Clamp(p, 0, 100);
+        Console.WriteLine($"[TV] Volume: {_vol}%");
+    }
+}
+
+// 2. Abstraction
+public class RemoteControl
+{
+    protected readonly IDevice _device;
+
+    public RemoteControl(IDevice device) => _device = device;
+
+    public void TogglePower()
+    {
+        if (_device.IsEnabled())
+            _device.Disable();
+        else
+            _device.Enable();
+    }
+
+    public void VolumeUp() => _device.SetVolume(_device.GetVolume() + 10);
+}
+
+// 3. Refined Abstraction
+public class AdvancedRemoteControl : RemoteControl
+{
+    public AdvancedRemoteControl(IDevice device) : base(device) { }
+
+    public void Mute()
+    {
+        Console.WriteLine("[Remote] Mute.");
+        _device.SetVolume(0);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IDevice tv = new TvDevice();
+        var remote = new AdvancedRemoteControl(tv);
+
+        remote.TogglePower();
+        remote.VolumeUp();
+        remote.Mute();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[TV] Enabled.
+[TV] Volume: 40%
+[Remote] Mute.
+[TV] Volume: 0%
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Міст розділяє систему на дві незалежні гілки, з'єднані посиланням через інтерфейс:</p>
+            <ul>
+                <li><b>Гілка реалізації (Implementor):</b> Інтерфейс <code>IDevice</code> та конкретні класи обладнання (<code>TvDevice</code>, а в майбутньому <code>RadioDevice</code>).</li>
+                <li><b>Гілка абстракції (Abstraction):</b> Базовий клас <code>RemoteControl</code> та його розширення <code>AdvancedRemoteControl</code>.</li>
+            </ul>
+            <p>Головна ідея: пульт не знає, як усередині влаштований телевізор чи радіо. Він звертається лише до методів інтерфейсу <code>IDevice</code>.</p>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Інтерфейс <code>IDevice</code>:</b> Контракт низькорівневих дій пристрою: вмикання, вимикання, регулювання гучності.</p>
+
+            <p><b>Клас <code>TvDevice</code>:</b> Зберігає внутрішній стан телевізора (<code>_on</code> і <code>_vol = 30</code>). Метод <code>SetVolume(int p)</code> використовує <code>Math.Clamp(p, 0, 100)</code>, щоб гучність ніколи не виходила за межі діапазону 0–100%.</p>
+
+            <p><b>Клас <code>RemoteControl</code> (Абстракція):</b>
+            <br>• Поле <code>protected readonly IDevice _device</code>: посилання зберігається саме через інтерфейс, що дозволяє працювати з будь-яким пристроєм. Модифікатор <code>protected</code> надає прямий доступ підкласам на кшталт <code>AdvancedRemoteControl</code>.
+            <br>• Метод <code>TogglePower()</code> перевіряє стан і або вмикає, або вимикає пристрій.</p>
+
+            <p><b>Клас <code>AdvancedRemoteControl</code>:</b> Успадковує базовий пульт і додає функцію швидкого вимкнення звуку <code>Mute()</code>, викликаючи <code>_device.SetVolume(0)</code>.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: TogglePower()</div>
+                Телевізор спочатку вимкнений (<code>_on = false</code>). Метод перемикача вмикає його, виводячи: <code>[TV] Enabled.</code>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: VolumeUp()</div>
+                Початкова гучність становила 30%. Пульт зчитує її, додає 10% і передає нове значення назад: <code>[TV] Volume: 40%</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Mute()</div>
+                Розширений пульт примусово скидає звук до нуля:
+                <br><code>[Remote] Mute.</code>
+                <br><code>[TV] Volume: 0%</code>
+            </div>
+
+            <h6>4. У чому саме полягає патерн Bridge?</h6>
+            <p>Якби ми використовували звичайне успадкування без Bridge, нам довелося б створювати окремі класи під кожну комбінацію: <code>TvRemote</code>, <code>AdvancedTvRemote</code>, <code>RadioRemote</code>, <code>AdvancedRadioRemote</code>. При додаванні 5 пристроїв і 4 видів пультів кількість класів зросла б до 20 ($5 \times 4$).</p>
+            <p>Міст перетворює множення на додавання ($5 + 4 = 9$ класів). Обидві гілки розвиваються абсолютно вільно одна від одної.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває комбінаторний вибух класів; дозволяє змінювати конкретну реалізацію прямо під час виконання програми.</li>
+            <li><strong>Недоліки:</strong> ускладнює початкову структуру коду введенням додаткового інтерфейсного шару.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 8: COMPOSITE                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p8">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 8: Composite (Компонувальник)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Згруповує об'єкти в <b>деревоподібну структуру</b> («частина — ціле»), дозволяючи клієнту однаково працювати як з окремими об'єктами, так і з їхніми вкладеними групами.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Модель даних природно представляється у вигляді дерева: файлова система (файли та папки), кошики покупок (товари та пакунки з товарами), організаційна структура компанії.</li>
+            <li>Клієнт повинен застосовувати операції (розрахунок вартості, вивід дерева на екран) до всієї гілки без ручного розпізнавання, де окремий елемент, а де контейнер.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Візуальне дерево елементів у WPF/MAUI (<code>UIElement</code> / <code>Panel</code>), ієрархічні секції конфігурації <code>IConfiguration</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// 1. Common Component interface
+public interface IItem
+{
+    string Name { get; }
+
+    decimal GetPrice();
+
+    void Display(int depth = 0);
+}
+
+// 2. Leaf element
+public class Product : IItem
+{
+    public string Name { get; }
+    private readonly decimal _price;
+
+    public Product(string name, decimal price)
+    {
+        Name = name;
+        _price = price;
+    }
+
+    public decimal GetPrice() => _price;
+
+    public void Display(int depth = 0) => Console.WriteLine($"{new string(' ', depth * 2)}- {Name} ({_price:C})");
+}
+
+// 3. Composite container
+public class Box : IItem
+{
+    private readonly List&lt;IItem&gt; _children = new();
+    public string Name { get; }
+
+    public Box(string name) => Name = name;
+
+    public void Add(IItem item) => _children.Add(item);
+
+    public decimal GetPrice() => _children.Sum(i => i.GetPrice());
+
+    public void Display(int depth = 0)
+    {
+        Console.WriteLine($"{new string(' ', depth * 2)}+ [{Name}]");
+        foreach (var item in _children)
+            item.Display(depth + 1);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var box = new Box("Main Order");
+        box.Add(new Product("Smartphone", 800m));
+
+        var subBox = new Box("Accessories");
+        subBox.Add(new Product("Phone Case", 20m));
+        box.Add(subBox);
+
+        box.Display();
+        Console.WriteLine($"Total: {box.GetPrice():C}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
++ [Main Order]
+  - Smartphone (800,00 ₴)
+  + [Accessories]
+    - Phone Case (20,00 ₴)
+Total: 820,00 ₴
+
+(Формат і знак валюти залежать від системної локалі, наприклад: 800,00 ₴ або $800.00)
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> спрощує роботу з рекурсивними деревоподібними структурами завдяки поліморфізму; полегшує додавання нових видів вузлів.</li>
+            <li><strong>Недоліки:</strong> важко накласти обмеження на типи дочірніх компонентів у конкретних контейнерах на етапі компіляції.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 9: DECORATOR                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p9">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 9: Decorator (Декоратор)*</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє <b>динамічно додавати об'єктам нові обов'язки та поведінку</b> під час виконання програми, загортаючи їх у класи-обгортки без використання наслідування.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно додавати функціонал (логування, шифрування, валідацію, кешування) на льоту, комбінуючи шари за потребою.</li>
+            <li>Успадкування неможливе або веде до комбінаторного вибуху класів (наприклад, коли базовий клас позначений як <code>sealed</code>).</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Ланцюжки потоків у <code>System.IO</code>: <code>new CryptoStream(new GZipStream(new FileStream(...)))</code>, реєстрація декораторів сервісів у DI за допомогою бібліотеки <em>Scrutor</em>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Component contract
+public interface INotifier
+{
+    void Send(string message);
+}
+
+// 2. Concrete base component
+public class EmailNotifier : INotifier
+{
+    public void Send(string message) => Console.WriteLine($"[Email]: {message}");
+}
+
+// 3. Base Decorator wrapper
+public abstract class NotifierDecorator : INotifier
+{
+    protected readonly INotifier _wrappee;
+
+    protected NotifierDecorator(INotifier wrappee) => _wrappee = wrappee;
+
+    public virtual void Send(string message) => _wrappee.Send(message);
+}
+
+// 4. Concrete Decorators
+public class SmsDecorator : NotifierDecorator
+{
+    public SmsDecorator(INotifier wrappee) : base(wrappee) { }
+
+    public override void Send(string message)
+    {
+        base.Send(message);
+        Console.WriteLine($"[SMS]: {message}");
+    }
+}
+
+public class TelegramDecorator : NotifierDecorator
+{
+    public TelegramDecorator(INotifier wrappee) : base(wrappee) { }
+
+    public override void Send(string message)
+    {
+        base.Send(message);
+        Console.WriteLine($"[Telegram]: {message}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Multi-layer wrapping: Email + SMS + Telegram
+        INotifier notifier = new TelegramDecorator(
+            new SmsDecorator(
+                new EmailNotifier()
+            )
+        );
+
+        notifier.Send("Warning! Server overloaded.");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[Email]: Warning! Server overloaded.
+[SMS]: Warning! Server overloaded.
+[Telegram]: Warning! Server overloaded.
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн Decorator будується на принципі «матрьошки» за спільним інтерфейсом:</p>
+            <ul>
+                <li><b>Інтерфейс компонента <code>INotifier</code>:</b> Єдиний контракт для базового сервісу та всіх його декораторів.</li>
+                <li><b>Базовий компонент <code>EmailNotifier</code>:</b> Реалізує первинну базову функціональність (відправка пошти).</li>
+                <li><b>Базовий декоратор <code>NotifierDecorator</code>:</b> Реалізує <code>INotifier</code> і одночасно <b>зберігає посилання</b> на вкладений <code>INotifier</code>.</li>
+                <li><b>Конкретні декоратори <code>SmsDecorator</code> та <code>TelegramDecorator</code>:</b> Додають новий функціонал до або після виклику загорнутого об'єкта.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Секрет базового декоратора:</b></p>
+            <pre style="margin: 0.5rem 0;"><code>public abstract class NotifierDecorator : INotifier
+{
+    protected readonly INotifier _wrappee;
+    protected NotifierDecorator(INotifier wrappee) => _wrappee = wrappee;
+    public virtual void Send(string message) => _wrappee.Send(message);
+}</code></pre>
+            <p>Декоратор зовні поводиться точно як <code>INotifier</code>, тому клієнт навіть не здогадується, що працює з обгорткою. Будь-який декоратор може обертати як базовий компонент, так і інший декоратор.</p>
+
+            <p><b>Виклик <code>base.Send(message)</code>:</b> Конкретний декоратор спочатку передає виклик углиб ланцюжка через <code>base.Send()</code>, а потім виконує власну специфічну дію (друк у консоль SMS або Telegram).</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Конструювання ланцюжка обгорток</div>
+                Створюється <code>EmailNotifier</code>. Він огортається в <code>SmsDecorator</code>, який своєю чергою огортається в <code>TelegramDecorator</code>. Змінна зберігається як інтерфейс <code>INotifier</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Виклик методу Send()</div>
+                Клієнт викликає <code>notifier.Send(...)</code> на зовнішньому об'єкті <code>TelegramDecorator</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Розгортання викликів зсередини-назовні</div>
+                1. <code>TelegramDecorator</code> викликає <code>base.Send()</code> &rarr; переходить у <code>SmsDecorator</code>.
+                <br>2. <code>SmsDecorator</code> викликає <code>base.Send()</code> &rarr; переходить у <code>EmailNotifier</code>.
+                <br>3. <code>EmailNotifier</code> не має обгорток і виконує дію першим: <code>[Email]: Warning! ...</code>.
+                <br>4. Стек повертається: <code>SmsDecorator</code> виводить <code>[SMS]: Warning! ...</code>.
+                <br>5. <code>TelegramDecorator</code> завершує виклик: <code>[Telegram]: Warning! ...</code>.
+            </div>
+
+            <h6>4. У чому саме полягає патерн Decorator?</h6>
+            <p>Патерн <b>зберігає незмінним інтерфейс</b> об'єкта, але <b>розширює його обов'язки</b>. Це альтернатива успадкуванню: замість створення класів на кожну комбінацію (<code>EmailAndSms</code>, <code>EmailAndTelegram</code>, <code>EmailAndSmsAndTelegram</code>) поведінка збирається динамічно під час роботи програми.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> динамічна комбінація поведінки без монолітного спадкування; дотримання принципу Single Responsibility.</li>
+            <li><strong>Недоліки:</strong> порядок огортання шарів має вирішальне значення; стек викликів важче відлагоджувати при багатьох вкладених рівнях.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 10: FACADE                                        -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p10">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 10: Facade (Фасад)*</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає <b>простий та високорівневий уніфікований інтерфейс</b> до складної підсистеми, що складається з десятків взаємопов'язаних сервісів або бібліотек.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно сховати хаос складної сторонньої бібліотеки або внутрішньої архітектури мікросервісів за кількома зрозумілими методами.</li>
+            <li>Потрібно послабити зачеплення (<em>coupling</em>) між клієнтським кодом і внутрішніми службами підсистеми.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> <code>DbContext</code> в EF Core (фасад над кешем відстеження сутностей, генератором SQL-виразів та пулом з'єднань ADO.NET), високорівневий клас <code>HttpClient</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Complex subsystem services
+public class InventoryService
+{
+    public bool CheckStock(string id)
+    {
+        Console.WriteLine($"[Inventory] Product {id} is in stock.");
+        return true;
+    }
+}
+
+public class PaymentService
+{
+    public bool Charge(string email, decimal amount)
+    {
+        Console.WriteLine($"[Payment] Charged {amount:C}.");
+        return true;
+    }
+}
+
+public class LogisticsService
+{
+    public string CreateShippingOrder(string id, string addr)
+    {
+        Console.WriteLine("[Logistics] Shipping order created.");
+        return "TTN-123";
+    }
+}
+
+// 2. High-level Facade
+public class OrderFacade
+{
+    private readonly InventoryService _inventory = new();
+    private readonly PaymentService _payment = new();
+    private readonly LogisticsService _logistics = new();
+
+    public bool PlaceOrder(string productId, decimal amount, string email, string address)
+    {
+        if (!_inventory.CheckStock(productId))
+            return false;
+
+        if (!_payment.Charge(email, amount))
+            return false;
+
+        _logistics.CreateShippingOrder(productId, address);
+
+        Console.WriteLine("Order placed successfully!");
+        return true;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var facade = new OrderFacade();
+        facade.PlaceOrder("LAPTOP", 2500m, "alex@test.com", "Kyiv");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[Inventory] Product LAPTOP is in stock.
+[Payment] Charged 2 500,00 ₴.
+[Logistics] Shipping order created.
+Order placed successfully!
+
+(Формат валюти залежить від системної локалі, наприклад: 2 500,00 ₴ або $2,500.00)
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн організовує роботу двох рівнів системи:</p>
+            <ul>
+                <li><b>Низькорівнева складна підсистема:</b> Незалежні класи <code>InventoryService</code>, <code>PaymentService</code>, <code>LogisticsService</code>. Кожен із них вимагає специфічних параметрів і має власний життєвий цикл.</li>
+                <li><b>Фасад <code>OrderFacade</code>:</b> Агрегує посилання на всі сервіси підсистеми і надає єдиний зручний метод <code>PlaceOrder(...)</code>.</li>
+                <li><b>Клієнт <code>Program</code>:</b> Спілкується лише з фасадом, позбавляючись потреби знати порядок викликів підсистеми.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Сервіси підсистеми:</b>
+            <br>• <code>InventoryService.CheckStock</code>: перевіряє залишки на складі.
+            <br>• <code>PaymentService.Charge</code>: списує кошти з платіжного шлюзу.
+            <br>• <code>LogisticsService.CreateShippingOrder</code>: реєструє товар у службі доставки.</p>
+
+            <p><b>Метод фасаду <code>PlaceOrder</code>:</b> Об'єднує типовий користувацький бізнес-сценарій в один виклик. Він бере на себе координацію послідовності кроків: перевірка наявності &rarr; списання оплати &rarr; оформлення доставки. Якщо один із проміжних кроків повертає <code>false</code>, подальший процес безпечно переривається.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Створення фасаду</div>
+                Клієнт інстанціює <code>facade = new OrderFacade()</code>. Фасад ініціалізує необхідні підсистеми всередині себе.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Оформлення замовлення одним рядком</div>
+                Клієнт викликає <code>facade.PlaceOrder("LAPTOP", 2500m, "alex@test.com", "Kyiv")</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Послідовна робота підсистем</div>
+                Фасад по черзі викликає сервіси: склад підтверджує наявність, банк списує гроші, логістика формує накладну, і консоль видає: <code>Order placed successfully!</code>.
+            </div>
+
+            <h6>4. У чому саме полягає патерн Facade?</h6>
+            <p>Фасад <b>спрощує інтерфейс</b> і знижує поріг входження для клієнтського коду. При цьому він не блокує прямий доступ до підсистем: якщо досвідченому модулю знадобиться звернутися безпосередньо до <code>LogisticsService</code>, він все ще може це зробити напряму.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> захищає клієнтський код від складності компонентів підсистеми; суттєво зменшує зв'язність (Loose Coupling).</li>
+            <li><strong>Недоліки:</strong> при неконтрольованому розширенні фасад ризикує перетворитися на перевантажений <em>God Object</em>.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 11: FLYWEIGHT                                     -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p11">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 11: Flyweight (Легковаговик)</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Заощаджує оперативну пам'ять процесу, розділяючи стан величезної кількості дрібних об'єктів на <b>внутрішній</b> (спільний, незмінний) та <b>зовнішній</b> (контекстний, унікальний).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>У пам'яті одночасно створюються сотні тисяч або мільйони схожих об'єктів (символи в документі, частинки графіки, елементи карти в іграх).</li>
+            <li>Більшість полів об'єктів дублюють однакові статичні дані (наприклад, колір, текстура, назва), які можна винести в спільний пул.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Таблиця інтернування рядків у CLR (<code>string.Intern</code>): однакові рядкові літерали зберігаються в пам'яті лише в одному екземплярі.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// 1. Intrinsic state: shared immutable flyweight
+public class TreeType
+{
+    public string Name { get; }
+    public string Color { get; }
+
+    public TreeType(string name, string color)
+    {
+        Name = name;
+        Color = color;
+    }
+
+    public void Draw(int x, int y) => Console.WriteLine($"Tree '{Name}' ({Color}) at ({x}, {y})");
+}
+
+// 2. Flyweight Factory: caches shared instances
+public static class TreeFactory
+{
+    private static readonly Dictionary&lt;string, TreeType&gt; _types = new();
+
+    public static TreeType GetTreeType(string name, string color)
+    {
+        string key = $"{name}_{color}";
+        if (!_types.TryGetValue(key, out var type))
+        {
+            type = new TreeType(name, color);
+            _types[key] = type;
+        }
+        return type;
+    }
+}
+
+// 3. Extrinsic state: unique coordinates context
+public class Tree
+{
+    private readonly int _x;
+    private readonly int _y;
+    private readonly TreeType _type;
+
+    public Tree(int x, int y, TreeType type)
+    {
+        _x = x;
+        _y = y;
+        _type = type;
+    }
+
+    public void Draw() => _type.Draw(_x, _y);
+}
+
+class Program
+{
+    static void Main()
+    {
+        var forest = new List&lt;Tree&gt;();
+        var oakType = TreeFactory.GetTreeType("Oak", "Green");
+
+        for (int i = 0; i &lt; 1000; i++)
+        {
+            forest.Add(new Tree(i, i * 2, oakType));
+        }
+    }
+}
+
+/* Результат виконання: **************************************/
+
+У наведеному коді в методі Main немає викликів Console.WriteLine() або методу .Draw(), 
+тому на консоль нічого не виведеться (вивід порожній).
+
+(Якщо додати в кінець Main, наприклад, виклик forest[0].Draw();, результат буде таким):
+
+Tree 'Oak' (Green) at (0, 0)
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> радикальне скорочення споживання RAM при масивах однотипних даних.</li>
+            <li><strong>Недоліки:</strong> витрати процесорного часу на пошук об'єктів у хеш-таблиці пулу; ускладнення коду через поділ внутрішнього та зовнішнього стану.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 12: PROXY                                         -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p12">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 12: Proxy (Замісник)*</h3>
+                <span class="badge badge-structural">Структурний (Structural)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає <b>об'єкт-замінник</b> іншого сервісу для <b>контролю доступу</b> до нього: лінивої ініціалізації, кешування запитів, перевірки прав тощо.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li><b>Virtual Proxy:</b> відкладене завантаження ресурсомісткого об'єкта лише в момент його реального першого виклику.</li>
+            <li><b>Caching Proxy:</b> автоматичне збереження та повернення результатів повторюваних важких обчислень чи запитів.</li>
+            <li><b>Protection Proxy:</b> перевірка ролей та авторизації клієнта перед виконанням цільової операції.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Ліниве завантаження зв'язаних сутностей в EF Core (<code>UseLazyLoadingProxies</code> на базі Castle DynamicProxy), клієнтські проксі WCF та gRPC.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// 1. Service contract
+public interface IVideoDownloader
+{
+    void DownloadVideo(string videoId);
+}
+
+// 2. Real heavy service
+public class YouTubeDownloader : IVideoDownloader
+{
+    public YouTubeDownloader() => Console.WriteLine("[YouTube] Heavy network connection initialized...");
+
+    public void DownloadVideo(string id) => Console.WriteLine($"[YouTube] Downloading video #{id}...");
+}
+
+// 3. Proxy: lazy loading and caching
+public class CachedYouTubeProxy : IVideoDownloader
+{
+    private YouTubeDownloader _service;
+    private readonly HashSet&lt;string&gt; _cache = new();
+
+    public void DownloadVideo(string id)
+    {
+        _service ??= new YouTubeDownloader();
+
+        if (_cache.Contains(id))
+        {
+            Console.WriteLine($"[Proxy] Video #{id} served from local cache!");
+            return;
+        }
+
+        _service.DownloadVideo(id);
+        _cache.Add(id);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        IVideoDownloader downloader = new CachedYouTubeProxy();
+        downloader.DownloadVideo("patterns");
+        downloader.DownloadVideo("patterns");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[YouTube] Heavy network connection initialized...
+[YouTube] Downloading video #patterns...
+[Proxy] Video #patterns served from local cache!
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн Proxy будується на повному збігу інтерфейсів між обгорткою та цільовим об'єктом:</p>
+            <ul>
+                <li><b>Контракт сервісу <code>IVideoDownloader</code>:</b> Описує метод <code>DownloadVideo(string videoId)</code>.</li>
+                <li><b>Реальний сервіс <code>YouTubeDownloader</code>:</b> Важкий сервіс, який при ініціалізації встановлює дороге мережеве з'єднання.</li>
+                <li><b>Проксі <code>CachedYouTubeProxy</code>:</b> Реалізує <code>IVideoDownloader</code>, відкладає створення <code>YouTubeDownloader</code> до першої потреби та кешує результати.</li>
+                <li><b>Клієнт <code>Program</code>:</b> Працює через інтерфейс <code>IVideoDownloader</code> і не знає, що звертається до проксі.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Лінива ініціалізація (Virtual Proxy):</b>
+            <br>Конструктор <code>CachedYouTubeProxy</code> взагалі не створює реальний об'єкт. Створення відбувається лише всередині <code>DownloadVideo</code> за допомогою оператора C# <code>_service ??= new YouTubeDownloader();</code>. Якщо клієнт створив проксі, але жодного разу не викликав завантаження, важке з'єднання ніколи не буде встановлено.</p>
+
+            <p><b>Локальне кешування (Caching Proxy):</b>
+            <br>Колекція <code>HashSet&lt;string&gt; _cache</code> зберігає ідентифікатори вже завантажених відео. При повторному запиті того самого <code>videoId</code> виклик перехоплюється: реальний сервіс не навантажується мережевим запитом, а результат миттєво віддається з локального кешу.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Перший виклик завантаження</div>
+                Клієнт викликає <code>downloader.DownloadVideo("patterns")</code>. Проксі бачить, що <code>_service == null</code>, ініціалізує <code>YouTubeDownloader</code> (виводиться повідомлення про важке підключення), завантажує відео з мережі та додає його ID у кеш.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Другий виклик завантаження з тим самим ID</div>
+                Клієнт повторно викликає <code>downloader.DownloadVideo("patterns")</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Перехоплення запиту</div>
+                Проксі перевіряє умову <code>_cache.Contains(id)</code>, знаходить запис і миттєво виводить: <code>[Proxy] Video #patterns served from local cache!</code>. До реального сервісу виклик навіть не доходить.
+            </div>
+
+            <h6>4. У чому різниця між Proxy та Decorator?</h6>
+            <p>Хоча UML-діаграми патернів ідентичні (обидва огортають об'єкт із тим самим інтерфейсом):</p>
+            <ul>
+                <li><b>Decorator:</b> Додає <em>нову поведінку</em> та бізнес-можливості. Клієнт зазвичай сам збирає матрьошку декораторів.</li>
+                <li><b>Proxy:</b> Не змінює результат роботи і не додає нової бізнес-функціональності — він <b>контролює доступ</b>, оптимізує ресурси та захищає реальний об'єкт. Найчастіше проксі сам створює та керує життєвим циклом свого реального суб'єкта.</li>
+            </ul>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> оптимізація споживання ресурсів завдяки лінивому створенню; прозорий контроль прав доступу та кешування без змін у вихідному сервісі.</li>
+            <li><strong>Недоліки:</strong> невелике збільшення затримки виконання викликів через додатковий проміжний шар.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>

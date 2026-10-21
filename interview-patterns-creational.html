@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Породжувальні патерни GoF на C#</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --badge-creational-bg: #e0f2fe;
+            --badge-creational-text: #0369a1;
+            --analysis-bg: #f8fafc;
+            --analysis-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Головне навігаційне меню між сторінками сайту */
+        .site-nav {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .site-nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .site-nav a:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .site-nav a.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-list a:hover {
+            text-decoration: underline;
+        }
+
+        .pattern-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0f172a;
+        }
+
+        .top-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-creational { background: var(--badge-creational-bg); color: var(--badge-creational-text); }
+
+        h4 {
+            font-size: 1.15rem;
+            color: #334155;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        blockquote {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        ul, ol {
+            padding-left: 1.4rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        p > code, li > code {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.875em;
+        }
+
+        .code-analysis {
+            background: var(--analysis-bg);
+            border: 1px solid var(--analysis-border);
+            border-left: 5px solid #0284c7;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-analysis h5 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            color: #0369a1;
+        }
+
+        .code-analysis h6 {
+            margin-top: 1.25rem;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .step-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem 0.5rem; }
+            .pattern-card { padding: 1.25rem; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ВЕРХНЄ МЕНЮ МІЖ СТОРІНКАМИ -->
+    <nav class="site-nav">
+        <a href="interview-patterns-gof.html">← Головна (Питання-пастки)</a>
+        <a href="interview-patterns-creational.html" class="active">Породжувальні (Creational)</a>
+        <a href="interview-patterns-structural.html">Структурні (Structural)</a>
+        <a href="interview-patterns-behavioral.html">Поведінкові (Behavioral)</a>
+    </nav>
+
+    <header>
+        <h1>Породжувальні патерни GoF на C#</h1>
+        <p style="color: var(--text-muted);">Відповідають за гнучке й безпечне створення об'єктів без жорсткого зв'язування з конкретними класами</p>
+    </header>
+
+    <!-- ЗМІСТ СТОРІНКИ -->
+    <nav class="toc-card" id="toc">
+        <h2>Швидкий перехід по розділу</h2>
+        <ul class="toc-list">
+            <li><a href="#p1">1. Singleton* (Одинак)</a></li>
+            <li><a href="#p2">2. Factory Method* (Фабричний метод)</a></li>
+            <li><a href="#p3">3. Abstract Factory* (Абстрактна фабрика)</a></li>
+            <li><a href="#p4">4. Builder* (Будівельник)</a></li>
+            <li><a href="#p5">5. Prototype (Прототип)</a></li>
+        </ul>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+            * Патерни з зірочкою містять розгорнутий аналіз архітектури та покрокове виконання коду.
+        </p>
+    </nav>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 1: SINGLETON                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p1">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 1: Singleton (Одинак)*</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Гарантує, що клас має <b>лише один екземпляр</b> у межах усієї програми, і надає глобальну точку доступу до цього екземпляра.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібен єдиний спільний ресурс: підключення до апаратного пристрою, кеш, пул з'єднань або конфігурація.</li>
+            <li>Необхідно суворо виключити можливість створення кількох екземплярів об'єкта.</li>
+        </ul>
+
+        <blockquote>
+            <b>Примітка для .NET:</b> У сучасному C# замість ручного написання канонічного класу найчастіше використовують механізм DI-контейнера: <code>services.AddSingleton&lt;IConfigurationManager, ConfigurationManager&gt;()</code>. Проте розуміння внутрішнього влаштування Singleton на рівні CLR обов'язкове на технічних інтерв'ю.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 'sealed' prevents derivation, which could break the singleton invariant
+public sealed class ConfigurationManager
+{
+    // Lazy&lt;T&gt; ensures thread-safety and creates the instance on first access
+    private static readonly Lazy&lt;ConfigurationManager&gt; _instance = 
+        new Lazy&lt;ConfigurationManager&gt;(() =&gt; new ConfigurationManager());
+
+    // 1. Private constructor prevents instantiation via 'new ConfigurationManager()' from outside
+    private ConfigurationManager()
+    {
+        Console.WriteLine("--&gt; Initializing ConfigurationManager (happens only once).");
+    }
+
+    // 2. Global access point to the singleton instance
+    public static ConfigurationManager Instance =&gt; _instance.Value;
+
+    // Service state
+    public string AppName { get; set; } = "MyApplication";
+
+    public void PrintSettings()
+    {
+        Console.WriteLine($"App Name: {AppName}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // First access: instance is created lazily
+        ConfigurationManager config1 = ConfigurationManager.Instance;
+        config1.PrintSettings();
+
+        // Mutating state via the first reference
+        config1.AppName = "UpdatedApplication";
+
+        // Second access: uses already created instance
+        ConfigurationManager config2 = ConfigurationManager.Instance;
+        config2.PrintSettings();
+
+        // Reference equality check
+        bool areSame = ReferenceEquals(config1, config2);
+        Console.WriteLine($"Are instances equal? {areSame}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+--&gt; Initializing ConfigurationManager (happens only once).
+App Name: MyApplication
+App Name: UpdatedApplication
+Are instances equal? True
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн будується на чотирьох ключових механізмах платформи .NET:</p>
+            <ul>
+                <li>Модифікатор <code>sealed</code> забороняє успадкування.</li>
+                <li>Приватний конструктор <code>private ConfigurationManager()</code> блокує пряме створення через <code>new</code>.</li>
+                <li>Статичне поле <code>Lazy&lt;ConfigurationManager&gt;</code> забезпечує ліниве створення та потокобезпечність (thread-safety).</li>
+                <li>Публічна статична властивість <code>Instance</code> є єдиною точкою доступу.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Модифікатор <code>sealed</code>:</b> Якщо дозволити нащадкам успадковувати цей клас, клас-нащадок зміг би викликати конструктор базового класу через <code>base()</code>, що призвело б до створення другого екземпляра і зламало б логіку Одинака.</p>
+
+            <p><b>Поле <code>Lazy&lt;ConfigurationManager&gt; _instance</code>:</b> Найбільш надійний та ідіоматичний підхід у .NET. За замовчуванням <code>Lazy&lt;T&gt;</code> використовує режим блокування <code>LazyThreadSafetyMode.ExecutionAndPublication</code>. Це гарантує: навіть якщо 100 потоків одночасно звернуться до властивості в першу мілісекунду, конструктор виконається лише <b>один-єдиний раз</b> без написання громіздкого блоку подвійної перевірки (Double-Checked Locking).</p>
+
+            <p><b>Приватний конструктор:</b> Робить неможливим виклик <code>new ConfigurationManager()</code> ззовні. Створити об'єкт дозволено лише лямбда-виразу всередині ініціалізатора <code>Lazy</code>.</p>
+
+            <p><b>Властивість <code>Instance</code>:</b> Повертає значення <code>_instance.Value</code>. Поки до цієї властивості ніхто не звертається, конструктор класу навіть не викликається, заощаджуючи оперативну пам'ять процесу.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Перше звернення через <code>config1</code></div>
+                Викликається <code>ConfigurationManager.Instance</code>. Внутрішній об'єкт <code>Lazy</code> ще не ініціалізований, тому запускається фабричний делегат: друкується <code>"--&gt; Initializing..."</code> і створюється об'єкт. Метод <code>config1.PrintSettings()</code> виводить дефолтне ім'я <code>"MyApplication"</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Зміна стану</div>
+                Рядок <code>config1.AppName = "UpdatedApplication"</code> модифікує значення властивості в єдиному створеному екземплярі на купі (heap).
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Друге звернення через <code>config2</code></div>
+                Виклик <code>ConfigurationManager.Instance</code> повертає вже створений раніше екземпляр. Конструктор більше <b>не викликається</b>. Метод <code>PrintSettings()</code> підтверджує оновлені дані: <code>"UpdatedApplication"</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 4: Перевірка адреси посилань</div>
+                Функція <code>ReferenceEquals(config1, config2)</code> перевіряє фізичні адреси вказівників у керованій пам'яті. Вона повертає <code>True</code>, підтверджуючи, що обидві змінні посилаються на один і той самий об'єкт.
+            </div>
+
+            <h6>4. У чому головна суть патерну?</h6>
+            <p>Singleton централізує спільний стан програми та усуває хаос багаторазового створення ресурсномістких сервісів. Завдяки <code>Lazy&lt;T&gt;</code> досягається максимальна продуктивність читання без накладних витрат на постійні блокування <code>lock</code> при повторних викликах.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> гарантована наявність лише одного об'єкта; економія ресурсів процесора та пам'яті.</li>
+            <li><strong>Недоліки:</strong> порушує SRP; ускладнює unit-тестування через наявність спільного мутабельного стану.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 2: FACTORY METHOD                                 -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p2">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 2: Factory Method (Фабричний метод)*</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає спільний інтерфейс для створення об'єкта в базовому класі, але <b>делегує вибір конкретного типу створюваного продукту класам-нащадкам</b> за допомогою поліморфізму.</p>
+
+        <blockquote>
+            <b>Важливий нюанс для інтерв'ю:</b> Не плутайте Factory Method з ідіомою «Проста фабрика» (клас зі статичним методом та конструкцією <code>switch/case</code>). Класичний патерн GoF будується саме на <b>успадкуванні класів-творців</b>, що дозволяє підтримувати <em>Open/Closed Principle</em> без модифікації базового класу.
+        </blockquote>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Заздалегідь невідомо, які саме типи продуктів знадобляться системі в майбутньому.</li>
+            <li>Необхідно надати розробникам бібліотеки чи фреймворку можливість розширювати її новими типами сутностей.</li>
+        </ul>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. General product contract
+public interface INotification
+{
+    void Send(string message);
+}
+
+// 2. Concrete products
+public class EmailNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine($"[Email] Sent email: \"{message}\"");
+    }
+}
+
+public class SmsNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine($"[SMS] Sent text message: \"{message}\"");
+    }
+}
+
+// 3. Base creator class
+public abstract class NotificationService
+{
+    // The Factory Method
+    public abstract INotification CreateNotification();
+
+    public void SendAlert(string message)
+    {
+        INotification notification = CreateNotification();
+        notification.Send(message);
+    }
+}
+
+// 4. Concrete creators
+public class EmailNotificationService : NotificationService
+{
+    public override INotification CreateNotification()
+    {
+        return new EmailNotification();
+    }
+}
+
+public class SmsNotificationService : NotificationService
+{
+    public override INotification CreateNotification()
+    {
+        return new SmsNotification();
+    }
+}
+
+// 5. Client usage
+class Program
+{
+    static void Main()
+    {
+        NotificationService service;
+        string notificationType = "email";
+
+        if (notificationType == "email")
+            service = new EmailNotificationService();
+        else
+            service = new SmsNotificationService();
+
+        service.SendAlert("Server restarted!");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[Email] Sent email: "Server restarted!"
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн складається з двох паралельних гілок ієрархії:</p>
+            <ul>
+                <li><b>Гілка продуктів:</b> Інтерфейс <code>INotification</code> та його реалізації: <code>EmailNotification</code> і <code>SmsNotification</code>.</li>
+                <li><b>Гілка творців (Creators):</b> Абстрактний клас <code>NotificationService</code> і підкласи <code>EmailNotificationService</code> та <code>SmsNotificationService</code>.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Контракт продукту <code>INotification</code>:</b> Визначає метод <code>Send(string message)</code>. Кожен конкретний канал сповіщень зобов'язаний реалізувати цю поведінку.</p>
+
+            <p><b>Базовий сервіс <code>NotificationService</code>:</b>
+            <br>Метод <code>public abstract INotification CreateNotification();</code> позначений як <code>abstract</code> — базовий клас не знає, як саме конструюється об'єкт.
+            <br>Метод <code>SendAlert(string message)</code> задає загальний каркас логіки: викликає фабричний метод <code>CreateNotification()</code>, отримує екземпляр продукту й викликає <code>Send()</code>. Базовий клас ізольований від конкретних конструкторів.</p>
+
+            <p><b>Підкласи-творці:</b> <code>EmailNotificationService</code> перевизначає метод через <code>override</code> та повертає <code>new EmailNotification()</code>. Аналогічно <code>SmsNotificationService</code> повертає <code>new SmsNotification()</code>.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Вибір творця</div>
+                Змінна <code>notificationType</code> дорівнює <code>"email"</code>. Код інстанціює <code>service = new EmailNotificationService()</code> та зберігає посилання в змінній базового типу <code>NotificationService</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Виклик високорівневого методу</div>
+                Викликається метод <code>service.SendAlert("Server restarted!")</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Поліморфний виклик фабричного методу</div>
+                Всередині <code>SendAlert</code> викликається <code>CreateNotification()</code>. Оскільки фактичним типом об'єкта є <code>EmailNotificationService</code>, за таблицею віртуальних методів викликається саме його перевизначений метод, який повертає <code>EmailNotification</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 4: Виконання дії продукту</div>
+                Об'єкт сповіщення викликає метод <code>Send(...)</code>, друкуючи в консоль: <code>[Email] Sent email: "Server restarted!"</code>.
+            </div>
+
+            <h6>4. У чому перевага над звичайним <code>switch</code>?</h6>
+            <p>Якщо необхідно додати новий тип сповіщень (наприклад, <b>Telegram</b>), не потрібно змінювати код базового класу <code>NotificationService</code>. Достатньо лише створити два нових незалежних класи:</p>
+            <ul>
+                <li><code>public class TelegramNotification : INotification</code></li>
+                <li><code>public class TelegramNotificationService : NotificationService</code></li>
+            </ul>
+            <p>Існуючий код залишається повністю закритим для модифікації, але відкритим для розширення (принцип OCP).</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває жорстке зачеплення (Loose Coupling); дозволяє легко додавати нові типи продуктів.</li>
+            <li><strong>Недоліки:</strong> призводить до розростання ієрархії класів через створення підкласу-фабрики під кожен новий продукт.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 3: ABSTRACT FACTORY                               -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p3">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 3: Abstract Factory (Абстрактна фабрика)*</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Надає інтерфейс для створення <b>цілих сімейств взаємопов'язаних або взаємозалежних об'єктів</b>, не прив'язуючись до їхніх конкретних класів.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Система повинна підтримувати кілька платформ, тем або рушіїв (наприклад, Windows, macOS, Linux).</li>
+            <li>Об'єкти всередині одного сімейства <b>обов'язково мають бути сумісними</b> і не повинні випадково змішуватися.</li>
+        </ul>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Abstract products
+public interface IButton
+{
+    void Render();
+}
+
+public interface ICheckbox
+{
+    void Render();
+}
+
+// 2. Concrete products for Windows
+public class WindowsButton : IButton
+{
+    public void Render() => Console.WriteLine("Rendering button in Windows style.");
+}
+
+public class WindowsCheckbox : ICheckbox
+{
+    public void Render() => Console.WriteLine("Rendering checkbox in Windows style.");
+}
+
+// 3. Concrete products for macOS
+public class MacButton : IButton
+{
+    public void Render() => Console.WriteLine("Rendering button in macOS style.");
+}
+
+public class MacCheckbox : ICheckbox
+{
+    public void Render() => Console.WriteLine("Rendering checkbox in macOS style.");
+}
+
+// 4. Abstract factory contract
+public interface IGuiFactory
+{
+    IButton CreateButton();
+
+    ICheckbox CreateCheckbox();
+}
+
+// 5. Concrete factories
+public class WindowsFactory : IGuiFactory
+{
+    public IButton CreateButton() => new WindowsButton();
+
+    public ICheckbox CreateCheckbox() => new WindowsCheckbox();
+}
+
+public class MacFactory : IGuiFactory
+{
+    public IButton CreateButton() => new MacButton();
+
+    public ICheckbox CreateCheckbox() => new MacCheckbox();
+}
+
+// 6. Client application
+public class Application
+{
+    private readonly IButton _button;
+    private readonly ICheckbox _checkbox;
+
+    public Application(IGuiFactory factory)
+    {
+        _button = factory.CreateButton();
+        _checkbox = factory.CreateCheckbox();
+    }
+
+    public void Paint()
+    {
+        _button.Render();
+        _checkbox.Render();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        string osName = "mac";
+        IGuiFactory factory = osName == "win" ? new WindowsFactory() : new MacFactory();
+
+        var app = new Application(factory);
+        app.Paint();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Rendering button in macOS style.
+Rendering checkbox in macOS style.
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>У патерні виділяються дві взаємопов'язані частини:</p>
+            <ul>
+                <li><b>Продукти:</b> Інтерфейси <code>IButton</code> та <code>ICheckbox</code> із конкретними реалізаціями під кожну платформу.</li>
+                <li><b>Фабрики:</b> Інтерфейс <code>IGuiFactory</code> та його конкретні реалізації <code>WindowsFactory</code> і <code>MacFactory</code>.</li>
+                <li><b>Клієнт <code>Application</code>:</b> Працює виключно через інтерфейси й ніколи не посилається на конкретні класи платформ.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Контракти продуктів:</b> Визначають операції над UI-елементами (метод <code>Render()</code>). Клієнтський код не знає нічого про конкретну розмітку чи стиль відмальовування.</p>
+
+            <p><b>Інтерфейс <code>IGuiFactory</code>:</b> Описує контракт на створення повної лінійки сумісних елементів (кнопка + чекбокс). Фабрика гарантує, що неможливо отримати кнопку від однієї ОС, а чекбокс — від іншої.</p>
+
+            <p><b>Клас <code>Application</code>:</b> Отримує фабрику через конструктор (впровадження залежностей). Він викликає методи створення та делегує малювання елементам:</p>
+            <pre style="margin: 0.5rem 0;"><code>_button = factory.CreateButton();
+_checkbox = factory.CreateCheckbox();</code></pre>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Вибір фабрики платформи</div>
+                Умова <code>osName == "win"</code> повертає <code>MacFactory</code>. Посилання зберігається в змінній інтерфейсного типу <code>IGuiFactory</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Передача фабрики в клієнтський код</div>
+                Викликається <code>new Application(factory)</code>. Конструктор створює взаємосумісну пару: <code>MacButton</code> та <code>MacCheckbox</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Рендеринг інтерфейсу</div>
+                Виклик <code>app.Paint()</code> викликає <code>.Render()</code> для кожного елемента:
+                <br><code>Rendering button in macOS style.</code>
+                <br><code>Rendering checkbox in macOS style.</code>
+            </div>
+
+            <h6>4. У чому головна користь патерну?</h6>
+            <p>Патерн гарантує 100% сумісність продуктів. Клієнтський код захищений від випадкового змішування компонентів різних стилів на етапі компіляції.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> гарантована сумісність усіх створюваних сутностей родини; ізоляція клієнта від конкретних реалізацій.</li>
+            <li><strong>Недоліки:</strong> складно додавати нові типи продуктів у родину (вимагає змін у інтерфейсі <code>IGuiFactory</code> та всіх його реалізаціях).</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 4: BUILDER                                        -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p4">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 4: Builder (Будівельник)*</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Відокремлює процес конструювання складного об'єкта від його представлення, дозволяючи <b>покроково створювати різні конфігурації</b> за допомогою зрозумілого ланцюжкового виклику методів (Fluent API).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Конструктор класу розрісся до 8+ параметрів, більшість з яких опціональні («Телескопічний конструктор»).</li>
+            <li>Перед поверненням об'єкта клієнту потрібно провести сувору валідацію цілісності стану.</li>
+        </ul>
+
+        <blockquote>
+            <b>Де зустрічається в .NET:</b> <code>StringBuilder</code>, <code>WebApplication.CreateBuilder()</code>, налаштування маршрутизації в <code>Program.cs</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Complex product
+public class Computer
+{
+    public string CPU { get; set; }
+    public string RAM { get; set; }
+    public string Storage { get; set; }
+    public string GPU { get; set; }
+    public bool HasWaterCooling { get; set; }
+
+    public void DisplayInfo()
+    {
+        Console.WriteLine("PC Configuration:");
+        Console.WriteLine($" - CPU: {CPU}");
+        Console.WriteLine($" - RAM: {RAM}");
+        Console.WriteLine($" - Storage: {Storage}");
+        Console.WriteLine($" - GPU: {GPU ?? "Integrated"}");
+        Console.WriteLine($" - Water Cooling: {(HasWaterCooling ? "Yes" : "No")}\n");
+    }
+}
+
+// 2. Fluent Builder
+public class ComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public ComputerBuilder SetCPU(string cpu)
+    {
+        _computer.CPU = cpu;
+        return this;
+    }
+
+    public ComputerBuilder SetRAM(string ram)
+    {
+        _computer.RAM = ram;
+        return this;
+    }
+
+    public ComputerBuilder SetStorage(string storage)
+    {
+        _computer.Storage = storage;
+        return this;
+    }
+
+    public ComputerBuilder SetGPU(string gpu)
+    {
+        _computer.GPU = gpu;
+        return this;
+    }
+
+    public ComputerBuilder EnableWaterCooling()
+    {
+        _computer.HasWaterCooling = true;
+        return this;
+    }
+
+    public Computer Build()
+    {
+        if (string.IsNullOrEmpty(_computer.CPU) || string.IsNullOrEmpty(_computer.RAM))
+        {
+            throw new InvalidOperationException("CPU and RAM are required!");
+        }
+
+        Computer result = _computer;
+        _computer = new Computer();
+        return result;
+    }
+}
+
+// 3. Director (optional helper)
+public class ComputerDirector
+{
+    public void BuildGamingPC(ComputerBuilder builder)
+    {
+        builder.SetCPU("Intel Core i9")
+               .SetRAM("32GB DDR5")
+               .SetStorage("2TB NVMe SSD")
+               .SetGPU("NVIDIA RTX 4090")
+               .EnableWaterCooling();
+    }
+
+    public void BuildOfficePC(ComputerBuilder builder)
+    {
+        builder.SetCPU("Intel Core i3")
+               .SetRAM("8GB DDR4")
+               .SetStorage("512GB SSD");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var builder = new ComputerBuilder();
+
+        // Custom PC via Fluent API
+        Computer customPC = builder
+            .SetCPU("AMD Ryzen 7")
+            .SetRAM("16GB DDR5")
+            .SetStorage("1TB SSD")
+            .SetGPU("AMD Radeon RX 7800")
+            .Build();
+
+        customPC.DisplayInfo();
+
+        // Standard build via Director
+        var director = new ComputerDirector();
+        director.BuildGamingPC(builder);
+        Computer gamingPC = builder.Build();
+        gamingPC.DisplayInfo();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+PC Configuration:
+ - CPU: AMD Ryzen 7
+ - RAM: 16GB DDR5
+ - Storage: 1TB SSD
+ - GPU: AMD Radeon RX 7800
+ - Water Cooling: No
+
+PC Configuration:
+ - CPU: Intel Core i9
+ - RAM: 32GB DDR5
+ - Storage: 2TB NVMe SSD
+ - GPU: NVIDIA RTX 4090
+ - Water Cooling: Yes
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн розділяє обов'язки між трьома сутностями:</p>
+            <ul>
+                <li><b>Продукт <code>Computer</code>:</b> Складний об'єкт із багатьма характеристиками.</li>
+                <li><b>Будівельник <code>ComputerBuilder</code>:</b> Надає методи покрокового заповнення параметрів і повертає <code>this</code>.</li>
+                <li><b>Директор <code>ComputerDirector</code>:</b> Інкапсулює типові шаблони збирання готових продуктів.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Концепція Fluent API:</b> Кожен конфігураційний метод закінчується інструкцією <code>return this;</code>. Завдяки цьому виклики вибудовуються в зручний ланцюжок: <code>builder.SetCPU(...).SetRAM(...).Build()</code>.</p>
+
+            <p><b>Метод <code>Build()</code>:</b> Фінальна точка створення. Перевіряє наявність обов'язкових полів (CPU та RAM). Якщо умови порушено, викидається виняток <code>InvalidOperationException</code>. Обнулення <code>_computer = new Computer();</code> готує будівельник до наступного збирання.</p>
+
+            <p><b>Клас <code>ComputerDirector</code>:</b> Допоміжний клас для позбавлення дублювання коду, коли потрібні стандартизовані пресети конфігурацій (Office PC, Gaming PC).</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Кастомне збирання через Fluent API</div>
+                Клієнт передає потрібні компоненти по черзі. Метод <code>Build()</code> валідує поля та повертає сконфігурований екземпляр.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Типове збирання через Директора</div>
+                Директор викликає попередньо налаштований набір викликів на тому самому екземплярі будівельника.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Отримання другого екземпляра</div>
+                Виклик <code>builder.Build()</code> повертає топовий ігровий ПК. Результати підтверджують повну ізоляцію двох створених машин.
+            </div>
+
+            <h6>4. У чому головна користь патерну?</h6>
+            <p>Будівельник усуває помилки під час передачі аргументів однакових типів у довгий конструктор та гарантує, що неможливо отримати некоректно сконфігурований об'єкт.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> покрокове конструювання; читабельний Fluent-синтаксис; централізована валідація в <code>Build()</code>.</li>
+            <li><strong>Недоліки:</strong> створення додаткового класу будівельника збільшує загальний обсяг коду.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 5: PROTOTYPE                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p5">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 5: Prototype (Прототип)</h3>
+                <span class="badge badge-creational">Породжувальний (Creational)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє <b>копіювати існуючі об'єкти</b>, не прив'язуючись до деталей їхніх конкретних класів і без повторного виклику їхніх конструкторів.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Створення об'єкта через <code>new</code> є ресурсомістким (важкі обчислення, запити в БД).</li>
+            <li>Необхідно створювати копії об'єктів, тип яких відомий клієнту лише через інтерфейс.</li>
+        </ul>
+
+        <blockquote>
+            <b>Порада для C#:</b> Інтерфейс <code>ICloneable</code> вважається застарілим через нетипізованість (<code>object</code>). Рекомендується оголошувати типізований інтерфейс <code>IPrototype&lt;T&gt;</code> або застосовувати <code>record with { ... }</code> у сучасному C#.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+public interface IPrototype&lt;T&gt;
+{
+    T Clone();
+}
+
+public class Author
+{
+    public string Name { get; set; }
+
+    public Author(string name) => Name = name;
+}
+
+public class Document : IPrototype&lt;Document&gt;
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public Author Author { get; set; }
+
+    public Document(string title, string content, Author author)
+    {
+        Title = title;
+        Content = content;
+        Author = author;
+    }
+
+    public Document Clone()
+    {
+        Document clone = (Document)this.MemberwiseClone();
+        // Deep copy of reference type
+        clone.Author = new Author(this.Author.Name);
+        return clone;
+    }
+
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Document: '{Title}', Author: {Author.Name}, Content: '{Content}'");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var originalDoc = new Document("Template", "Standard content...", new Author("Alex"));
+        Document clonedDoc = originalDoc.Clone();
+
+        clonedDoc.Title = "Q3 Report";
+        clonedDoc.Author.Name = "Iryna";
+
+        Console.WriteLine("Clone:");
+        clonedDoc.DisplayInfo();
+
+        Console.WriteLine("Original:");
+        originalDoc.DisplayInfo();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Clone:
+Document: 'Q3 Report', Author: Iryna, Content: 'Standard content...'
+Original:
+Document: 'Template', Author: Alex, Content: 'Standard content...'
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> швидке дублювання об'єктів у рантаймі; уникнення повторної важкої ініціалізації.</li>
+            <li><strong>Недоліки:</strong> глибоке копіювання складних об'єктів із циклічними посиланнями вимагає додаткових зусиль.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>

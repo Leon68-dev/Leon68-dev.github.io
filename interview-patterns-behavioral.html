@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поведінкові патерни GoF на C#</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --code-bg: #1e3a8a;
+            --code-text: #fde047;
+            --badge-behavioral-bg: #dcfce7;
+            --badge-behavioral-text: #15803d;
+            --analysis-bg: #f8fafc;
+            --analysis-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Головне навігаційне меню між сторінками сайту */
+        .site-nav {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .site-nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .site-nav a:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .site-nav a.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .toc-card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-list a:hover {
+            text-decoration: underline;
+        }
+
+        .pattern-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0f172a;
+        }
+
+        .top-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-behavioral { background: var(--badge-behavioral-bg); color: var(--badge-behavioral-text); }
+
+        h4 {
+            font-size: 1.15rem;
+            color: #334155;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        blockquote {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        ul, ol {
+            padding-left: 1.4rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        p > code, li > code {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.875em;
+        }
+
+        .code-analysis {
+            background: var(--analysis-bg);
+            border: 1px solid var(--analysis-border);
+            border-left: 5px solid #16a34a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-analysis h5 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            color: #15803d;
+        }
+
+        .code-analysis h6 {
+            margin-top: 1.25rem;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .step-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem 0.5rem; }
+            .pattern-card { padding: 1.25rem; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ВЕРХНЄ МЕНЮ МІЖ СТОРІНКАМИ -->
+    <nav class="site-nav">
+        <a href="interview-patterns-gof.html">← Головна (Питання-пастки)</a>
+        <a href="interview-patterns-creational.html">Породжувальні (Creational)</a>
+        <a href="interview-patterns-structural.html">Структурні (Structural)</a>
+        <a href="interview-patterns-behavioral.html" class="active">Поведінкові (Behavioral)</a>
+    </nav>
+
+    <header>
+        <h1>Поведінкові патерни GoF на C#</h1>
+        <p style="color: var(--text-muted);">Відповідають за ефективну комунікацію, розподіл обов'язків та взаємодію між об'єктами</p>
+    </header>
+
+    <!-- ЗМІСТ СТОРІНКИ -->
+    <nav class="toc-card" id="toc">
+        <h2>Швидкий перехід по розділу</h2>
+        <ul class="toc-list">
+            <li><a href="#p13">13. Chain of Responsibility*</a></li>
+            <li><a href="#p14">14. Command* (Команда)</a></li>
+            <li><a href="#p15">15. Iterator (Ітератор)</a></li>
+            <li><a href="#p16">16. Mediator* (Посередник)</a></li>
+            <li><a href="#p17">17. Memento (Знімок)</a></li>
+            <li><a href="#p18">18. Observer* (Спостерігач)</a></li>
+            <li><a href="#p19">19. State (Стан)</a></li>
+            <li><a href="#p20">20. Strategy* (Стратегія)</a></li>
+            <li><a href="#p21">21. Template Method*</a></li>
+            <li><a href="#p22">22. Visitor (Відвідувач)</a></li>
+            <li><a href="#p23">23. Interpreter (Інтерпретатор)</a></li>
+        </ul>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+            * Патерни з зірочкою містять розгорнутий аналіз архітектури та покрокове виконання коду.
+        </p>
+    </nav>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 13: CHAIN OF RESPONSIBILITY                       -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p13">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 13: Chain of Responsibility (Ланцюжок обов'язків)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє передавати запити послідовно через <b>ланцюжок обробників</b>. Кожен обробник вирішує: обробити запит самостійно, передати його далі наступному чи перервати виконання.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Запит повинен пройти серію послідовних незалежних перевірок (автентифікація, ліміти запитів Rate Limiting, валідація, кешування).</li>
+            <li>Склад і точний порядок обробників повинні гнучко конфігуруватися під час запуску програми.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Конвеєр Middleware в ASP.NET Core (<code>app.UseAuthentication()</code>, <code>app.UseAuthorization()</code> тощо), ланцюжки <code>DelegatingHandler</code> у <code>HttpClientFactory</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Request model
+public class SupportTicket
+{
+    public string Description { get; set; }
+    public int SeverityLevel { get; set; }
+
+    public SupportTicket(string desc, int level)
+    {
+        Description = desc;
+        SeverityLevel = level;
+    }
+}
+
+// 2. Base handler defining the chain structure
+public abstract class BaseHandler
+{
+    private BaseHandler _next;
+
+    public BaseHandler SetNext(BaseHandler next)
+    {
+        _next = next;
+        return next;
+    }
+
+    public virtual void Handle(SupportTicket ticket)
+    {
+        if (_next != null)
+            _next.Handle(ticket);
+        else
+            Console.WriteLine($"[!] Unable to handle: {ticket.Description}");
+    }
+}
+
+// 3. Concrete handler: automated bot
+public class BotHandler : BaseHandler
+{
+    public override void Handle(SupportTicket ticket)
+    {
+        if (ticket.SeverityLevel == 1)
+            Console.WriteLine($"[Bot] Resolved: {ticket.Description}");
+        else
+            base.Handle(ticket);
+    }
+}
+
+// 4. Concrete handler: support engineer
+public class EngineerHandler : BaseHandler
+{
+    public override void Handle(SupportTicket ticket)
+    {
+        if (ticket.SeverityLevel == 2)
+            Console.WriteLine($"[Engineer] Fixed bug: {ticket.Description}");
+        else
+            base.Handle(ticket);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var bot = new BotHandler();
+        var engineer = new EngineerHandler();
+        bot.SetNext(engineer);
+
+        bot.Handle(new SupportTicket("Forgot password", 1));
+        bot.Handle(new SupportTicket("Database crashed", 2));
+    }
+}
+
+/* Результат виконання: **************************************/
+
+[Bot] Resolved: Forgot password
+[Engineer] Fixed bug: Database crashed
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн будується на зв'язаному списку обробників запиту:</p>
+            <ul>
+                <li><b>Модель запиту <code>SupportTicket</code>:</b> Несе дані про задачу та її рівень складності (<code>SeverityLevel</code>).</li>
+                <li><b>Базовий обробник <code>BaseHandler</code>:</b> Зберігає посилання на наступну ланку (<code>_next</code>) та реалізує перехід по ланцюжку.</li>
+                <li><b>Конкретні обробники:</b> <code>BotHandler</code> (вирішує прості тікети рівня 1) та <code>EngineerHandler</code> (вирішує критичні баги рівня 2).</li>
+                <li><b>Клієнт <code>Program</code>:</b> Формує послідовність зв'язків і надсилає запит лише у вхідну точку ланцюжка.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Зв'язування ланок (<code>SetNext</code>):</b>
+            <br>Метод повертає переданий наступний обробник (<code>return next;</code>), що дозволяє зв'язувати ланцюжки лаконічно: <code>first.SetNext(second).SetNext(third)</code>.</p>
+
+            <p><b>Логіка делегування <code>base.Handle(ticket)</code>:</b> Якщо поточний обробник не може розв'язати проблему (наприклад, для бота прийшов критичний рівень 2), він викликає базовий метод <code>base.Handle()</code>, який автоматично перенаправляє тікет до <code>_next</code>.</p>
+
+            <p><b>Кінець ланцюжка:</b> Якщо жодна ланка не змогла обробити запит і <code>_next == null</code>, базовий обробник виводить повідомлення про неможливість обробки.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Побудова ланцюжка</div>
+                Створюються <code>bot</code> та <code>engineer</code>. Виклик <code>bot.SetNext(engineer)</code> призначає інженера наступником бота.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Обробка першого тікета (рівень 1)</div>
+                Викликається <code>bot.Handle("Forgot password", 1)</code>. Умова <code>SeverityLevel == 1</code> істинна, бот закриває питання сам: <code>[Bot] Resolved: Forgot password</code>. Запит далі не йде.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Обробка другого тікета (рівень 2)</div>
+                Викликається <code>bot.Handle("Database crashed", 2)</code>. Бот не вміє лагодити базу і передає тікет через <code>base.Handle()</code> до <code>engineer</code>. Інженер підтверджує рівень 2: <code>[Engineer] Fixed bug: Database crashed</code>.
+            </div>
+
+            <h6>4. У чому головна користь патерну?</h6>
+            <p>Відправник запиту повністю ізольований від кінцевих виконавців. Можна додавати нові перевірки (наприклад, <code>ManagerHandler</code>) або змінювати черговість фільтрів під час запуску програми без модифікації коду інших обробників.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> послаблює зв'язок між відправником і отримувачами (SRP); дозволяє гнучко налаштовувати конвеєр обробки.</li>
+            <li><strong>Недоліки:</strong> якщо ланцюжок налаштовано некоректно, запит може пройти до кінця і залишитися необробленим.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 14: COMMAND                                       -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p14">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 14: Command (Команда)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Перетворює запити або операції на <b>окремі самостійні об'єкти</b>. Це дає змогу передавати запити як параметри, ставити їх у чергу, логувати та реалізовувати <b>скасування дій (Undo/Redo)</b>.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібна підтримка відкату змін (Undo) та повтору дій (Redo) у текстових або графічних редакторах, фінансових операціях.</li>
+            <li>Потрібно планувати виконання операцій у часі (фонові черги задач Job Queues).</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Інтерфейс <code>ICommand</code> у WPF / .NET MAUI (зв'язування команд із кнопками в MVVM), архітектура CQRS через бібліотеку <code>MediatR</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// 1. Receiver: contains business logic
+public class BankAccount
+{
+    public decimal Balance { get; private set; }
+
+    public void Deposit(decimal amt) => Balance += amt;
+
+    public void Withdraw(decimal amt) => Balance -= amt;
+}
+
+// 2. Command interface
+public interface ICommand
+{
+    void Execute();
+
+    void Undo();
+}
+
+// 3. Concrete Command
+public class DepositCommand : ICommand
+{
+    private readonly BankAccount _acc;
+    private readonly decimal _amt;
+
+    public DepositCommand(BankAccount acc, decimal amt)
+    {
+        _acc = acc;
+        _amt = amt;
+    }
+
+    public void Execute() => _acc.Deposit(_amt);
+
+    public void Undo() => _acc.Withdraw(_amt);
+}
+
+// 4. Invoker: tracks execution history for undo
+public class TransactionManager
+{
+    private readonly Stack&lt;ICommand&gt; _history = new();
+
+    public void Execute(ICommand cmd)
+    {
+        cmd.Execute();
+        _history.Push(cmd);
+    }
+
+    public void Undo()
+    {
+        if (_history.Count &gt; 0)
+            _history.Pop().Undo();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var acc = new BankAccount();
+        var manager = new TransactionManager();
+
+        manager.Execute(new DepositCommand(acc, 500m));
+        Console.WriteLine($"Balance: {acc.Balance:C}");
+
+        manager.Undo();
+        Console.WriteLine($"Balance after Undo: {acc.Balance:C}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Balance: 500,00 ₴
+Balance after Undo: 0,00 ₴
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн складається з чотирьох ключових елементів:</p>
+            <ul>
+                <li><b>Одержувач (Receiver) <code>BankAccount</code>:</b> Знає, як реально змінювати баланс (методи <code>Deposit</code> і <code>Withdraw</code>).</li>
+                <li><b>Контракт команди <code>ICommand</code>:</b> Оголошує пряму дію <code>Execute()</code> та зворотну дію <code>Undo()</code>.</li>
+                <li><b>Конкретна команда <code>DepositCommand</code>:</b> Зв'язує одержувача з аргументом операції (сума поповнення).</li>
+                <li><b>Ініціатор (Invoker) <code>TransactionManager</code>:</b> Зберігає стек історії виконання та керує процесом відкату.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Інкапсуляція операції:</b> Клас <code>DepositCommand</code> запам'ятовує рахунок та суму в конструкторі. Коли викликається <code>Execute()</code>, команда виконує поповнення. Коли викликається <code>Undo()</code>, команда виконує протилежну операцію — списання тієї самої суми.</p>
+
+            <p><b>Стек історії в <code>TransactionManager</code>:</b>
+            <br>Використовується структура даних <code>Stack&lt;ICommand&gt;</code> (LIFO — Last In, First Out). При виклику <code>manager.Execute(cmd)</code> команда спочатку виконується, а потім поміщається на вершину стека через <code>_history.Push(cmd)</code>.</p>
+
+            <p><b>Метод <code>Undo()</code>:</b> Знімає останню команду з вершини стека через <code>_history.Pop()</code> та викликає її метод <code>Undo()</code>. Завдяки цьому можна реалізувати багаторівневий відкат десятків дій назад.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Виконання депозиту</div>
+                Створюється команда <code>new DepositCommand(acc, 500m)</code> і передається менеджеру. Рахунок збільшується на 500. Консоль виводить: <code>Balance: 500,00 ₴</code>. Команда потрапляє у стек.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Виклик Undo()</div>
+                Менеджер витягує команду зі стека і викликає її метод <code>Undo()</code>, який списує 500 назад.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Перевірка фінального стану</div>
+                Баланс знову стає нульовим: <code>Balance after Undo: 0,00 ₴</code>.
+            </div>
+
+            <h6>4. У чому перевага над прямим викликом методів?</h6>
+            <p>Якби ми викликали <code>acc.Deposit(500)</code> напряму, ми б втратили можливість автоматично скасувати цю дію, зберегти історію в файл або відкласти операцію на ніч для пакетної обробки. Команда перетворює метод на самостійні дані, якими можна маніпулювати як завгодно.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> елегантна підтримка операцій скасування (Undo) і повтору дій (Redo); відокремлення ініціатора виклику від виконавця.</li>
+            <li><strong>Недоліки:</strong> розмноження класів команд під кожну окрему бізнес-операцію.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 15: ITERATOR                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p15">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 15: Iterator (Ітератор)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дає можливість послідовно обходити елементи складної колекції, <b>не розкриваючи її внутрішнього влаштування</b> (масив, дерево, зв'язаний список).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно надати клієнту зручний спосіб навігації без надання прямого доступу до внутрішніх структур даних.</li>
+            <li>Потрібно підтримувати кілька різних варіантів обходу однієї колекції (прямий, зворотний, фільтрований).</li>
+        </ul>
+
+        <blockquote>
+            <b>У .NET:</b> Патерн глибоко інтегрований у мову C# через інтерфейси <code>IEnumerable&lt;T&gt;</code>, <code>IEnumerator&lt;T&gt;</code>, цикл <code>foreach</code> та ключове слово <code>yield return</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections;
+using System.Collections.Generic;
+
+// Collection supporting custom iteration
+public class Playlist : IEnumerable&lt;string&gt;
+{
+    private readonly List&lt;string&gt; _songs = new();
+
+    public void Add(string song) => _songs.Add(song);
+
+    public IEnumerator&lt;string&gt; GetEnumerator()
+    {
+        foreach (var s in _songs)
+            yield return s;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public IEnumerable&lt;string&gt; Backwards()
+    {
+        for (int i = _songs.Count - 1; i &gt;= 0; i--)
+            yield return _songs[i];
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var list = new Playlist { "Song 1", "Song 2", "Song 3" };
+
+        foreach (var song in list.Backwards())
+        {
+            Console.WriteLine(song);
+        }
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Song 3
+Song 2
+Song 1
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> спрощує роботу з колекціями; дозволяє паралельно робити кілька незалежних обходів одних даних.</li>
+            <li><strong>Недоліки:</strong> використання для простих масивів може бути надлишковим.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 16: MEDIATOR                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p16">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 16: Mediator (Посередник)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Змушує компоненти взаємодіяти не напряму між собою, а через <b>єдиний об'єкт-посередник</b>. Це перетворює заплутані зв'язки «багато-до-багатьох» ($M \times N$) на прості зв'язки «один-до-багатьох» ($1 \times N$).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Між класами інтерфейсу або сервісами виникла складна «павутина» взаємних посилань і подій.</li>
+            <li>Потрібно повторно використовувати компоненти форми або бізнес-шару в різних сценаріях, не прив'язуючи їх намертво до сусідів.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Бібліотека <code>MediatR</code> для розділення контролерів API та обробників доменної логіки за принципом CQRS.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Mediator contract
+public interface IMediator
+{
+    void Notify(object sender, string ev);
+}
+
+// 2. Colleague 1: Button
+public class Button
+{
+    private IMediator _m;
+    public bool IsEnabled { get; set; }
+
+    public void SetMediator(IMediator m) => _m = m;
+}
+
+// 3. Colleague 2: Checkbox
+public class Checkbox
+{
+    private IMediator _m;
+    public bool Checked { get; private set; }
+
+    public void SetMediator(IMediator m) => _m = m;
+
+    public void Toggle()
+    {
+        Checked = !Checked;
+        _m?.Notify(this, "toggle");
+    }
+}
+
+// 4. Concrete Mediator coordinating UI components
+public class DialogMediator : IMediator
+{
+    private readonly Button _btn;
+    private readonly Checkbox _cb;
+
+    public DialogMediator(Button btn, Checkbox cb)
+    {
+        _btn = btn;
+        _btn.SetMediator(this);
+        _cb = cb;
+        _cb.SetMediator(this);
+    }
+
+    public void Notify(object sender, string ev)
+    {
+        if (ev == "toggle")
+            _btn.IsEnabled = _cb.Checked;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var button = new Button();
+        var checkbox = new Checkbox();
+        var mediator = new DialogMediator(button, checkbox);
+
+        Console.WriteLine("Initial state:");
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}\n");
+
+        Console.WriteLine("Toggle checkbox (user accepts terms):");
+        checkbox.Toggle();
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}\n");
+
+        Console.WriteLine("Toggle checkbox again:");
+        checkbox.Toggle();
+        Console.WriteLine($"Checkbox Checked: {checkbox.Checked}");
+        Console.WriteLine($"Button IsEnabled: {button.IsEnabled}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Initial state:
+Checkbox Checked: False
+Button IsEnabled: False
+
+Toggle checkbox (user accepts terms):
+Checkbox Checked: True
+Button IsEnabled: True
+
+Toggle checkbox again:
+Checkbox Checked: False
+Button IsEnabled: False
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн вибудовує зіркоподібну топологію комунікації:</p>
+            <ul>
+                <li><b>Контракт посередника <code>IMediator</code>:</b> Метод <code>Notify(object sender, string ev)</code>, через який надсилаються всі повідомлення про події.</li>
+                <li><b>Колеги (Colleagues):</b> <code>Button</code> і <code>Checkbox</code>. Вони взагалі не знають про існування один одного! Вони мають посилання лише на інтерфейс <code>IMediator</code>.</li>
+                <li><b>Конкретний посередник <code>DialogMediator</code>:</b> Зберігає прямі посилання на кнопку й чекбокс та містить усю логіку їхньої взаємодії.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Ізоляція компонентів:</b> У класі <code>Checkbox</code> у методі <code>Toggle()</code> немає рядка <code>_button.IsEnabled = true</code>. Чекбокс лише сповіщає: «у мене відбулася подія "toggle"» через <code>_m?.Notify(this, "toggle")</code>.</p>
+
+            <p><b>Централізована координація:</b> Метод <code>DialogMediator.Notify</code> аналізує, хто надіслав повідомлення і яка саме подія відбулася. Якщо це перемикання чекбокса, він встановлює доступність кнопки: <code>_btn.IsEnabled = _cb.Checked</code>.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Початковий стан</div>
+                Кнопка вимкнена (<code>IsEnabled = false</code>), чекбокс не позначений (<code>Checked = false</code>).
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Перше перемикання (Toggle)</div>
+                Користувач клікає чекбокс. Чекбокс змінює <code>Checked</code> на <code>true</code> і шле нотифікацію в <code>DialogMediator</code>. Посередник перехоплює подію та вмикає кнопку: <code>Button IsEnabled: True</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Повторне перемикання</div>
+                Користувач знімає галочку. Чекбокс інформує посередника, який синхронно вимикає кнопку: <code>Button IsEnabled: False</code>.
+            </div>
+
+            <h6>4. У чому саме полягає патерн Mediator?</h6>
+            <p>Без посередника форма з 10 елементами (кнопки, списки, поля вводу, чекбокси) перетворюється на хаос: кожен елемент повинен підписуватися на події інших дев'яти. Посередник забирає всю координаційну логіку на себе, роблячи UI-компоненти максимально простими та перевикористовуваними.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває хаос взаємних посилань (SRP); полегшує повторне використання окремих класів.</li>
+            <li><strong>Недоліки:</strong> з часом клас посередника може надмірно розростися й перетворитися на важкопідтримуваний <em>God Object</em>.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 17: MEMENTO                                       -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p17">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 17: Memento (Знімок)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє фіксувати та відновлювати минулий стан об'єкта, <b>не порушуючи його інкапсуляцію</b> та не розкриваючи приватні поля назовні.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно зберігати контрольні точки (checkpoints) гри чи документа для подальшого повернення назад.</li>
+            <li>Прямий доступ до полів об'єкта зламав би інкапсуляцію або внутрішні бізнес-правила.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Механізм відстеження змін у EF Core: <code>EntityEntry.OriginalValues</code> фіксує початковий знімок значень властивостей при зчитуванні з бази даних.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// Marker interface for snapshots
+public interface IMemento { }
+
+// Originator: stateful object
+public class Editor
+{
+    private string _text = "";
+
+    public void Type(string words) => _text += words;
+
+    public string Text => _text;
+
+    public IMemento Save() => new Memento(_text);
+
+    public void Restore(IMemento m)
+    {
+        if (m is Memento s)
+            _text = s.State;
+    }
+
+    // Private inner snapshot class protecting encapsulation
+    private class Memento : IMemento
+    {
+        public string State { get; }
+
+        public Memento(string state) => State = state;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var editor = new Editor();
+        var history = new Stack&lt;IMemento&gt;();
+
+        editor.Type("Version 1");
+        history.Push(editor.Save());
+
+        editor.Type(" + error text");
+        editor.Restore(history.Pop());
+        Console.WriteLine(editor.Text);
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Version 1
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> надійне збереження стану без розкриття приватних полів класу; простий інтерфейс відновлення.</li>
+            <li><strong>Недоліки:</strong> часте створення знімків важких об'єктів створює значне навантаження на оперативну пам'ять.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 18: OBSERVER                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p18">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 18: Observer (Спостерігач)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Створює механізм підписки, який дає змогу об'єктам <b>автоматично отримувати сповіщення</b> про зміну стану іншого суб'єкта, за яким вони спостерігають.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Зміна стану одного компонента вимагає синхронного оновлення багатьох інших, набір яких заздалегідь невідомий.</li>
+            <li>Побудова реактивних інтерфейсів (UI), моделей Publisher-Subscriber або обробки подій у реальному часі.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Ключове слово <code>event</code> та стандартні делегати C#, інтерфейс <code>INotifyPropertyChanged</code> у WPF/MAUI, інтерфейси <code>IObservable&lt;T&gt;</code> та <code>IObserver&lt;T&gt;</code> у бібліотеці Reactive Extensions (Rx.NET).
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// Subject: raises an event when its state changes
+public class Product
+{
+    private decimal _price;
+
+    // Idiomatic C# event-based Observer
+    public event Action&lt;decimal&gt; PriceChanged;
+
+    public decimal Price
+    {
+        get => _price;
+        set
+        {
+            if (_price != value)
+            {
+                _price = value;
+                PriceChanged?.Invoke(_price);
+            }
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var product = new Product();
+
+        // Subscribing to notifications
+        product.PriceChanged += price => Console.WriteLine($"New price alert: {price:C}");
+
+        // Modifying state triggers observer callback
+        product.Price = 120m;
+    }
+}
+
+/* Результат виконання: **************************************/
+
+New price alert: 120,00 ₴
+
+(Формат валюти залежить від системної локалі, наприклад: 120,00 ₴ або $120.00)
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>У C# патерн Observer найчастіше реалізують ідіоматично за допомогою делегатів та подій:</p>
+            <ul>
+                <li><b>Суб'єкт (Subject) <code>Product</code>:</b> Джерело подій. Містить стан (<code>_price</code>) та оголошує подію <code>event Action&lt;decimal&gt; PriceChanged</code>.</li>
+                <li><b>Спостерігач (Observer):</b> Будь-який метод або лямбда-функція, сигнатура якої збігається з <code>Action&lt;decimal&gt;</code>.</li>
+                <li><b>Клієнт <code>Program</code>:</b> Підписує спостерігача через оператор <code>+=</code> та змінює стан суб'єкта.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Ключове слово <code>event</code>:</b> На відміну від звичайного публічного поля-делегата, конструкція <code>event</code> забороняє зовнішньому коду скидати список підписників через <code>= null</code> або штучно викликати подію ззовні. Зовнішній код може лише підписатися (<code>+=</code>) або відписатися (<code>-=</code>).</p>
+
+            <p><b>Сеттер властивості <code>Price</code>:</b>
+            <br>1. Спочатку перевіряє умову <code>if (_price != value)</code>, щоб уникнути спаму нотифікацій, якщо ціна фактично не змінилася.
+            <br>2. Виклик <code>PriceChanged?.Invoke(_price)</code> використовує оператор безпечного доступу (Null-conditional operator <code>?.</code>). Якщо підписників немає, подія просто не викликається без генерації <code>NullReferenceException</code>.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Підписка спостерігача</div>
+                Код підписує лямбда-вираз на подію: <code>product.PriceChanged += price =&gt; ...</code>. Список викликів делегата тепер містить один обробник.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Зміна стану</div>
+                Присвоєння <code>product.Price = 120m</code> запускає сеттер властивості.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Оповіщення</div>
+                Сеттер викликає <code>PriceChanged?.Invoke(120m)</code>. Спостерігач миттєво реагує та друкує в консоль: <code>New price alert: 120,00 ₴</code>.
+            </div>
+
+            <h6>4. Пастка на співбесіді: «Lapsed Listener Problem»</h6>
+            <p>Коли короткоживучий об'єкт підписується на подію довгоживучого сервісу через <code>+=</code>, довгоживучий об'єкт утримує сильне посилання (Strong Reference) на підписника через делегат. Якщо забути відписатися через <code>-=</code> або <code>IDisposable</code>, збирач сміття (GC) <b>ніколи не звільнить пам'ять</b> підписника, що призводить до непомітних, але критичних витоків пам'яті.</p>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> слабке зв'язування суб'єкта з одержувачами; можливість динамічно підключати та відключати підписників у рантаймі.</li>
+            <li><strong>Недоліки:</strong> ризик витоку пам'яті (Lapsed Listener); порядок сповіщення підписників зазвичай не гарантується.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 19: STATE                                         -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p19">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 19: State (Стан)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє об'єкту кардинально <b>змінювати свою поведінку при зміні внутрішнього стану</b>, створюючи ілюзію того, що об'єкт змінив свій клас, та усуваючи громіздкі блоки умов <code>switch/case</code>.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Поведінка сутності залежить від її поточного бізнес-статусу (наприклад, Замовлення: Нове &rarr; Оплачене &rarr; Відправлене).</li>
+            <li>Методи класу перевантажені десятками розгалужень <code>if (status == 1) ... else if (status == 2)</code>.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Бібліотека <code>Stateless</code> для наочного опису скінченних автоматів (State Machines) у чистому C# коді.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. State contract
+public interface IOrderState
+{
+    void Pay(OrderContext ctx);
+
+    void Ship(OrderContext ctx);
+}
+
+// 2. Context holding the active state
+public class OrderContext
+{
+    private IOrderState _state = new NewState();
+
+    public void SetState(IOrderState state) => _state = state;
+
+    public void Pay() => _state.Pay(this);
+
+    public void Ship() => _state.Ship(this);
+}
+
+// 3. Concrete State: New
+public class NewState : IOrderState
+{
+    public void Pay(OrderContext ctx)
+    {
+        Console.WriteLine("Order paid successfully.");
+        ctx.SetState(new PaidState());
+    }
+
+    public void Ship(OrderContext ctx) => Console.WriteLine("Error: Cannot ship an unpaid order!");
+}
+
+// 4. Concrete State: Paid
+public class PaidState : IOrderState
+{
+    public void Pay(OrderContext ctx) => Console.WriteLine("Warning: Already paid.");
+
+    public void Ship(OrderContext ctx) => Console.WriteLine("Order shipped via courier.");
+}
+
+class Program
+{
+    static void Main()
+    {
+        var order = new OrderContext();
+
+        Console.WriteLine("1. Attempting to ship new order:");
+        order.Ship();
+
+        Console.WriteLine("\n2. Paying for the order:");
+        order.Pay();
+
+        Console.WriteLine("\n3. Attempting to pay again:");
+        order.Pay();
+
+        Console.WriteLine("\n4. Shipping the paid order:");
+        order.Ship();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+1. Attempting to ship new order:
+Error: Cannot ship an unpaid order!
+
+2. Paying for the order:
+Order paid successfully.
+
+3. Attempting to pay again:
+Warning: Already paid.
+
+4. Shipping the paid order:
+Order shipped via courier.
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> прибирає спагеті-код складних умовних операторів; ізолює поведінку кожного стану в окремий клас (SRP).</li>
+            <li><strong>Недоліки:</strong> може бути надлишковим ускладненням для простих сутностей із двома станами.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 20: STRATEGY                                      -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p20">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 20: Strategy (Стратегія)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає сімейство взаємозамінних алгоритмів, інкапсулює кожен із них в окремий клас і дає змогу <b>підміняти алгоритми на льоту</b> під час роботи програми.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно використовувати різні варіації розрахунків (тарифи доставки, розрахунок податків, алгоритми стиснення або сортування).</li>
+            <li>Необхідно підміняти алгоритм у реальному часі залежно від вибору клієнта без зміни класу, який проводить операцію.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Інтерфейси <code>IComparer&lt;T&gt;</code> та <code>IEqualityComparer&lt;T&gt;</code> у методах <code>LINQ OrderBy</code> та <code>Array.Sort</code>.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// 1. Strategy contract
+public interface IShippingStrategy
+{
+    decimal Calculate(decimal total);
+}
+
+// 2. Concrete Strategy: Postal delivery
+public class PostalShipping : IShippingStrategy
+{
+    public decimal Calculate(decimal total) => 50m;
+}
+
+// 3. Concrete Strategy: Courier delivery
+public class CourierShipping : IShippingStrategy
+{
+    public decimal Calculate(decimal total) => 150m;
+}
+
+// 4. Context using strategy via composition
+public class OrderCalculator
+{
+    private IShippingStrategy _strategy;
+
+    public OrderCalculator(IShippingStrategy s) => _strategy = s;
+
+    public void SetStrategy(IShippingStrategy s) => _strategy = s;
+
+    public decimal GetTotal(decimal subtotal) => subtotal + _strategy.Calculate(subtotal);
+}
+
+class Program
+{
+    static void Main()
+    {
+        decimal subtotal = 1000m;
+        Console.WriteLine($"Base order amount: {subtotal} UAH\n");
+
+        var calculator = new OrderCalculator(new PostalShipping());
+        decimal postalTotal = calculator.GetTotal(subtotal);
+        Console.WriteLine($"Total with postal shipping: {postalTotal} UAH");
+
+        calculator.SetStrategy(new CourierShipping());
+        decimal courierTotal = calculator.GetTotal(subtotal);
+        Console.WriteLine($"Total with courier shipping: {courierTotal} UAH");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Base order amount: 1000 UAH
+
+Total with postal shipping: 1050 UAH
+Total with courier shipping: 1150 UAH
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн Strategy реалізує принцип композиції замість успадкування:</p>
+            <ul>
+                <li><b>Контракт стратегії <code>IShippingStrategy</code>:</b> Описує єдиний метод <code>decimal Calculate(decimal total)</code>.</li>
+                <li><b>Конкретні стратегії:</b> <code>PostalShipping</code> (фіксований тариф 50 грн) та <code>CourierShipping</code> (тариф 150 грн).</li>
+                <li><b>Контекст <code>OrderCalculator</code>:</b> Зберігає посилання на інтерфейс стратегії та викликає її для розрахунку загальної суми.</li>
+                <li><b>Клієнт <code>Program</code>:</b> Обирає початкову стратегію та може будь-якої миті змінити її на іншу через <code>SetStrategy()</code>.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Гнучкість через <code>SetStrategy</code>:</b> Контекст не прив'язується до конкретної формули доставки. Він лише комбінує суму замовлення з результатом розрахунку поточної стратегії: <code>subtotal + _strategy.Calculate(subtotal)</code>.</p>
+
+            <p><b>Принцип відкритості/закритості (OCP):</b> Якщо завтра з'явиться експрес-доставка дроном за 300 грн, ми просто створимо клас <code>DroneShipping : IShippingStrategy</code>. Клас <code>OrderCalculator</code> не зміниться ні на символ.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Розрахунок за базовою стратегією</div>
+                Калькулятор ініціалізується стратегією <code>PostalShipping</code>. Для замовлення на 1000 грн метод <code>GetTotal()</code> повертає: <code>1000 + 50 = 1050 UAH</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Зміна стратегії на льоту</div>
+                Клієнт змінює алгоритм викликом <code>calculator.SetStrategy(new CourierShipping())</code>. Об'єкт калькулятора залишається тим самим.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Повторний розрахунок</div>
+                Наступний виклик <code>GetTotal()</code> звертається до нового алгоритму: <code>1000 + 150 = 1150 UAH</code>.
+            </div>
+
+            <h6>4. Strategy проти State: у чому різниця?</h6>
+            <p>Хоча UML-діаграми патернів однакові:</p>
+            <ul>
+                <li>У <b>Strategy</b> клієнт сам передає та перемикає стратегії. Стратегії нічого не знають про сусідів і не перемикають себе.</li>
+                <li>У <b>State</b> переходи між станами відбуваються <em>автоматично всередині самих станів</em> або контексту (наприклад, стан <code>New</code> сам перемикає контекст у <code>Paid</code> після успішної оплати).</li>
+            </ul>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> швидка підміна алгоритмів під час виконання (runtime); повна ізоляція математики від бізнес-моделі (OCP).</li>
+            <li><strong>Недоліки:</strong> клієнтський код повинен знати різницю між доступними стратегіями, щоб правильно обрати потрібну.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 21: TEMPLATE METHOD                               -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p21">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 21: Template Method (Шаблонний метод)*</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Задає <b>жорсткий каркас алгоритму</b> в базовому класі, дозволяючи підкласам перевизначати окремі кроки без зміни загальної структури алгоритму.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Алгоритм складається з чіткої фіксованої черговості кроків, але деякі з них мають специфічні варіації в різних нащадках.</li>
+            <li>Потрібно усунути дублювання однакового каркасного коду (принцип DRY).</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Стандартний патерн звільнення некерованих ресурсів <code>Dispose(bool disposing)</code> у базових класах .NET BCL.
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+
+// Base class defining the algorithm template
+public abstract class DataExporter
+{
+    // The Template Method defining the step execution skeleton
+    public void Export()
+    {
+        ReadData();
+        FormatData();
+        Save();
+    }
+
+    private void ReadData() => Console.WriteLine("Reading data from database...");
+
+    protected abstract void FormatData();
+
+    protected virtual void Save() => Console.WriteLine("Saving by default...");
+}
+
+// Concrete subclass overriding only the specific formatting step
+public class PdfExporter : DataExporter
+{
+    protected override void FormatData() => Console.WriteLine("Formatting data to PDF.");
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("--- PDF Export Execution ---");
+        DataExporter exporter = new PdfExporter();
+
+        // Calling the template method
+        exporter.Export();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+--- PDF Export Execution ---
+Reading data from database...
+Formatting data to PDF.
+Saving by default...
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як працює код</h5>
+            
+            <h6>1. Архітектура та структура коду</h6>
+            <p>Патерн будується на розподілі рівнів абстракції всередині ієрархії спадкування:</p>
+            <ul>
+                <li><b>Базовий клас <code>DataExporter</code>:</b> Містить невіртуальний шаблонний метод <code>Export()</code>, який задає непорушний порядок дій.</li>
+                <li><b>Незмінні приватні кроки (<code>ReadData</code>):</b> Загальна логіка, однакова для всіх форматів.</li>
+                <li><b>Абстрактні кроки (<code>FormatData</code>):</b> Обов'язкові для реалізації в нащадках специфічні операції.</li>
+                <li><b>Віртуальні кроки (<code>Save</code> — хуки):</b> Надають стандартну поведінку за замовчуванням, яку за потреби можна перекрити.</li>
+            </ul>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Шаблонний метод <code>Export()</code>:</b></p>
+            <pre style="margin: 0.5rem 0;"><code>public void Export()
+{
+    ReadData();
+    FormatData();
+    Save();
+}</code></pre>
+            <p>Клієнтський код не викликає окремо <code>ReadData()</code> або <code>Save()</code>. Він викликає лише метод <code>Export()</code>, завдяки чому неможливо випадково зберегти дані до їхнього зчитування чи форматування.</p>
+
+            <p><b>Голлівудський принцип («Не дзвоніть нам, ми самі вам зателефонуємо»):</b> Базовий клас сам викликає методи нащадка <code>FormatData()</code> у потрібний для себе момент часу, керуючи потоком виконання зверху-вниз.</p>
+
+            <h6>3. Що відбувається в <code>Main()</code> по кроках</h6>
+            <div class="step-box">
+                <div class="step-title">Крок 1: Створення екземпляра</div>
+                Створюється <code>new PdfExporter()</code> під базовим типом <code>DataExporter</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 2: Виклик шаблонного методу</div>
+                Викликається <code>exporter.Export()</code>.
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">Крок 3: Послідовне виконання кроків</div>
+                1. Виконується приватний метод бази: <code>Reading data from database...</code>.
+                <br>2. Викликається поліморфний метод нащадка <code>FormatData()</code>: <code>Formatting data to PDF.</code>.
+                <br>3. Виконується віртуальний метод збереження: <code>Saving by default...</code>.
+            </div>
+
+            <h6>4. Template Method проти Strategy: спадкування проти композиції</h6>
+            <p>На технічних співбесідах часто запитують: чому в сучасній архітектурі Strategy обирають частіше?</p>
+            <ul>
+                <li><b>Template Method</b> прив'язаний до <em>успадкування</em>: ви не можете змінити крок алгоритму під час виконання (runtime), а підкласи жорстко залежать від коду батьківського класу.</li>
+                <li><b>Strategy</b> базується на <em>композиції</em> інтерфейсів, що дає змогу легко підміняти реалізації в рантаймі та тестувати компоненти ізольовано.</li>
+            </ul>
+        </div>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> усуває дублювання спільного коду каркаса (DRY); суворо фіксує послідовність кроків бізнес-алгоритму.</li>
+            <li><strong>Недоліки:</strong> жорстка зв'язаність класів через механізм спадкування; неможливість зміни поведінки в рантаймі.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 22: VISITOR                                       -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p22">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 22: Visitor (Відвідувач)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Дозволяє додавати нові операції до класів, <b>не змінюючи їхній вихідний код</b>, за допомогою механізму подвійної диспетчеризації (<em>Double Dispatch</em>).</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно виконувати різні непов'язані між собою операції над складною структурою вузлів (наприклад, синтаксичні дерева компіляторів AST, експорт у різні формати).</li>
+            <li>Ієрархія класів елементів стабільна і рідко змінюється, а нові операції над ними додаються регулярно.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Клас <code>ExpressionVisitor</code> у просторі <code>System.Linq.Expressions</code> (застосовується в EF Core для парсингу дерев виразів LINQ та їхньої трансляції в SQL).
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// 1. Visitor contract
+public interface IVisitor
+{
+    void Visit(Bank b);
+
+    void Visit(Shop s);
+}
+
+// 2. Element contract
+public interface IPlace
+{
+    void Accept(IVisitor v);
+}
+
+// 3. Concrete Elements
+public class Bank : IPlace
+{
+    public void Accept(IVisitor v) => v.Visit(this);
+}
+
+public class Shop : IPlace
+{
+    public void Accept(IVisitor v) => v.Visit(this);
+}
+
+// 4. Concrete Visitor containing operation logic
+public class TaxVisitor : IVisitor
+{
+    public void Visit(Bank b) => Console.WriteLine("Bank tax calculation: 10%");
+
+    public void Visit(Shop s) => Console.WriteLine("Shop tax calculation: 5%");
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var places = new List&lt;IPlace&gt;
+        {
+            new Bank(),
+            new Shop(),
+            new Bank()
+        };
+
+        IVisitor taxVisitor = new TaxVisitor();
+
+        Console.WriteLine("--- Tax Calculation Execution ---");
+        foreach (var place in places)
+        {
+            place.Accept(taxVisitor);
+        }
+    }
+}
+
+/* Результат виконання: **************************************/
+
+--- Tax Calculation Execution ---
+Bank tax calculation: 10%
+Shop tax calculation: 5%
+Bank tax calculation: 10%
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> легке додавання нових операцій без переписування класів елементів (OCP); централізація спорідненої логіки в одному відвідувачі (SRP).</li>
+            <li><strong>Недоліки:</strong> надзвичайно важко додавати нові класи елементів в ієрархію, адже це змушує оновлювати контракт <code>IVisitor</code> та всіх його реалізацій.</li>
+        </ul>
+    </article>
+
+    <!-- ======================================================== -->
+    <!-- ПАТЕРН 23: INTERPRETER                                   -->
+    <!-- ======================================================== -->
+    <article class="pattern-card" id="p23">
+        <div class="pattern-header">
+            <div>
+                <h3 class="pattern-title">Патерн 23: Interpreter (Інтерпретатор)</h3>
+                <span class="badge badge-behavioral">Поведінковий (Behavioral)</span>
+            </div>
+            <a href="#toc" class="top-link">↑ До змісту</a>
+        </div>
+
+        <h4>1. Призначення</h4>
+        <p>Визначає граматику простої спеціалізованої мови та будує деревоподібне представлення виразів (<em>AST</em>) для їхнього послідовного обчислення.</p>
+
+        <h4>2. Коли застосовувати</h4>
+        <ul>
+            <li>Потрібно створити простий внутрішній рушій предметно-орієнтованої мови (DSL) для фільтрації запитів, логічних правил або калькуляторів виразів.</li>
+            <li>Граматика мови проста і компактна.</li>
+        </ul>
+
+        <blockquote>
+            <b>Приклади у .NET:</b> Клас <code>System.Text.RegularExpressions.Regex</code> (інтерпретатор синтаксису регулярних виразів).
+        </blockquote>
+
+        <h4>3. Реалізація на C#</h4>
+        <pre><code>using System;
+using System.Collections.Generic;
+
+// 1. Expression contract
+public interface IExpression
+{
+    int Interpret(Dictionary&lt;string, int&gt; context);
+}
+
+// 2. Terminal expression (number constant)
+public class NumberExpression : IExpression
+{
+    private readonly int _num;
+
+    public NumberExpression(int n) => _num = n;
+
+    public int Interpret(Dictionary&lt;string, int&gt; ctx) => _num;
+}
+
+// 3. Non-terminal expression (addition operation)
+public class AddExpression : IExpression
+{
+    private readonly IExpression _left;
+    private readonly IExpression _right;
+
+    public AddExpression(IExpression l, IExpression r)
+    {
+        _left = l;
+        _right = r;
+    }
+
+    public int Interpret(Dictionary&lt;string, int&gt; ctx) => _left.Interpret(ctx) + _right.Interpret(ctx);
+}
+
+class Program
+{
+    static void Main()
+    {
+        // AST representing expression: 5 + 10
+        IExpression expr = new AddExpression(new NumberExpression(5), new NumberExpression(10));
+        Console.WriteLine($"Result: {expr.Interpret(null)}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Result: 15
+
+/*************************************************************/
+</code></pre>
+
+        <h4>4. Плюси та мінуси</h4>
+        <ul>
+            <li><strong>Переваги:</strong> легке розширення граматики новими правилами-вузлами; чудово підходить для створення предметно-орієнтованих мов (DSL).</li>
+            <li><strong>Недоліки:</strong> зі зростанням граматики дерево класів стає занадто складним для підтримки.</li>
+        </ul>
+    </article>
+
+</div>
+
+</body>
+</html>
