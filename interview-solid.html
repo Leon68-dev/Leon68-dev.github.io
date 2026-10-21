@@ -1,232 +1,34 @@
-
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Принципи SOLID на C# з прикладами</title>
-    <style>
-:root {
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --primary: #2563eb;
-            /* Updated code block colors: blue background and yellow text */
-            --code-bg: #1e3a8a;
-            --code-text: #fde047;
-            
-            --badge-creational-bg: #e0f2fe;
-            --badge-creational-text: #0369a1;
-            --badge-structural-bg: #fef3c7;
-            --badge-structural-text: #92400e;
-            --badge-behavioral-bg: #dcfce7;
-            --badge-behavioral-text: #15803d;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.65;
-            color: var(--text-main);
-            background-color: var(--bg-body);
-            margin: 0;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        h1 {
-            font-size: 2.25rem;
-            color: #0f172a;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Навігація / Зміст */
-        .toc-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .toc-card h2 {
-            margin-top: 0;
-            font-size: 1.3rem;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-
-        .toc-list {
-            list-style: none;
-            padding: 0;
-            margin: 1rem 0 0 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .toc-list a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .toc-list a:hover {
-            text-decoration: underline;
-        }
-
-        /* Картка принципу */
-        .pattern-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-
-        .pattern-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .pattern-title {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #0f172a;
-        }
-
-        .top-link {
-            font-size: 0.85rem;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .badge {
-            display: inline-block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .badge-srp { background: var(--badge-srp-bg); color: var(--badge-srp-text); }
-        .badge-ocp { background: var(--badge-ocp-bg); color: var(--badge-ocp-text); }
-        .badge-lsp { background: var(--badge-lsp-bg); color: var(--badge-lsp-text); }
-        .badge-isp { background: var(--badge-isp-bg); color: var(--badge-isp-text); }
-        .badge-dip { background: var(--badge-dip-bg); color: var(--badge-dip-text); }
-
-        h4 {
-            font-size: 1.15rem;
-            color: #334155;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        blockquote {
-            background-color: #f1f5f9;
-            border-left: 4px solid var(--primary);
-            margin: 1rem 0;
-            padding: 0.85rem 1.25rem;
-            border-radius: 0 8px 8px 0;
-            color: #334155;
-            font-size: 0.95rem;
-        }
-
-        .alert-bad {
-            background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 0.75rem 1rem;
-            border-radius: 0 8px 8px 0;
-            margin: 1rem 0;
-            color: #991b1b;
-            font-size: 0.95rem;
-        }
-
-        .alert-good {
-            background-color: #f0fdf4;
-            border-left: 4px solid #22c55e;
-            padding: 0.75rem 1rem;
-            border-radius: 0 8px 8px 0;
-            margin: 1rem 0;
-            color: #166534;
-            font-size: 0.95rem;
-        }
-
-        ul {
-            padding-left: 1.4rem;
-        }
-
-        li {
-            margin-bottom: 0.4rem;
-        }
-
-        pre {
-            background: var(--code-bg);
-            color: var(--code-text);
-            padding: 1.25rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            margin: 1rem 0;
-        }
-
-        code {
-            font-family: inherit;
-        }
-
-        p > code, li > code {
-            background: #e2e8f0;
-            color: #0f172a;
-            padding: 0.15rem 0.35rem;
-            border-radius: 4px;
-            font-size: 0.875em;
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 1rem 0.5rem; }
-            .pattern-card { padding: 1.25rem; }
-            h1 { font-size: 1.75rem; }
-        }
-    </style>
+    <title>5 Принципів SOLID на C# з прикладами</title>
+    <!-- Connected external shared stylesheet -->
+    <link rel="stylesheet" href="interview-patterns.css">
 </head>
 <body>
 
 <div class="container">
+
+    <!-- ВЕРХНЄ МЕНЮ МІЖ СТОРІНКАМИ -->
+    <nav class="site-nav">
+        <a href="interview-patterns-gof.html">← Патерни GoF (Головна)</a>
+        <a href="interview-patterns-creational.html">Породжувальні</a>
+        <a href="interview-patterns-structural.html">Структурні</a>
+        <a href="interview-patterns-behavioral.html">Поведінкові</a>
+        <a href="interview-solid.html" class="active">Принципи SOLID</a>
+    </nav>
+
     <header>
         <h1>5 Принципів SOLID на C#</h1>
-        <p style="color: var(--text-muted);">Фундаментальні принципи об'єктно-орієнтованого проєктування з розбором антипатернів та рішень</p>
+        <p style="color: var(--text-muted);">Фундаментальні принципи чистої архітектури: антипатерни, живі розбори та рішення на C#</p>
     </header>
 
     <!-- ЗМІСТ -->
     <nav class="toc-card" id="toc">
-        <h2>Швидка навігація</h2>
-        <ul class="toc-list">
+        <h2>Швидка навігація по принципах</h2>
+        <ul class="toc-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
             <li><a href="#srp"><b>S</b> — Single Responsibility (Єдиний обов'язок)</a></li>
             <li><a href="#ocp"><b>O</b> — Open/Closed (Відкритість / Закритість)</a></li>
             <li><a href="#lsp"><b>L</b> — Liskov Substitution (Підстановка Лісков)</a></li>
@@ -242,7 +44,7 @@
         <div class="pattern-header">
             <div>
                 <h3 class="pattern-title">S: Single Responsibility Principle (SRP)</h3>
-                <span class="badge badge-srp">Принцип єдиного обов'язку</span>
+                <span class="badge" style="background: #fee2e2; color: #991b1b;">Єдиний обов'язок</span>
             </div>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
@@ -254,67 +56,122 @@
         </blockquote>
 
         <h4>2. Порушення принципу (Антипатерн)</h4>
-        <div class="alert-bad">
-            <b>Проблема:</b> Клас <code>Invoice</code> одночасно рахує підсумкову вартість (бізнес-логіка), зберігає дані в базу даних (персистентність) та формує PDF-звіт (відображення). Будь-яка зміна структури бази або дизайну звіту змушує редагувати цей клас.
+        <div class="note-box" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+            <b>Проблема:</b> Клас <code>Invoice</code> одночасно рахує підсумкову вартість (бізнес-логіка), зберігає дані в базу даних (персистентність) та формує PDF-звіт (відображення). Будь-яка зміна структури бази або дизайну звіту змушує редагувати один і той самий файл.
         </div>
 
-        <pre><code>// ПОГАНО: Клас має 3 різні причини для змін!
-public class Invoice
+        <pre><code>// BAD: Class has 3 different reasons to change!
+public class BadInvoice
 {
     public decimal Amount { get; set; }
 
-    public decimal CalculateTotal() =&gt; Amount * 1.2m; // 1. Бізнес-розрахунок
+    public decimal CalculateTotal() => Amount * 1.2m; // 1. Business logic calculation
 
-    public void SaveToDatabase()                     // 2. Робота з БД
+    public void SaveToDatabase()
     {
-        Console.WriteLine("Збереження рахунку в SQL базі...");
+        Console.WriteLine("Saving invoice to SQL database..."); // 2. Persistence / DB
     }
 
-    public void PrintPdfReport()                     // 3. Форматування / Друк
+    public void PrintPdfReport()
     {
-        Console.WriteLine("Формування PDF звіту...");
+        Console.WriteLine("Generating PDF report..."); // 3. Presentation formatting
     }
-}</code></pre>
+}
+</code></pre>
 
         <h4>3. Правильне рішення на C#</h4>
-        <div class="alert-good">
-            <b>Рішення:</b> Розбиваємо обов'язки на окремі незалежні класи: сутність рахунку, репозиторій для бази даних та генератор звітів.
+        <div class="note-box" style="background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
+            <b>Рішення:</b> Розбиваємо обов'язки на три окремі класи: сутність рахунку, репозиторій для бази даних та генератор звітів.
         </div>
 
-        <pre><code>// ДОБРЕ: Кожен клас має лише одну зону відповідальності
+        <pre><code>using System;
 
-// 1. Відповідає виключно за дані та бізнес-правила рахунку
+// 1. Responsible purely for invoice data and business rules
 public class Invoice
 {
     public int Id { get; set; }
     public decimal Amount { get; set; }
 
-    public decimal CalculateTotal() =&gt; Amount * 1.2m;
+    public Invoice(int id, decimal amount)
+    {
+        Id = id;
+        Amount = amount;
+    }
+
+    public decimal CalculateTotal() => Amount * 1.2m;
 }
 
-// 2. Відповідає виключно за збереження даних
+// 2. Responsible purely for database persistence
 public class InvoiceRepository
 {
     public void Save(Invoice invoice)
     {
-        Console.WriteLine($"Рахунок #{invoice.Id} збережено в БД.");
+        Console.WriteLine($"Invoice #{invoice.Id} saved to SQL database.");
     }
 }
 
-// 3. Відповідає виключно за відображення / звітність
+// 3. Responsible purely for presentation and formatting
 public class InvoiceReportPrinter
 {
     public void PrintPdf(Invoice invoice)
     {
-        Console.WriteLine($"PDF звіт для рахунку #{invoice.Id} на суму: {invoice.CalculateTotal():C}");
+        Console.WriteLine($"PDF report generated for invoice #{invoice.Id} with total: {invoice.CalculateTotal():C}");
     }
-}</code></pre>
+}
+
+class Program
+{
+    static void Main()
+    {
+        var invoice = new Invoice(101, 1000m);
+        var repository = new InvoiceRepository();
+        var printer = new InvoiceReportPrinter();
+
+        Console.WriteLine($"Invoice #{invoice.Id} total: {invoice.CalculateTotal():C}");
+        repository.Save(invoice);
+        printer.PrintPdf(invoice);
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Invoice #101 total: 1 200,00 ₴
+Invoice #101 saved to SQL database.
+PDF report generated for invoice #101 with total: 1 200,00 ₴
+
+(Формат валюти залежить від системної локалі, наприклад: 1 200,00 ₴ або $1,200.00)
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ ЖИВИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як влаштований і працює цей код</h5>
+            
+            <p>Уяви співробітника компанії, який одночасно є <b>головним бухгалтером, системним адміністратором і прибиральником</b>. Якщо він ламає швабру, компанія не може здати податковий звіт, бо бухгалтер зайнятий ремонтом швабри. Це абсурд. У професійній команді бухгалтер рахує фінанси, сисадмін налаштовує сервери, а клінінг прибирає приміщення. SRP вимагає від класів такого самого чіткого розподілу обов'язків.</p>
+
+            <h6>1. Як влаштований код</h6>
+            <div class="diagram-box">Invoice (Тільки бізнес-правила: ставка ПДВ, підсумок)
+   │
+   ├── InvoiceRepository   ──► Відповідає виключно за SQL/БД
+   └── InvoiceReportPrinter ──► Відповідає виключно за генерацію PDF</div>
+
+            <p>Головна ідея: якщо бухгалтер змінює формулу податку — ми міняємо <b>лише</b> <code>Invoice</code>. Якщо сисадмін переносить базу з SQL Server у PostgreSQL — ми міняємо <b>лише</b> <code>InvoiceRepository</code>. Якщо дизайнер оновив шрифт PDF-шаблону — ми міняємо <b>лише</b> <code>InvoiceReportPrinter</code>.</p>
+
+            <h6>2. Розбираємо код по частинах</h6>
+            <p><b>Клас <code>Invoice</code>:</b> Зберігає ID та вартість, а метод <code>CalculateTotal()</code> рахує підсумок із ПДВ. Він не знає, як створювати PDF, і не знає, чи взагалі існує якась база даних.</p>
+            <p><b>Клас <code>InvoiceRepository</code>:</b> Має один метод <code>Save(Invoice invoice)</code>. Його єдина турбота — зберегти дані в таблицю.</p>
+            <p><b>Клас <code>InvoiceReportPrinter</code>:</b> Має один метод <code>PrintPdf(Invoice invoice)</code>. Його єдина турбота — розмітка та візуалізація.</p>
+
+            <h6>3. Чому це краще за змішування в одному класі?</h6>
+            <p>У "поганому" класі зміна дизайну звіту змушувала перетестовувати методи роботи з базою даних, бо вони ділили один спільний стан усередині класу. Розбиття на три класи дає змогу трьом розробникам працювати над рахунком, базою та звітами одночасно без конфліктів у Git.</p>
+        </div>
 
         <h4>4. Ознаки порушення (Code Smells)</h4>
         <ul>
-            <li>Клас називають <code>Manager</code>, <code>Processor</code>, <code>Handler</code> і він містить 1000+ рядків коду («Божественний об'єкт»).</li>
-            <li>Клас імпортує одночасно простори імен для роботи з БД, GUI, відправки пошти та бізнес-моделей.</li>
-            <li>Зміна формату дати в інтерфейсі призводить до падіння unit-тестів роботи з базою даних.</li>
+            <li>Клас називається узагальнено: <code>Manager</code>, <code>Processor</code>, <code>Helper</code> і містить понад 500–1000 рядків коду («Божественний об'єкт» / God Object).</li>
+            <li>Клас одночасно підключає простори імен для роботи з БД (<code>Microsoft.EntityFrameworkCore</code>), графікою (<code>SkiaSharp</code>) та відправкою листів (<code>System.Net.Mail</code>).</li>
+            <li>Зміна кольору кнопки в інтерфейсі несподівано ламає збереження даних у базу.</li>
         </ul>
     </article>
 
@@ -325,7 +182,7 @@ public class InvoiceReportPrinter
         <div class="pattern-header">
             <div>
                 <h3 class="pattern-title">O: Open/Closed Principle (OCP)</h3>
-                <span class="badge badge-ocp">Принцип відкритості / закритості</span>
+                <span class="badge" style="background: #fef3c7; color: #92400e;">Відкритість / Закритість</span>
             </div>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
@@ -333,16 +190,16 @@ public class InvoiceReportPrinter
         <h4>1. Суть принципу</h4>
         <blockquote>
             <b>«Програмні сутності повинні бути відкриті для розширення, але закриті для модифікації».</b><br/>
-            Поведінку системи слід розширювати додаванням нового коду (нових класів), а не переписуванням уже перевіреного та протестованого коду.
+            Нова функціональність повинна додаватися створенням нових класів, а не переписуванням уже перевіреного та протестованого коду.
         </blockquote>
 
         <h4>2. Порушення принципу (Антипатерн)</h4>
-        <div class="alert-bad">
-            <b>Проблема:</b> Додавання нового типу клієнта змушує змінювати існуючий метод <code>CalculateDiscount</code>, додаючи нові гілки <code>switch/case</code> або <code>if-else</code>. Це створює ризик поламати існуючу логіку і вимагає повторного тестування всього класу.
+        <div class="note-box" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+            <b>Проблема:</b> Додавання нового типу клієнта змушує змінювати існуючий метод <code>CalculateDiscount</code>, додаючи нові гілки <code>switch/case</code> або <code>if-else</code>. Кожне редагування старого класу створює ризик внести регресійний баг.
         </div>
 
-        <pre><code>// ПОГАНО: Щоб додати клієнта "VIP", доведеться модифікувати вже протестований код
-public class DiscountCalculator
+        <pre><code>// BAD: Adding a "VIP" customer requires modifying existing, tested code
+public class BadDiscountCalculator
 {
     public decimal CalculateDiscount(string customerType, decimal amount)
     {
@@ -350,52 +207,100 @@ public class DiscountCalculator
             return amount * 0.05m;
         else if (customerType == "Premium")
             return amount * 0.10m;
-        // Додавання "VIP" вимагає втручання в цей метод!
+        // Adding "VIP" forces us to open and edit this method!
         return 0;
     }
-}</code></pre>
+}
+</code></pre>
 
         <h4>3. Правильне рішення на C#</h4>
-        <div class="alert-good">
-            <b>Рішення:</b> Використовуємо поліморфізм та інтерфейс стратегії. Щоб додати новий тип клієнта, ми просто створюємо новий клас — старий код не чіпається взагалі.
+        <div class="note-box" style="background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
+            <b>Рішення:</b> Застосовуємо поліморфізм та інтерфейс стратегії (патерн Strategy). Новий тип знижки — це просто новий клас, а калькулятор залишається незмінним назавжди.
         </div>
 
-        <pre><code>// ДОБРЕ: Поліморфна система знижок, закрита для модифікації, відкрита для розширення
+        <pre><code>using System;
 
+// 1. Strategy contract
 public interface IDiscountStrategy
 {
     decimal Calculate(decimal amount);
 }
 
+// 2. Concrete strategies
 public class RegularCustomerDiscount : IDiscountStrategy
 {
-    public decimal Calculate(decimal amount) =&gt; amount * 0.05m;
+    public decimal Calculate(decimal amount) => amount * 0.05m;
 }
 
 public class PremiumCustomerDiscount : IDiscountStrategy
 {
-    public decimal Calculate(decimal amount) =&gt; amount * 0.10m;
+    public decimal Calculate(decimal amount) => amount * 0.10m;
 }
 
-// Новий тип додається просто створенням нового класу:
+// New discount type added WITHOUT modifying existing classes:
 public class VipCustomerDiscount : IDiscountStrategy
 {
-    public decimal Calculate(decimal amount) =&gt; amount * 0.20m;
+    public decimal Calculate(decimal amount) => amount * 0.20m;
 }
 
-// Калькулятор залишається незмінним назавжди:
+// 3. Calculator is closed for modification, but open for extension:
 public class DiscountCalculator
 {
     public decimal CalculateDiscount(IDiscountStrategy strategy, decimal amount)
     {
         return strategy.Calculate(amount);
     }
-}</code></pre>
+}
+
+class Program
+{
+    static void Main()
+    {
+        var calculator = new DiscountCalculator();
+        decimal amount = 1000m;
+
+        decimal regularDiscount = calculator.CalculateDiscount(new RegularCustomerDiscount(), amount);
+        Console.WriteLine($"Regular discount: {regularDiscount:C}");
+
+        decimal vipDiscount = calculator.CalculateDiscount(new VipCustomerDiscount(), amount);
+        Console.WriteLine($"VIP discount: {vipDiscount:C}");
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Regular discount: 50,00 ₴
+VIP discount: 200,00 ₴
+
+(Формат валюти залежить від системної локалі, наприклад: 50,00 ₴ або $50.00)
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ ЖИВИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як влаштований і працює цей код</h5>
+            
+            <p>Уяви <b>смартфон із портом USB-C або магазин додатків App Store</b>. Коли ти хочеш додати в телефон тепловізор, додаткову пам'ять або нову гру, ти не розбираєш корпус викруткою і не перепаюєш мікросхеми на материнській платі. Телефон <i>закритий для модифікації</i> (плата запаяна на заводі), але <i>відкритий для розширення</i> через універсальний порт і магазин додатків. OCP перетворює твій код на такий самий модульний смартфон.</p>
+
+            <h6>1. Як влаштований код</h6>
+            <div class="diagram-box">DiscountCalculator (Калькулятор: закритий від змін, не має жодного switch)
+      │ викликає strategy.Calculate(amount)
+      ▼
+IDiscountStrategy (Інтерфейс: відкритий для будь-яких нових класів)
+      ▲
+   ┌──┴─────────────────────────┐
+   │                            │
+RegularCustomerDiscount      VipCustomerDiscount (додали без зміни калькулятора)</div>
+
+            <h6>2. Чому це краще за перемикач <code>switch</code>?</h6>
+            <p>Якщо у великому інтернет-магазині діє 15 видів акцій, метод зі <code>switch</code> розростається на сотні рядків. Будь-яка помилка в одній гілці може випадково зламати знижки для інших покупців. З OCP кожна знижка живе у своєму ізольованому класі: її можна протестувати окремим модульним тестом, видалити або замінити без найменшого страху зламати сусідні розрахунки.</p>
+        </div>
 
         <h4>4. Ознаки порушення (Code Smells)</h4>
         <ul>
-            <li>Каскади умовних операторів <code>if (type == ...)</code> або довгі <code>switch-case</code> за типом сутності.</li>
-            <li>Кожна нова вимога бізнесу змушує відкривати ті самі центральні сервісні файли та дописувати логіку.</li>
+            <li>Каскади операторів <code>if (type == "VIP") ... else if (...)</code> або розлогі конструкції <code>switch-case</code> за переліками типів.</li>
+            <li>Кожна поява нової бізнес-фічі змушує відкривати ті самі 2–3 центральні файли ядра й дописувати нові умови.</li>
         </ul>
     </article>
 
@@ -406,79 +311,125 @@ public class DiscountCalculator
         <div class="pattern-header">
             <div>
                 <h3 class="pattern-title">L: Liskov Substitution Principle (LSP)</h3>
-                <span class="badge badge-lsp">Принцип підстановки Лісков</span>
+                <span class="badge" style="background: #dbeafe; color: #1e40af;">Підстановка Лісков</span>
             </div>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
 
         <h4>1. Суть принципу</h4>
         <blockquote>
-            <b>«Підкласи повинні бути взаємозамінними зі своїми базовими класами без порушення коректності програми»</b> (Барбара Лісков).<br/>
-            Клієнтський код не повинен ламатися чи поводитися несподівано, якщо йому замість базового класу передати будь-якого з його нащадків.
+            <b>«Підкласи повинні бути вільно взаємозамінними зі своїми базовими класами без порушення очікуваної коректності програми»</b> (Барбара Лісков).<br/>
+            Клієнтський код не повинен ламатися, викидати несподівані винятки чи вимагати додаткових перевірок типів, якщо замість базового класу йому підсунули нащадка.
         </blockquote>
 
         <h4>2. Порушення принципу (Антипатерн)</h4>
-        <div class="alert-bad">
-            <b>Проблема:</b> Класичний приклад зі страусом або пінгвіном. Якщо базовий клас <code>Bird</code> має метод <code>Fly()</code>, а нащадок <code>Ostrich</code> викидає виняток <code>NotSupportedException</code> або нічого не робить, контракт базового класу ламається.
+        <div class="note-box" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+            <b>Проблема:</b> Класичний приклад зі страусом. Якщо базовий клас <code>Bird</code> декларує метод <code>Fly()</code>, а підклас <code>Ostrich</code> (страус) викидає <code>NotSupportedException</code> (бо страуси не літають), контракт базового класу ламається. Цикл обробки птахів неочікувано впаде в рантаймі.
         </div>
 
-        <pre><code>// ПОГАНО: Нащадок порушує контракт батьківського класу
-public class Bird
+        <pre><code>// BAD: Subclass breaks parent's contract!
+public class BadBird
 {
-    public virtual void Fly() =&gt; Console.WriteLine("Птах летить у небі.");
+    public virtual void Fly() => Console.WriteLine("Bird is flying.");
 }
 
-public class Ostrich : Bird
+public class BadOstrich : BadBird
 {
     public override void Fly()
     {
-        // Страуси не літають! Викидання винятку ламає клієнтський цикл
-        throw new NotSupportedException("Страус не вміє літати!");
+        // Ostriches cannot fly! Throwing exception crashes client code unexpectedly!
+        throw new NotSupportedException("Ostriches cannot fly!");
     }
 }
-
-// Клієнтський код впаде з помилкою під час виконання:
-// foreach (var bird in birds) bird.Fly();</code></pre>
+</code></pre>
 
         <h4>3. Правильне рішення на C#</h4>
-        <div class="alert-good">
-            <b>Рішення:</b> Не наділяти базовий клас поведінкою, якої немає у всіх його нащадків. Літальні можливості виносяться в окремий інтерфейс <code>IFlyable</code>.
+        <div class="note-box" style="background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
+            <b>Рішення:</b> Не наділяти базовий клас поведінкою, якої немає у 100% його нащадків. Здатність літати виноситься в окремий інтерфейс <code>IFlyable</code>.
         </div>
 
-        <pre><code>// ДОБРЕ: Правильна ієрархія та інтерфейси здатності
+        <pre><code>using System;
+using System.Collections.Generic;
 
-// Базовий клас містить лише те, що роблять абсолютно всі птахи
+// 1. Base class contains only what ALL birds truly do
 public abstract class Bird
 {
     public abstract void Eat();
 }
 
+// 2. Separate capability contract for flying
 public interface IFlyable
 {
     void Fly();
 }
 
-// Горобець і їсть, і літає
+// Sparrow eats and flies:
 public class Sparrow : Bird, IFlyable
 {
-    public override void Eat() =&gt; Console.WriteLine("Горобець дзьобає зерно.");
-    public void Fly() =&gt; Console.WriteLine("Горобець летить.");
+    public override void Eat() => Console.WriteLine("Sparrow is eating seeds.");
+
+    public void Fly() => Console.WriteLine("Sparrow is flying in the sky.");
 }
 
-// Страус тільки їсть
+// Ostrich only eats:
 public class Ostrich : Bird
 {
-    public override void Eat() =&gt; Console.WriteLine("Страус їсть траву.");
+    public override void Eat() => Console.WriteLine("Ostrich is eating grass.");
 }
 
-// Клієнт викликає Fly() лише для тих, хто гарантовано реалізує IFlyable:
-// foreach (IFlyable flyingBird in flyingFlock) flyingBird.Fly();</code></pre>
+class Program
+{
+    static void Main()
+    {
+        var birds = new List&lt;Bird&gt; { new Sparrow(), new Ostrich() };
+
+        // Safe polymorphism: ALL birds can Eat without crashes
+        foreach (var bird in birds)
+        {
+            bird.Eat();
+        }
+
+        // Only flying birds are commanded to fly
+        var flyingFlock = new List&lt;IFlyable&gt; { new Sparrow() };
+        foreach (var flyer in flyingFlock)
+        {
+            flyer.Fly();
+        }
+    }
+}
+
+/* Результат виконання: **************************************/
+
+Sparrow is eating seeds.
+Ostrich is eating grass.
+Sparrow is flying in the sky.
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ ЖИВИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як влаштований і працює цей код</h5>
+            
+            <p>Уяви <b>бездротову комп'ютерну мишку</b>. Якщо стара мишка зламалася, ти йдеш у магазин і купуєш нову іншої моделі. Ти очікуєш, що підключивши її в USB-порт, курсор рухатиметься по екрану. Якби нова мишка замість руху курсора вибивала пробки у всій квартирі зі словами: <i>«Я нова супермодель, я не підтримую рух по столу!»</i> — це і було б грубим порушенням принципу Лісков. Підклас зобов'язаний повноцінно виконувати обіцянки базового класу.</p>
+
+            <h6>1. Як влаштований код</h6>
+            <div class="diagram-box">Bird (Базовий клас: декларує лише Eat())
+   ▲
+   ├── Ostrich (Страус: реалізує Eat() і чесно каже, що не літає)
+   └── Sparrow (Горобець: реалізує Eat())
+         ▲
+         └── IFlyable (Окремий контракт: здатність літати)</div>
+
+            <h6>2. Чому це краще за наївне успадкування?</h6>
+            <p>Клієнтський код ніколи не повинен писати сором'язливі перевірки на кшталт <code>if (bird is not Ostrich) bird.Fly();</code>. Це головний маркер порушення LSP. Якщо базовий клас оголосив метод, будь-який нащадок повинен виконувати його безпечно та без сюрпризів.</p>
+        </div>
 
         <h4>4. Ознаки порушення (Code Smells)</h4>
         <ul>
             <li>Перевизначені методи підкласів кидають <code>NotImplementedException</code> або <code>NotSupportedException</code>.</li>
-            <li>Клієнтський код містить перевірки типу перед викликом методу: <code>if (bird is not Ostrich) bird.Fly();</code>.</li>
-            <li>Підклас послаблює вихідні умови (повертає несподіваний <code>null</code>) або посилює вхідні умови.</li>
+            <li>Клієнтський код рясніє перевірками типів перед викликом: <code>if (obj is SubClass) ...</code>.</li>
+            <li>Підклас повертає <code>null</code> там, де базовий клас гарантовано повертав дійсний об'єкт.</li>
         </ul>
     </article>
 
@@ -489,7 +440,7 @@ public class Ostrich : Bird
         <div class="pattern-header">
             <div>
                 <h3 class="pattern-title">I: Interface Segregation Principle (ISP)</h3>
-                <span class="badge badge-isp">Принцип розділення інтерфейсу</span>
+                <span class="badge" style="background: #f3e8ff; color: #6b21a8;">Розділення інтерфейсу</span>
             </div>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
@@ -497,37 +448,39 @@ public class Ostrich : Bird
         <h4>1. Суть принципу</h4>
         <blockquote>
             <b>«Клієнти не повинні залежати від методів, якими вони не користуються».</b><br/>
-            Краще створити багато вузькоспеціалізованих інтерфейсів, ніж один універсальний «товстий» (Fat Interface).
+            Краще створити багато невеликих вузькоспеціалізованих інтерфейсів, ніж один універсальний «товстий» монстр-інтерфейс (Fat Interface).
         </blockquote>
 
         <h4>2. Порушення принципу (Антипатерн)</h4>
-        <div class="alert-bad">
-            <b>Проблема:</b> Інтерфейс <code>IMachine</code> об'єднує функції друку, сканування та факсу. Простий домашній принтер змушений реалізовувати порожні методи або кидати помилки для методів сканування та факсу.
+        <div class="note-box" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+            <b>Проблема:</b> Інтерфейс <code>IMachine</code> об'єднує друк, сканування та факс. Дешевий домашній принтер змушений реалізовувати непотрібні методи сканера й факсу пустишками або викидати винятки.
         </div>
 
-        <pre><code>// ПОГАНО: "Товстий" інтерфейс змушує реалізовувати непотрібне
-public interface IMachine
+        <pre><code>// BAD: Fat interface forces implementors to carry dead weight
+public interface IBadMachine
 {
     void Print(string text);
     void Scan();
     void Fax();
 }
 
-public class BasicPrinter : IMachine
+public class BadBasicPrinter : IBadMachine
 {
-    public void Print(string text) =&gt; Console.WriteLine($"Друк: {text}");
+    public void Print(string text) => Console.WriteLine($"Printing: {text}");
 
-    public void Scan() =&gt; throw new NotImplementedException("Не підтримується!");
-    public void Fax()  =&gt; throw new NotImplementedException("Не підтримується!");
-}</code></pre>
+    public void Scan() => throw new NotImplementedException("Scanner not available!");
+    public void Fax() => throw new NotImplementedException("Fax not available!");
+}
+</code></pre>
 
         <h4>3. Правильне рішення на C#</h4>
-        <div class="alert-good">
-            <b>Рішення:</b> Дробимо інтерфейс на незалежні контракти (ролі). Простий принтер бере лише друк, а потужний офісний МФУ реалізує всі необхідні інтерфейси одночасно.
+        <div class="note-box" style="background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
+            <b>Рішення:</b> Дробимо один масивний інтерфейс на три незалежні ролі: <code>IPrinter</code>, <code>IScanner</code>, <code>IFax</code>.
         </div>
 
-        <pre><code>// ДОБРЕ: Маленькі спеціалізовані інтерфейси
+        <pre><code>using System;
 
+// 1. Segregated, narrow role interfaces
 public interface IPrinter
 {
     void Print(string text);
@@ -543,24 +496,65 @@ public interface IFax
     void Fax();
 }
 
-// 1. Простий принтер залежить лише від того, що реально вміє робити
+// 2. Simple printer implements ONLY what it can do
 public class BasicPrinter : IPrinter
 {
-    public void Print(string text) =&gt; Console.WriteLine($"Друк: {text}");
+    public void Print(string text) => Console.WriteLine($"BasicPrinter: Printing {text}");
 }
 
-// 2. Багатофункціональний пристрій (МФУ) комбінує потрібні інтерфейси
+// 3. Multi-function center (MFP) combines all three interfaces
 public class MultiFunctionCenter : IPrinter, IScanner, IFax
 {
-    public void Print(string text) =&gt; Console.WriteLine($"МФУ Друк: {text}");
-    public void Scan()             =&gt; Console.WriteLine("МФУ Сканування...");
-    public void Fax()              =&gt; Console.WriteLine("МФУ Відправка факсу...");
-}</code></pre>
+    public void Print(string text) => Console.WriteLine($"MFP: Printing {text}");
+
+    public void Scan() => Console.WriteLine("MFP: Scanning document to cloud.");
+
+    public void Fax() => Console.WriteLine("MFP: Sending fax over phone line.");
+}
+
+class Program
+{
+    static void Main()
+    {
+        IPrinter simplePrinter = new BasicPrinter();
+        simplePrinter.Print("document.pdf");
+
+        MultiFunctionCenter mfp = new MultiFunctionCenter();
+        mfp.Print("contract.pdf");
+        mfp.Scan();
+    }
+}
+
+/* Результат виконання: **************************************/
+
+BasicPrinter: Printing document.pdf
+MFP: Printing contract.pdf
+MFP: Scanning document to cloud.
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ ЖИВИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як влаштований і працює цей код</h5>
+            
+            <p>Уяви <b>ресторанне меню</b>. Якщо ти зайшов у кав'ярню випити одну чашку еспресо, офіціант не повинен змушувати тебе підписувати контракт на комплексний банкет із 7 страв (салат, перше, стейк, десерт, пляшка вина). Ти замовляєш лише те, що споживаєш. Інтерфейси в коді повинні давати таку саму свободу: клас підписується лише на ті методи, якими реально володіє.</p>
+
+            <h6>1. Як влаштований код</h6>
+            <div class="diagram-box">IPrinter        IScanner        IFax
+   ▲               ▲             ▲
+   │               └──────┬──────┘
+BasicPrinter        MultiFunctionCenter
+(бере тільки друк)    (комбінує всі три інтерфейси)</div>
+
+            <h6>2. Чому це краще за універсальний інтерфейс?</h6>
+            <p>Якщо завтра в інтерфейс <code>IScanner</code> знадобиться додати метод <code>ScanToPdf()</code>, клас простого принтера <code>BasicPrinter</code> навіть не відчує цих змін і не потребуватиме перекомпіляції, адже він залежить лише від <code>IPrinter</code>.</p>
+        </div>
 
         <h4>4. Ознаки порушення (Code Smells)</h4>
         <ul>
-            <li>Інтерфейси містять десятки різноманітних методів на всі випадки життя.</li>
-            <li>Класи реалізують методи інтерфейсу порожніми блоками <code>{ /* нічого */ }</code> або кидають <code>NotImplementedException</code>.</li>
+            <li>Інтерфейси з десятками методів на всі випадки життя («товсті» контракти).</li>
+            <li>Класи реалізують методи інтерфейсу порожніми дужками <code>{ /* empty */ }</code> або кидають <code>NotImplementedException</code>.</li>
         </ul>
     </article>
 
@@ -571,7 +565,7 @@ public class MultiFunctionCenter : IPrinter, IScanner, IFax
         <div class="pattern-header">
             <div>
                 <h3 class="pattern-title">D: Dependency Inversion Principle (DIP)</h3>
-                <span class="badge badge-dip">Принцип інверсії залежностей</span>
+                <span class="badge" style="background: #dcfce7; color: #166534;">Інверсія залежностей</span>
             </div>
             <a href="#toc" class="top-link">↑ До змісту</a>
         </div>
@@ -584,42 +578,36 @@ public class MultiFunctionCenter : IPrinter, IScanner, IFax
         </blockquote>
 
         <h4>2. Порушення принципу (Антипатерн)</h4>
-        <div class="alert-bad">
-            <b>Проблема:</b> Високорівневий клас бізнес-логіки <code>OrderService</code> напряму створює через <code>new</code> екземпляри низькорівневих класів <code>SqlDatabase</code> та <code>SmtpEmailSender</code>. Тепер підмінити базу даних або протестувати сервіс через mock-об'єкти без реальної бази неможливо.
+        <div class="note-box" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+            <b>Проблема:</b> Високорівневий клас бізнес-логіки <code>OrderService</code> напряму створює через оператор <code>new</code> низькорівневі інфраструктурні класи <code>SqlDatabase</code> та <code>SmtpEmailSender</code>. Тепер підмінити базу даних або протестувати сервіс через mock-об'єкти без реальної бази неможливо.
         </div>
 
-        <pre><code>// ПОГАНО: Пряма жорстка залежність від конкретних реалізацій
-public class SqlDatabase
+        <pre><code>// BAD: Direct hardcoded dependency via 'new'
+public class BadSqlDatabase
 {
-    public void Save(string data) =&gt; Console.WriteLine("Запис у SQL...");
+    public void Save(string data) => Console.WriteLine("Writing to SQL...");
 }
 
-public class SmtpEmailSender
+public class BadOrderService
 {
-    public void Send(string to, string body) =&gt; Console.WriteLine("Відправка по SMTP...");
-}
-
-public class OrderService
-{
-    // Жорстко зашиті конкретні залежності через 'new'
-    private readonly SqlDatabase _db = new SqlDatabase();
-    private readonly SmtpEmailSender _mail = new SmtpEmailSender();
+    // Hardcoded low-level dependency: impossible to unit test or swap!
+    private readonly BadSqlDatabase _db = new BadSqlDatabase();
 
     public void ProcessOrder(string orderData)
     {
         _db.Save(orderData);
-        _mail.Send("client@test.com", "Замовлення оформлено");
     }
-}</code></pre>
+}
+</code></pre>
 
         <h4>3. Правильне рішення на C#</h4>
-        <div class="alert-good">
+        <div class="note-box" style="background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
             <b>Рішення:</b> Вводимо інтерфейси-абстракції <code>IOrderRepository</code> та <code>INotificationService</code>. Сервіс приймає залежності через конструктор (Constructor Injection).
         </div>
 
-        <pre><code>// ДОБРЕ: Обидва рівні залежать від спільних абстракцій
+        <pre><code>using System;
 
-// 1. Абстракції
+// 1. Abstractions (contracts)
 public interface IOrderRepository
 {
     void Save(string data);
@@ -630,55 +618,83 @@ public interface INotificationService
     void Send(string to, string message);
 }
 
-// 2. Конкретні реалізації (деталі)
+// 2. Low-level details implementing abstractions
 public class SqlOrderRepository : IOrderRepository
 {
-    public void Save(string data) =&gt; Console.WriteLine($"[SQL] Збережено: {data}");
+    public void Save(string data) => Console.WriteLine($"[SQL] Order saved: {data}");
 }
 
 public class EmailNotificationService : INotificationService
 {
-    public void Send(string to, string message) =&gt; Console.WriteLine($"[Email] Надіслано до {to}: {message}");
+    public void Send(string to, string message) => Console.WriteLine($"[Email] Sent to {to}: {message}");
 }
 
-// 3. Високорівневий модуль залежить ЛИШЕ від абстракцій
+// 3. High-level business service depends ONLY on abstractions
 public class OrderService
 {
     private readonly IOrderRepository _repository;
-    private readonly INotificationService _notificationService;
+    private readonly INotificationService _notifier;
 
-    // Впровадження залежностей через конструктор (Dependency Injection)
-    public OrderService(IOrderRepository repository, INotificationService notificationService)
+    // Dependency Injection via constructor
+    public OrderService(IOrderRepository repository, INotificationService notifier)
     {
         _repository = repository;
-        _notificationService = notificationService;
+        _notifier = notifier;
     }
 
     public void ProcessOrder(string orderData, string customerEmail)
     {
         _repository.Save(orderData);
-        _notificationService.Send(customerEmail, "Ваше замовлення успішно оброблено!");
+        _notifier.Send(customerEmail, "Your order was successfully processed!");
     }
 }
 
-// Використання (або конфігурація у Program.cs через builder.Services):
 class Program
 {
     static void Main()
     {
+        // Composition root: wire up dependencies (or use builder.Services in ASP.NET Core)
         IOrderRepository repo = new SqlOrderRepository();
         INotificationService mailer = new EmailNotificationService();
 
         var service = new OrderService(repo, mailer);
-        service.ProcessOrder("Замовлення #1042", "alex@example.com");
+        service.ProcessOrder("Order #1042", "alex@example.com");
     }
-}</code></pre>
+}
+
+/* Результат виконання: **************************************/
+
+[SQL] Order saved: Order #1042
+[Email] Sent to alex@example.com: Your order was successfully processed!
+
+/*************************************************************/
+</code></pre>
+
+        <!-- ДЕТАЛЬНИЙ ЖИВИЙ РОЗБІР КОДУ -->
+        <div class="code-analysis">
+            <h5>🔍 Детальний розбір: як влаштований і працює цей код</h5>
+            
+            <p>Уяви <b>настільну лампу та електричну розетку на стіні</b>. Твоя лампа не припаює свої мідні дроти напряму до турбіни Дніпровської ГЕС. І лампа, і гідроелектростанція погоджуються на <b>спільну абстракцію — стандартну настінну розетку 220V</b>. Завдяки розетці ти можеш вимкнути лампу й підключити зарядку для телефону або тостер. DIP робить класи в програмі такими самими взаємозамінними приладами.</p>
+
+            <h6>1. Як влаштований код</h6>
+            <div class="diagram-box">OrderService (Високий рівень: чиста бізнес-логіка)
+      │ залежить ЛИШЕ від інтерфейсів
+      ▼
+IOrderRepository & INotificationService (Абстракції-розетки)
+      ▲
+      │ реалізують деталі
+SqlOrderRepository & EmailNotificationService (Низький рівень: конкретні драйвери)</div>
+
+            <h6>2. Чому це краще за створення через <code>new</code>?</h6>
+            <p>Коли сервіс викликає <code>new SqlDatabase()</code> всередині себе, його неможливо протестувати ізольовано. Щоб запустити найпростіший тест, доведеться піднімати реальний сервер SQL Server у Docker.
+            <br>З інверсією залежностей у unit-тесті замість реальної бази передається легкий фейк: <code>new Mock&lt;IOrderRepository&gt;()</code>, і 500 тестів проходять за 0.2 секунди в оперативній пам'яті.</p>
+        </div>
 
         <h4>4. Ознаки порушення (Code Smells)</h4>
         <ul>
-            <li>Використання оператора <code>new</code> для створення екземплярів сервісів доступу до даних, пошти чи сторонніх API прямо всередині бізнес-класів.</li>
-            <li>Неможливість написати швидкий модульний тест (unit-test) без підключення реальної бази даних або мережі.</li>
-            <li>Використання глобального стану через класичні одинаки (Singleton).</li>
+            <li>Використання оператора <code>new</code> для створення екземплярів репозиторіїв, HTTP-клієнтів або сервісів логування всередині бізнес-класів.</li>
+            <li>Неможливість написати модульний тест без підключення до живої бази даних чи інтернету.</li>
+            <li>Використання глобального статичного стану замість впровадження залежностей (Dependency Injection).</li>
         </ul>
     </article>
 

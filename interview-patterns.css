@@ -1,0 +1,393 @@
+/* ========================================================
+   Root Variables & Color Scheme
+   ======================================================== */
+:root {
+    --bg-body: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+
+    /* Code block colors */
+    --code-bg: #1e3a8a;
+    --code-text: #fde047;
+
+    /* Pattern category badges */
+    --badge-creational-bg: #e0f2fe;
+    --badge-creational-text: #0369a1;
+    --badge-structural-bg: #fef3c7;
+    --badge-structural-text: #92400e;
+    --badge-behavioral-bg: #dcfce7;
+    --badge-behavioral-text: #15803d;
+
+    /* Pedagogical code analysis box */
+    --analysis-bg: #f8fafc;
+    --analysis-border: #0284c7;
+}
+
+/* ========================================================
+   Base & Typography
+   ======================================================== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.65;
+    color: var(--text-main);
+    background-color: var(--bg-body);
+    margin: 0;
+    padding: 2rem 1rem;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+h1 {
+    font-size: 2.25rem;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+h4 {
+    font-size: 1.15rem;
+    color: #334155;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+blockquote {
+    background-color: #f1f5f9;
+    border-left: 4px solid var(--primary);
+    margin: 1rem 0;
+    padding: 0.85rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+ul, ol {
+    padding-left: 1.4rem;
+}
+
+li {
+    margin-bottom: 0.4rem;
+}
+
+/* ========================================================
+   Site Navigation Bar
+   ======================================================== */
+.site-nav {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.site-nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.site-nav a:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.site-nav a.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+/* ========================================================
+   Category Cards (Index page)
+   ======================================================== */
+.category-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.category-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.category-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.category-card p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+.category-btn {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+/* ========================================================
+   Table of Contents
+   ======================================================== */
+.toc-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.toc-card h2 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.toc-column h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+}
+
+.toc-grid .toc-list {
+    margin: 0;
+}
+
+.toc-list li {
+    margin-bottom: 0.4rem;
+}
+
+.toc-list a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.toc-list a:hover {
+    text-decoration: underline;
+}
+
+/* ========================================================
+   Pattern Card & Header
+   ======================================================== */
+.pattern-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.pattern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pattern-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #0f172a;
+}
+
+.top-link {
+    font-size: 0.85rem;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.badge-creational {
+    background: var(--badge-creational-bg);
+    color: var(--badge-creational-text);
+}
+
+.badge-structural {
+    background: var(--badge-structural-bg);
+    color: var(--badge-structural-text);
+}
+
+.badge-behavioral {
+    background: var(--badge-behavioral-bg);
+    color: var(--badge-behavioral-text);
+}
+
+/* ========================================================
+   Code Blocks
+   ======================================================== */
+pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 1rem 0;
+}
+
+code {
+    font-family: inherit;
+}
+
+p > code, li > code {
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.875em;
+}
+
+/* ========================================================
+   Pedagogical Code Analysis Helpers
+   ======================================================== */
+.code-analysis {
+    background: var(--analysis-bg);
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid var(--analysis-border);
+    border-radius: 8px;
+    padding: 1.75rem;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.code-analysis h5 {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    font-size: 1.2rem;
+    color: #0369a1;
+}
+
+.code-analysis h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.6rem;
+    font-size: 1.05rem;
+    color: #0f172a;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.3rem;
+}
+
+.diagram-box {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    white-space: pre;
+    overflow-x: auto;
+    margin: 0.75rem 0 1.25rem 0;
+    line-height: 1.4;
+}
+
+.step-item {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.step-item b {
+    color: #0369a1;
+}
+
+.note-box {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+}
+
+/* ========================================================
+   Responsive Media Queries
+   ======================================================== */
+@media (max-width: 640px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+
+    .pattern-card {
+        padding: 1.25rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+}
