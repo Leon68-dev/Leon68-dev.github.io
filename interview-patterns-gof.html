@@ -1532,10 +1532,16 @@ public class OrderFacade
 
     public bool PlaceOrder(string productId, decimal amount, string email, string address)
     {
-        if (!_inventory.CheckStock(productId)) return false;
-        if (!_payment.Charge(email, amount)) return false;
+        if (!_inventory.CheckStock(productId)) 
+            return false;
+        
+            if (!_payment.Charge(email, amount)) 
+            return false;
+        
         _logistics.CreateShippingOrder(productId, address);
+        
         Console.WriteLine("Замовлення успішно виконано!");
+        
         return true;
     }
 }
