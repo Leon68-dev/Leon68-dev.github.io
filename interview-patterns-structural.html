@@ -822,9 +822,14 @@ OrderFacade (Фасад)
             <p>Фасад тримає екземпляри всіх трьох сервісів у приватних полях. Поглянь на метод <code>PlaceOrder</code>:</p>
             <pre style="margin: 0.5rem 0;"><code>public bool PlaceOrder(string productId, decimal amount, string email, string address)
 {
-    if (!_inventory.CheckStock(productId)) return false;
-    if (!_payment.Charge(email, amount)) return false;
+    if (!_inventory.CheckStock(productId)) 
+        return false;
+    
+    if (!_payment.Charge(email, amount)) return 
+        false;
+    
     _logistics.CreateShippingOrder(productId, address);
+
     Console.WriteLine("Order placed successfully!");
     return true;
 }</code></pre>
