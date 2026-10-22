@@ -260,9 +260,7 @@ using System.Collections.Generic;
 public class BankAccount
 {
     public decimal Balance { get; private set; }
-
     public void Deposit(decimal amt) => Balance += amt;
-
     public void Withdraw(decimal amt) => Balance -= amt;
 }
 
@@ -270,7 +268,6 @@ public class BankAccount
 public interface ICommand
 {
     void Execute();
-
     void Undo();
 }
 
@@ -287,7 +284,6 @@ public class DepositCommand : ICommand
     }
 
     public void Execute() => _acc.Deposit(_amt);
-
     public void Undo() => _acc.Withdraw(_amt);
 }
 
