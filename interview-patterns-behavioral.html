@@ -187,8 +187,10 @@ EngineerHandler (Рівень 2: Складні технічні баги)
             <p>А ось як влаштований метод переходу:</p>
             <pre style="margin: 0.5rem 0;"><code>public virtual void Handle(SupportTicket ticket)
 {
-    if (_next != null) _next.Handle(ticket);
-    else Console.WriteLine($"[!] Unable to handle: {ticket.Description}");
+    if (_next != null) 
+        _next.Handle(ticket);
+    else 
+        Console.WriteLine($"[!] Unable to handle: {ticket.Description}");
 }</code></pre>
             <p>Якщо обробник не зміг впоратися, він викликає <code>base.Handle(ticket)</code>, який автоматично «штовхає» тікет наступній ланці.</p>
 
